@@ -109,10 +109,36 @@ END $fn$;
 CREATE OR REPLACE FUNCTION exp.publish_decision(p_id text, p_ver int, p_attest jsonb)
   RETURNS text LANGUAGE plpgsql SECURITY DEFINER
   SET search_path = pg_catalog, exp, public, pg_temp AS $fn$
-DECLARE r record; a jsonb; acked int; blk int; reason text;
+DECLARE r record; a jsonb; acked int; blk int; reason text; bad record;
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM exp.adjudicators WHERE role=session_user) THEN
     RAISE EXCEPTION 'only an adjudicator may publish decisions';
+  END IF;
+  -- The artifact being published must exist.
+  IF NOT EXISTS (SELECT 1 FROM exp.artifacts WHERE artifact_id=p_id AND version=p_ver) THEN
+    reason := format('unknown artifact %s/%s', p_id, p_ver);
+    INSERT INTO exp.approvals(artifact_id,version,reviewer,decision,reason)
+      VALUES (p_id,p_ver,session_user,'rejected',reason);
+    RETURN 'rejected: '||reason;
+  END IF;
+  -- Walk the TRANSITIVE dependency closure, including the artifact itself, and
+  -- reject if any node carries a blocking (withdrawn/adjudicated) invalidation.
+  -- A direct-only check misses a withdrawn grandparent and a withdrawn self.
+  WITH RECURSIVE clo(id,ver) AS (
+    SELECT p_id, p_ver
+    UNION
+    SELECT pr.source_id, pr.source_ver
+      FROM exp.provenance pr JOIN clo ON pr.derived_id=clo.id AND pr.derived_ver=clo.ver
+  )
+  SELECT c.id, c.ver, MAX(i.epoch) AS epoch INTO bad
+    FROM clo c JOIN exp.invalidations i
+      ON i.artifact_id=c.id AND i.version=c.ver AND i.kind IN ('withdrawn','adjudicated')
+    GROUP BY c.id, c.ver LIMIT 1;
+  IF bad.id IS NOT NULL THEN
+    reason := format('closure member %s/%s invalidated (epoch %s)', bad.id, bad.ver, bad.epoch);
+    INSERT INTO exp.approvals(artifact_id,version,reviewer,decision,reason)
+      VALUES (p_id,p_ver,session_user,'rejected',reason);
+    RETURN 'rejected: '||reason;
   END IF;
   FOR r IN SELECT source_id, source_ver FROM exp.provenance WHERE derived_id=p_id AND derived_ver=p_ver LOOP
     SELECT elem INTO a FROM jsonb_array_elements(p_attest) elem
@@ -144,6 +170,32 @@ BEGIN
     VALUES (p_id,p_ver,session_user,'approved',NULL);
   RETURN 'approved';
 END $fn$;
+
+-- Provenance authorization: an edge (derived -> source) may be recorded only by
+-- the derived artifact's own author or by an adjudicator (the trusted runtime).
+-- Without this, any agent can poison another artifact's lineage, forge edges,
+-- or amplify quarantine. source and derived must both already exist (DAG).
+CREATE OR REPLACE FUNCTION exp.authz_provenance() RETURNS trigger
+  LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, exp, public, pg_temp AS $fn$
+DECLARE v_author text;
+BEGIN
+  SELECT author_role INTO v_author FROM exp.artifacts WHERE artifact_id=NEW.derived_id AND version=NEW.derived_ver;
+  IF v_author IS NULL THEN RAISE EXCEPTION 'derived artifact %/% does not exist', NEW.derived_id, NEW.derived_ver; END IF;
+  IF NOT EXISTS (SELECT 1 FROM exp.artifacts WHERE artifact_id=NEW.source_id AND version=NEW.source_ver) THEN
+    RAISE EXCEPTION 'source artifact %/% does not exist', NEW.source_id, NEW.source_ver;
+  END IF;
+  IF NEW.derived_id=NEW.source_id AND NEW.derived_ver=NEW.source_ver THEN
+    RAISE EXCEPTION 'self-dependency not allowed';
+  END IF;
+  IF session_user <> v_author AND NOT EXISTS (SELECT 1 FROM exp.adjudicators WHERE role=session_user) THEN
+    RAISE EXCEPTION 'only the derived artifact author or an adjudicator may record its provenance'
+      USING ERRCODE = 'insufficient_privilege';
+  END IF;
+  RETURN NEW;
+END $fn$;
+DROP TRIGGER IF EXISTS trg_authz_provenance ON exp.provenance;
+CREATE TRIGGER trg_authz_provenance BEFORE INSERT ON exp.provenance
+  FOR EACH ROW EXECUTE FUNCTION exp.authz_provenance();
 
 -- Grants: agents may create their own artifacts and provenance, may read, may
 -- EXECUTE invalidate (authority checked inside), but may NOT write approvals or
