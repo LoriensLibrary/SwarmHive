@@ -32,6 +32,17 @@ CREATE TABLE IF NOT EXISTS exp.proposals (
   submitted_at timestamptz NOT NULL DEFAULT now(),
   payload     jsonb NOT NULL
 );
+-- Bind proposer to the authenticated login; a caller-supplied proposer is a spoof.
+CREATE OR REPLACE FUNCTION exp.bind_proposer() RETURNS trigger
+  LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, exp, public, pg_temp AS $fn$
+BEGIN
+  NEW.proposer := session_user;
+  NEW.submitted_at := now();
+  RETURN NEW;
+END $fn$;
+DROP TRIGGER IF EXISTS trg_bind_proposer ON exp.proposals;
+CREATE TRIGGER trg_bind_proposer BEFORE INSERT ON exp.proposals
+  FOR EACH ROW EXECUTE FUNCTION exp.bind_proposer();
 
 -- Provenance edges: which source (id,version) was DELIVERED as input to a
 -- derived (id,version). Recorded by the runtime, not self-asserted as truth.
@@ -263,7 +274,9 @@ BEGIN
   IF EXISTS (SELECT 1 FROM exp.artifacts WHERE artifact_id=p_id AND version=p_ver) THEN
     RAISE EXCEPTION 'immutable artifact %/% already exists', p_id, p_ver USING ERRCODE = 'unique_violation';
   END IF;
-  IF jsonb_typeof(p_deps) <> 'array' THEN RAISE EXCEPTION 'deps must be a json array'; END IF;
+  IF p_deps IS NULL OR jsonb_typeof(p_deps) IS DISTINCT FROM 'array' THEN
+    RAISE EXCEPTION 'deps must be a json array' USING ERRCODE = '22023';  -- invalid_parameter_value
+  END IF;
   n := jsonb_array_length(p_deps);
   IF n > max_deps THEN RAISE EXCEPTION 'dependency limit % exceeded', max_deps; END IF;
   v_kind := CASE WHEN n = 0 THEN 'root' ELSE 'derivative' END;
@@ -292,5 +305,13 @@ REVOKE INSERT, UPDATE, DELETE ON exp.artifacts, exp.provenance FROM bot_research
 GRANT SELECT ON exp.artifacts, exp.provenance, exp.invalidations, exp.approvals, exp.adjudicators TO bot_researcher, bot_writer, bot_reviewer, bot_intruder;
 GRANT INSERT ON exp.proposals TO bot_researcher, bot_writer, bot_reviewer, bot_intruder;
 GRANT USAGE, SELECT ON SEQUENCE exp.proposals_id_seq TO bot_researcher, bot_writer, bot_reviewer, bot_intruder;
+-- Function ACL: PostgreSQL grants EXECUTE to PUBLIC by default, which would let
+-- a bot call internal helpers directly (e.g. take the fence lock, or call seal).
+-- Revoke PUBLIC from every exp function, then grant back ONLY the two intended
+-- agent entry points. The SECURITY DEFINER functions call the internal helpers
+-- as the owner, so revoking PUBLIC does not break their internal use.
+REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA exp FROM PUBLIC;
+REVOKE EXECUTE ON FUNCTION exp._enter_fence(), exp.seal_artifact(text,text,int,text,jsonb)
+  FROM bot_researcher, bot_writer, bot_reviewer, bot_intruder;
 GRANT EXECUTE ON FUNCTION exp.invalidate(text,int,text) TO bot_researcher, bot_writer, bot_reviewer, bot_intruder;
 GRANT EXECUTE ON FUNCTION exp.publish_decision(text,int,jsonb) TO bot_researcher, bot_writer, bot_reviewer, bot_intruder;
