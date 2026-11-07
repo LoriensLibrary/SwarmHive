@@ -1,0 +1,23 @@
+{
+ "request": {
+  "max_tokens": 1200,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 9, \\\"summary\\\": \\\"inventory figure per source\\\"}\",\"id\":\"p3c8d7b_V0_2bb95b\",\"ver\":1},{\"body\":\"{\\\"units\\\": 9, \\\"note\\\": \\\"observed\\\"}\",\"id\":\"p3c8d7b_V0_ef5a0a\",\"ver\":1}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"author\":\"bot_researcher\",\"id\":\"p3c8d7b_V0_ef5a0a\",\"inputs\":[],\"kind\":\"root\",\"status\":\"valid\",\"ver\":1},{\"author\":\"bot_writer\",\"id\":\"p3c8d7b_V0_2bb95b\",\"inputs\":[{\"id\":\"p3c8d7b_V0_ef5a0a\",\"ver\":1}],\"kind\":\"derivative\",\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: p3c8d7b_V0_2bb95b/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "claude-sonnet-5-5",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 5,
+  "model": "claude-sonnet-5-5",
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cost_usd": 0.0,
+  "elapsed_s": 0.0,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"p3c8d7b_V0_2bb95b\", \"result\": {\"units\": 9}, \"evidence\": [{\"id\": \"p3c8d7b_V0_2bb95b\", \"ver\": 1}]}"
+ }
+}

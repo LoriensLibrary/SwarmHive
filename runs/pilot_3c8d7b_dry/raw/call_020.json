@@ -1,0 +1,23 @@
+{
+ "request": {
+  "max_tokens": 1200,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 14, \\\"summary\\\": \\\"inventory figure per source\\\"}\",\"id\":\"p3c8d7b_V5_541240\",\"ver\":1},{\"body\":\"{\\\"units\\\": 11, \\\"summary\\\": \\\"inventory figure per source\\\"}\",\"id\":\"p3c8d7b_V5_034c01\",\"ver\":1},{\"body\":\"{\\\"units\\\": 11, \\\"note\\\": \\\"observed\\\"}\",\"id\":\"p3c8d7b_V5_0688ac\",\"ver\":2},{\"body\":\"{\\\"units\\\": 14, \\\"note\\\": \\\"observed\\\"}\",\"id\":\"p3c8d7b_V5_0688ac\",\"ver\":1},{\"body\":\"{\\\"units\\\": 14, \\\"summary\\\": \\\"inventory figure per source\\\"}\",\"id\":\"p3c8d7b_V5_f02bd1\",\"ver\":1}],\"corrections\":[{\"id\":\"p3c8d7b_V5_0688ac\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"p3c8d7b_V5_0688ac\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"author\":\"bot_researcher\",\"id\":\"p3c8d7b_V5_0688ac\",\"inputs\":[],\"kind\":\"root\",\"status\":\"invalidated:adjudicated\",\"ver\":1},{\"author\":\"bot_writer\",\"id\":\"p3c8d7b_V5_f02bd1\",\"inputs\":[{\"id\":\"p3c8d7b_V5_0688ac\",\"ver\":1}],\"kind\":\"derivative\",\"status\":\"valid\",\"ver\":1},{\"author\":\"bot_researcher\",\"id\":\"p3c8d7b_V5_0688ac\",\"inputs\":[],\"kind\":\"root\",\"status\":\"valid\",\"ver\":2},{\"author\":\"bot_writer\",\"id\":\"p3c8d7b_V5_034c01\",\"inputs\":[{\"id\":\"p3c8d7b_V5_0688ac\",\"ver\":2}],\"kind\":\"derivative\",\"status\":\"valid\",\"ver\":1},{\"author\":\"bot_writer\",\"id\":\"p3c8d7b_V5_541240\",\"inputs\":[{\"id\":\"p3c8d7b_V5_0688ac\",\"ver\":1}],\"kind\":\"derivative\",\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: p3c8d7b_V5_541240/1, p3c8d7b_V5_034c01/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "claude-sonnet-5-5",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 20,
+  "model": "claude-sonnet-5-5",
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cost_usd": 0.0,
+  "elapsed_s": 0.0,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"p3c8d7b_V5_034c01\", \"result\": {\"units\": 11}, \"evidence\": [{\"id\": \"p3c8d7b_V5_034c01\", \"ver\": 1}]}"
+ }
+}
