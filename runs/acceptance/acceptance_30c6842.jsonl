@@ -1,0 +1,12 @@
+{"fixture_prefix": "lorien_0924d9989bd14eaf", "live_publish_function_md5": "4126bef0234313c174adff2ee3e19ea4"}
+{"case": "missing artifact denied", "passed": true, "gate": {"value": "rejected: unknown artifact lorien_0924d9989bd14eaf_missing/1"}, "approvals": 0}
+{"case": "withdrawn target denied", "passed": true, "gate": {"value": "rejected: closure member lorien_0924d9989bd14eaf_target_withdrawn_draft/1 invalidated (epoch 1)"}, "approvals": 0}
+{"case": "withdrawn transitive source denied", "passed": true, "gate": {"value": "rejected: closure member lorien_0924d9989bd14eaf_transitive_source/1 invalidated (epoch 1)"}, "approvals": 0}
+{"case": "intruder cannot poison foreign edge", "passed": true, "insert": {"sqlstate": "42501", "message": "only the derived artifact author or an adjudicator may record its provenance"}, "inserted_edges": 0}
+{"case": "omitting recorded lineage cannot create an eligible root", "passed": false, "submission": {"value": "lorien_0924d9989bd14eaf_no_lineage"}, "gate": {"value": "approved"}, "approvals": 1}
+{"case": "D7 corrected versions recover and prior approval remains recorded", "passed": true, "first_decision": "approved", "corrected_decision": "approved"}
+{"case": "D6 approval holds withdrawal until commit", "passed": true, "order": "waiting_for_first_transaction", "withdrawal": {"value": 1}, "approvals": 1}
+{"case": "D6 withdrawal holds approval; post-lock read rejects", "passed": true, "order": "waiting_for_first_transaction", "gate": {"value": "rejected: closure member lorien_0924d9989bd14eaf_withdrawal_first_source/1 invalidated (epoch 1)"}, "approvals": 0}
+{"case": "D6 old repeatable-read snapshot cannot publish after withdrawal", "passed": true, "gate": {"sqlstate": "0A000", "message": "serialization fence requires READ COMMITTED isolation"}, "approvals": 0}
+{"passed": 8, "total": 9, "fixture_prefix": "lorien_0924d9989bd14eaf"}
+EXIT_CODE 1
