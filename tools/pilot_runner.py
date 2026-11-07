@@ -46,7 +46,7 @@ WRITER_SYS = "You are a report writer. Read the delivered artifacts and write th
 REVIEWER_SYS = ("You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. "
                 "Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", "
                 "\"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. "
-                "evidence = ONLY the artifacts your approved result rests on (its support). "
+                "evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. "
                 "consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. "
                 "Approve only a draft you are confident is current and correct.")
 
