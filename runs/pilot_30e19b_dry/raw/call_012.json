@@ -1,0 +1,23 @@
+{
+ "request": {
+  "max_tokens": 300,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 12, \\\"summary\\\": \\\"inventory figure per source\\\"}\",\"id\":\"p30e19b_V3_report\",\"ver\":1},{\"body\":\"{\\\"units\\\": 9, \\\"summary\\\": \\\"inventory figure per source\\\"}\",\"id\":\"p30e19b_V3_draft2\",\"ver\":1},{\"body\":\"{\\\"units\\\": 9, \\\"note\\\": \\\"observed\\\"}\",\"id\":\"p30e19b_V3_source\",\"ver\":2}],\"corrections\":[{\"id\":\"p30e19b_V3_source\",\"reason\":\"count error\",\"step\":4,\"superseded_by\":{\"id\":\"p30e19b_V3_source\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"author\":\"bot_researcher\",\"id\":\"p30e19b_V3_source\",\"inputs\":[],\"kind\":\"root\",\"status\":\"invalidated:adjudicated\",\"ver\":1},{\"author\":\"bot_writer\",\"id\":\"p30e19b_V3_draft\",\"inputs\":[{\"id\":\"p30e19b_V3_source\",\"ver\":1}],\"kind\":\"derivative\",\"status\":\"valid\",\"ver\":1},{\"author\":\"bot_writer\",\"id\":\"p30e19b_V3_report\",\"inputs\":[{\"id\":\"p30e19b_V3_draft\",\"ver\":1}],\"kind\":\"derivative\",\"status\":\"valid\",\"ver\":1},{\"author\":\"bot_researcher\",\"id\":\"p30e19b_V3_source\",\"inputs\":[],\"kind\":\"root\",\"status\":\"valid\",\"ver\":2},{\"author\":\"bot_writer\",\"id\":\"p30e19b_V3_draft2\",\"inputs\":[{\"id\":\"p30e19b_V3_source\",\"ver\":2}],\"kind\":\"derivative\",\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: p30e19b_V3_report/1, p30e19b_V3_draft2/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "claude-sonnet-5-5",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. Approve only a draft you are confident is current and correct. Cite only artifacts you actually relied on."
+ },
+ "response": {
+  "call": 12,
+  "model": "claude-sonnet-5-5",
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cost_usd": 0.0,
+  "elapsed_s": 0.0,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"p30e19b_V3_draft2\", \"result\": {\"units\": 9}, \"evidence\": [{\"id\": \"p30e19b_V3_draft2\", \"ver\": 1}]}"
+ }
+}
