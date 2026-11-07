@@ -146,19 +146,28 @@ BEGIN
   RETURN v_epoch;
 END $fn$;
 
--- publish_decision(): the ONLY path to an approval. In one transaction it
--- re-reads dependency state, requires the attestation to cover EVERY real
--- provenance edge (omitted lineage -> reject, never clean by default), and
--- rejects if any covered dependency has a BLOCKING invalidation (withdrawn or
--- adjudicated) with epoch greater than the epoch the reviewer acknowledged.
--- 'contradicted' is advisory and does not block. Check and commit are one
--- transaction, closing the check-then-approve TOCTOU for a retraction that
--- linearizes before this call.
---   p_attest: jsonb array of {"id":..,"ver":..,"acked_epoch":..} per dependency.
+-- publish_decision(): the ONLY path to an approval. What it actually enforces,
+-- stated honestly (not "independent reviewer attestation"):
+--   1. caller is an adjudicator (the trusted runtime);
+--   2. the artifact exists and is sealed (kind set) -- unknown lineage is ineligible;
+--   3. NO member of the transitive dependency closure, the artifact included, carries
+--      a withdrawn/adjudicated invalidation (the authoritative eligibility check);
+--   4. the operator-supplied acknowledgment list covers every DIRECT provenance edge
+--      (an operator acknowledgment that it saw the recorded direct inputs, NOT a
+--      model/reviewer attestation to the full history or to specific revisions).
+-- Check and commit are one fenced transaction, so a retraction that linearizes
+-- before this call is seen (step 3) and one that linearizes after leaves a
+-- reconcilable superseded state. 'contradicted' is advisory and never blocks.
+-- NOTE: acked_epoch was removed. It never changed a decision: step 3 already
+-- rejects any blocking invalidation in the closure, which supersedes any
+-- per-edge epoch comparison. A real independent attestation (binding artifact
+-- version + full dependency snapshot, computed independently of the model) is
+-- future work; it is NOT claimed here.
+--   p_attest: jsonb array of {"id":..,"ver":..} naming each acknowledged direct edge.
 CREATE OR REPLACE FUNCTION exp.publish_decision(p_id text, p_ver int, p_attest jsonb)
   RETURNS text LANGUAGE plpgsql SECURITY DEFINER
   SET search_path = pg_catalog, exp, public, pg_temp AS $fn$
-DECLARE r record; a jsonb; acked int; blk int; reason text; bad record;
+DECLARE r record; reason text; bad record;
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM exp.adjudicators WHERE role=session_user) THEN
     RAISE EXCEPTION 'only an adjudicator may publish decisions';
@@ -198,27 +207,13 @@ BEGIN
       VALUES (p_id,p_ver,session_user,'rejected',reason);
     RETURN 'rejected: '||reason;
   END IF;
+  -- Step 4: the operator-supplied acknowledgment list must name every DIRECT
+  -- recorded input. (Per-edge invalidation checks were removed here: step 3
+  -- already rejects any blocking invalidation anywhere in the closure.)
   FOR r IN SELECT source_id, source_ver FROM exp.provenance WHERE derived_id=p_id AND derived_ver=p_ver LOOP
-    SELECT elem INTO a FROM jsonb_array_elements(p_attest) elem
-      WHERE elem->>'id'=r.source_id AND (elem->>'ver')::int=r.source_ver LIMIT 1;
-    IF a IS NULL THEN
+    IF NOT EXISTS (SELECT 1 FROM jsonb_array_elements(p_attest) elem
+                   WHERE elem->>'id'=r.source_id AND (elem->>'ver')::int=r.source_ver) THEN
       reason := format('unacknowledged dependency %s/%s', r.source_id, r.source_ver);
-      INSERT INTO exp.approvals(artifact_id,version,reviewer,decision,reason)
-        VALUES (p_id,p_ver,session_user,'rejected',reason);
-      RETURN 'rejected: '||reason;
-    END IF;
-    acked := COALESCE((a->>'acked_epoch')::int, 0);
-    -- A withdrawn/adjudicated dependency is DEAD and blocks regardless of what
-    -- the reviewer acknowledged. acked_epoch only classifies whether the gate
-    -- caught it after review (TOCTOU) or the reviewer already knew. Revalidation
-    -- requires a NEW clean source version, not a higher acked_epoch. 'contradicted'
-    -- is advisory and never blocks here (blocking it would be an availability attack).
-    SELECT COALESCE(MAX(epoch),0) INTO blk FROM exp.invalidations
-      WHERE artifact_id=r.source_id AND version=r.source_ver AND kind IN ('withdrawn','adjudicated');
-    IF blk > 0 THEN
-      reason := format('dependency %s/%s invalidated (epoch %s; %s)', r.source_id, r.source_ver, blk,
-                       CASE WHEN blk > acked THEN 'after attestation, TOCTOU caught at gate'
-                            ELSE 'known at review' END);
       INSERT INTO exp.approvals(artifact_id,version,reviewer,decision,reason)
         VALUES (p_id,p_ver,session_user,'rejected',reason);
       RETURN 'rejected: '||reason;
