@@ -57,6 +57,14 @@ CREATE TABLE IF NOT EXISTS exp.approvals (
 -- trusted reviewer/publication gate. Operator-managed.
 CREATE TABLE IF NOT EXISTS exp.adjudicators (role text PRIMARY KEY);
 
+-- Serialization fence. publish_decision() and every blocking invalidation take
+-- SELECT ... FOR UPDATE on this singleton row before any state check and hold it
+-- through COMMIT, so a publication and a retraction cannot interleave. Singleton
+-- is a serial correctness reference, not a throughput design (per-source locking
+-- is a later optimization once the graph closure is sealed).
+CREATE TABLE IF NOT EXISTS exp.fence (run_id text PRIMARY KEY);
+INSERT INTO exp.fence(run_id) VALUES ('singleton') ON CONFLICT DO NOTHING;
+
 -- Bind artifact author to the authenticated login; keep any claimed name.
 CREATE OR REPLACE FUNCTION exp.bind_author() RETURNS trigger
   LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, exp, public, pg_temp AS $fn$
@@ -70,6 +78,19 @@ END $fn$;
 DROP TRIGGER IF EXISTS trg_bind_author ON exp.artifacts;
 CREATE TRIGGER trg_bind_author BEFORE INSERT ON exp.artifacts
   FOR EACH ROW EXECUTE FUNCTION exp.bind_author();
+
+-- Enter the serialization fence: require READ COMMITTED (so the post-lock state
+-- check sees the latest committed state, not a fixed pre-withdrawal snapshot) and
+-- take the singleton row lock, held until the caller commits. Raises 0A000 under
+-- any other isolation level, which the acceptance driver recognizes.
+CREATE OR REPLACE FUNCTION exp._enter_fence() RETURNS void
+  LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path = pg_catalog, exp, public, pg_temp AS $fn$
+BEGIN
+  IF current_setting('transaction_isolation') <> 'read committed' THEN
+    RAISE EXCEPTION 'serialization fence requires READ COMMITTED isolation' USING ERRCODE = '0A000';
+  END IF;
+  PERFORM 1 FROM exp.fence WHERE run_id = 'singleton' FOR UPDATE;
+END $fn$;
 
 -- invalidate(): the ONLY way to write an invalidation. Authority is checked
 -- against the authenticated login, not asserted by the caller.
@@ -91,6 +112,7 @@ BEGIN
   ELSIF p_kind NOT IN ('withdrawn','adjudicated','contradicted') THEN
     RAISE EXCEPTION 'bad kind %', p_kind;
   END IF;
+  PERFORM exp._enter_fence();   -- serialize against concurrent publication
   SELECT COALESCE(MAX(epoch),0)+1 INTO v_epoch FROM exp.invalidations WHERE artifact_id=p_id AND version=p_ver;
   INSERT INTO exp.invalidations(artifact_id,version,epoch,kind,by_role)
     VALUES (p_id,p_ver,v_epoch,p_kind,session_user);
@@ -114,6 +136,7 @@ BEGIN
   IF NOT EXISTS (SELECT 1 FROM exp.adjudicators WHERE role=session_user) THEN
     RAISE EXCEPTION 'only an adjudicator may publish decisions';
   END IF;
+  PERFORM exp._enter_fence();   -- serialize against concurrent withdrawal; READ COMMITTED required
   -- The artifact being published must exist.
   IF NOT EXISTS (SELECT 1 FROM exp.artifacts WHERE artifact_id=p_id AND version=p_ver) THEN
     reason := format('unknown artifact %s/%s', p_id, p_ver);
