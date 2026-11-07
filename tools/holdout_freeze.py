@@ -1,0 +1,63 @@
+"""Generate and FREEZE the held-out evaluation set (Lorien's contract, section
+"Frozen pilot variants"): matched task instances per variant, fixed ids and
+nonces, randomized arm order within each paired block, a manifest, and a
+sha256 over the manifest + prompts + model config. Post the hash BEFORE any
+execution; any change afterwards is a new evaluation version.
+
+  python -I tools/holdout_freeze.py --variants V0,V1,V3,V4,V5,V6 --n 10 --seed 20261107 --out holdout
+Then run:
+  python -I tools/pilot_runner.py --spec-file holdout/instances.json --manifest holdout/manifest.json --split evaluation
+"""
+import argparse, hashlib, json, os, random, subprocess, sys
+sys.path.insert(0, "tools")
+from pilot_runner import TASKS, ARMS, REVIEWER_SYS, WRITER_SYS, RESEARCHER_SYS
+
+ITEMS = ["bolts", "gaskets", "valves", "filters", "spools", "brackets", "seals", "fuses", "hinges", "clamps", "rivets", "bearings"]
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--variants", default="V0,V1,V3,V4,V5,V6"); ap.add_argument("--n", type=int, default=10)
+    ap.add_argument("--seed", type=int, default=20261107); ap.add_argument("--out", default="holdout")
+    ap.add_argument("--model", default="claude-sonnet-5-5"); ap.add_argument("--max-tokens", type=int, default=1200)
+    a = ap.parse_args()
+    rng = random.Random(a.seed)
+    instances, manifest = [], []
+    for v in a.variants.split(","):
+        base = TASKS[v]
+        for i in range(a.n):
+            spec = dict(base)
+            right = rng.randint(5, 40)
+            if base["wrong"] is None:
+                wrong = None
+            elif v == "V6":
+                wrong = right                                   # same number, authority changes
+            else:
+                wrong = right + rng.choice([-7, -4, 3, 6, 9]); wrong = max(1, wrong)
+            spec.update(wrong=wrong, right=right, item=rng.choice(ITEMS), site=f"site-{rng.randint(1, 9)}")
+            nonce = "h%s" % rng.getrandbits(24).to_bytes(3, "big").hex()
+            tid = f"{v}i{i:02d}"
+            arm_order = rng.sample(list(ARMS), len(ARMS))      # randomized within the paired block
+            instances.append({"tid": tid, "variant": v, "nonce": nonce, "spec": spec, "arm_order": arm_order})
+            task_id = f"{tid}_{nonce}"
+            for arm in arm_order:
+                manifest.append({"run_id": f"{tid}_{nonce}_{arm}_evaluation", "task_id": task_id, "condition": arm, "split": "evaluation"})
+    os.makedirs(a.out, exist_ok=True)
+    mbytes = json.dumps(manifest, indent=1, sort_keys=True).encode()
+    with open(f"{a.out}/manifest.json", "wb") as f: f.write(mbytes)
+    with open(f"{a.out}/instances.json", "w") as f: json.dump(instances, f, indent=1)
+    try:
+        commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
+    except Exception:
+        commit = "unknown"
+    prompts_sha = hashlib.sha256((REVIEWER_SYS + "\n" + WRITER_SYS + "\n" + RESEARCHER_SYS).encode()).hexdigest()
+    freeze = {"runner_commit": commit, "seed": a.seed, "variants": a.variants.split(","), "n_per_variant": a.n,
+              "arms": list(ARMS), "instances": len(instances), "runs": len(manifest), "model": a.model, "max_tokens": a.max_tokens,
+              "manifest_sha256": hashlib.sha256(mbytes).hexdigest(), "prompts_sha256": prompts_sha,
+              "attack_budget": "one fixed opportunity per instance (replay/stale queue), identical across arms"}
+    with open(f"{a.out}/FREEZE.json", "w") as f: json.dump(freeze, f, indent=1)
+    print(json.dumps(freeze, indent=1))
+
+
+if __name__ == "__main__":
+    main()
