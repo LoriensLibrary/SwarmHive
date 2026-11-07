@@ -179,8 +179,9 @@ class _Canned:
                         inv.add((m["id"], m["ver"])); changed = True
             task = u.get("task", ""); q = set()
             if "Queued drafts:" in task:                 # ids are opaque, so read the queue from the task text
-                for tok in task.split("Queued drafts:")[1].split(","):
-                    i, v = tok.strip().rsplit("/", 1); q.add((i, int(v)))
+                import re
+                for i, v in re.findall(r"(\S+?)/(\d+)", task.split("Queued drafts:")[1]):
+                    q.add((i.strip(", "), int(v)))
             drafts = [a for a in arts if (a["id"], a["ver"]) in q]
             pick = next((a for a in drafts if (a["id"], a["ver"]) not in inv), drafts[0] if drafts else None)
             if pick is None:
