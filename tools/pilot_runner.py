@@ -105,7 +105,8 @@ class DB:
                 roots.append({"id": sid, "ver": sver})
                 if (sid, sver) not in seen:
                     seen.add((sid, sver)); sources.append(ArtifactInput(sid, sver, body))
-                    records.append({"id": sid, "ver": sver, "inputs": [], "status": "withdrawn" if inv else "active"})
+                    # same vocabulary as DB.meta() so the lookup arm and the compact arm read identical status strings
+                    records.append({"id": sid, "ver": sver, "inputs": [], "status": "invalidated" if inv else "valid"})
             records.append({"id": did, "ver": dver, "inputs": roots})
         return sources, records
     def status(self, aid, ver):
@@ -169,7 +170,7 @@ class _Canned:
             text = json.dumps({"units": json.loads(arts[0]["body"])["units"], "summary": "inventory figure per source"})
         else:  # reviewer: approve the newest-looking draft that is NOT flagged invalid, if metadata shows it; else first
             meta = (u.get("history_metadata") or {}).get("artifacts", [])
-            bad = {(m["id"], m["ver"]) for m in meta if m["status"] != "valid"}
+            bad = {(m["id"], m["ver"]) for m in meta if m.get("status", "valid") != "valid"}   # draft records carry no status
             inv = set(bad); changed = True
             while changed:
                 changed = False
@@ -325,6 +326,7 @@ def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS):
                 sources, records = db.source_lookup(queued)
                 with open(os.path.join(out, "lookups.jsonl"), "a", encoding="utf-8") as lf:
                     lf.write(json.dumps({"run_id": run_id, "records": records}) + "\n")
+                trace["lookup"] = {"available": True, "used": True, "records": records}   # recorded even if the 2nd call fails
                 have = {(i.artifact_id, i.version) for i in inputs}
                 inputs2 = inputs + [s for s in sources if (s.artifact_id, s.version) not in have]
                 resp, receipt = dispatch_stage(model.send, actor="bot_reviewer", model=model.model, instructions=REVIEWER_SYS,
