@@ -1,0 +1,23 @@
+{
+ "request": {
+  "max_tokens": 1200,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 9, \\\"summary\\\": \\\"There are 9 units of item X at warehouse A (source p9268a9_V0_af59ca).\\\"}\",\"id\":\"p9268a9_V0_de0fc5\",\"ver\":1},{\"body\":\"{\\\"units\\\": 9, \\\"note\\\": \\\"item X at warehouse A\\\"}\",\"id\":\"p9268a9_V0_af59ca\",\"ver\":1}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"author\":\"bot_researcher\",\"id\":\"p9268a9_V0_af59ca\",\"inputs\":[],\"kind\":\"root\",\"status\":\"valid\",\"ver\":1},{\"author\":\"bot_writer\",\"id\":\"p9268a9_V0_de0fc5\",\"inputs\":[{\"id\":\"p9268a9_V0_af59ca\",\"ver\":1}],\"kind\":\"derivative\",\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: p9268a9_V0_de0fc5/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 5,
+  "model": "gemma-4-31b-it",
+  "input_tokens": 439,
+  "output_tokens": 100,
+  "cost_usd": 0.0,
+  "elapsed_s": 1.367,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"p9268a9_V0_de0fc5\", \"result\": {\"units\": 9}, \"evidence\": [{\"id\": \"p9268a9_V0_af59ca\", \"ver\": 1}], \"consulted\": [{\"id\": \"p9268a9_V0_de0fc5\", \"ver\": 1}]}\n```"
+ }
+}

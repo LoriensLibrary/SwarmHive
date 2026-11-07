@@ -1,0 +1,23 @@
+{
+ "request": {
+  "max_tokens": 1200,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 12, \\\"summary\\\": \\\"There are 12 units of item Q at warehouse D, as reported in p9268a9_V6_be014f.\\\"}\",\"id\":\"p9268a9_V6_34627b\",\"ver\":1},{\"body\":\"{\\\"units\\\": 12, \\\"summary\\\": \\\"Based on source p9268a9_V6_be014f, there are 12 units of item Q at warehouse D.\\\"}\",\"id\":\"p9268a9_V6_c8d3a5\",\"ver\":1},{\"body\":\"{\\\"units\\\": 12, \\\"note\\\": \\\"Recount item Q at warehouse D\\\"}\",\"id\":\"p9268a9_V6_be014f\",\"ver\":2}],\"corrections\":[{\"id\":\"p9268a9_V6_be014f\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"p9268a9_V6_be014f\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: p9268a9_V6_34627b/1, p9268a9_V6_c8d3a5/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 25,
+  "model": "gemma-4-31b-it",
+  "input_tokens": 505,
+  "output_tokens": 150,
+  "cost_usd": 0.0,
+  "elapsed_s": 1.931,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\n  \"decision\": \"approve\",\n  \"artifact\": \"p9268a9_V6_34627b\",\n  \"result\": {\n    \"units\": 12\n  },\n  \"evidence\": [\n    {\n      \"id\": \"p9268a9_V6_be014f\",\n      \"ver\": 2\n    }\n  ],\n  \"consulted\": [\n    {\n      \"id\": \"p9268a9_V6_c8d3a5\",\n      \"ver\": 1\n    }\n  ]\n}\n```"
+ }
+}
