@@ -174,6 +174,26 @@ class Model:
     def _ledger(self, row):
         if self.ledger:
             with open(self.ledger, "a", encoding="utf-8") as f: f.write(json.dumps(row) + "\n")
+    RETRY_STATUS = (408, 409, 429, 500, 502, 503, 504)
+    MAX_ATTEMPTS = 5
+    def _call_with_backoff(self, request):
+        """Sequential, one request in flight. On a rate-limit or transient server status, back off 2/4/8/16 s and
+        retry up to MAX_ATTEMPTS, each attempt written to the ledger. The ceiling was checked for this call's
+        reserve once before the first attempt; a retry re-sends the same request and cannot exceed that reserve."""
+        import urllib.error
+        for attempt in range(1, self.MAX_ATTEMPTS + 1):
+            try:
+                if self.provider == "adaption":
+                    return self.client.send(**request)
+                return self.client.messages.create(**request)
+            except Exception as e:
+                code = getattr(e, "code", None) or getattr(e, "status_code", None) or getattr(getattr(e, "response", None), "status_code", None)
+                if code not in self.RETRY_STATUS or attempt == self.MAX_ATTEMPTS:
+                    self._ledger({"call": self.n, "event": "failed", "attempt": attempt, "status": code, "error": type(e).__name__})
+                    raise
+                wait = 2 ** attempt
+                self._ledger({"call": self.n, "event": "retry", "attempt": attempt, "status": code, "wait_s": wait})
+                time.sleep(wait)
     def send(self, **request):
         self.n += 1; t0 = time.time()
         res = 0.0 if self.dry else self.reserve(request)
@@ -183,10 +203,8 @@ class Model:
         self._ledger({"call": self.n, "event": "reserve", "reserve": round(res, 6), "spend_before": round(self.spend, 6), "unit": self.unit})
         if self.dry:
             resp = _Canned(request)
-        elif self.provider == "adaption":
-            resp = self.client.send(**request)
         else:
-            resp = self.client.messages.create(**request)
+            resp = self._call_with_backoff(request)
         text = "".join(getattr(b, "text", "") for b in resp.content)
         usage = getattr(resp, "usage", None)
         it, ot = (usage.input_tokens, usage.output_tokens) if usage else (0, 0)
