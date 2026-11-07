@@ -1,0 +1,25 @@
+{
+ "request": {
+  "max_tokens": 1200,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 8, \\\"summary\\\": \\\"inventory figure per source\\\"}\",\"id\":\"ph099950_V1i01_c790d7\",\"ver\":1},{\"body\":\"{\\\"units\\\": 8, \\\"note\\\": \\\"observed\\\"}\",\"id\":\"ph099950_V1i01_03151b\",\"ver\":1}],\"corrections\":[{\"id\":\"ph099950_V1i01_4feb6d\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"ph099950_V1i01_4feb6d\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph099950_V1i01_03151b\",\"inputs\":[],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph099950_V1i01_c790d7\",\"inputs\":[{\"id\":\"ph099950_V1i01_03151b\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph099950_V1i01_c790d7/1 lookup_available=false (your one lookup was used; decide now)\"}",
+    "role": "user"
+   }
+  ],
+  "model": "claude-sonnet-5-5",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 16,
+  "model": "claude-sonnet-5-5",
+  "provider": "anthropic",
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cost": 0.0,
+  "unit": "usd",
+  "elapsed_s": 0.002,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"ph099950_V1i01_c790d7\", \"result\": {\"units\": 8}, \"evidence\": [{\"id\": \"ph099950_V1i01_c790d7\", \"ver\": 1}]}"
+ }
+}

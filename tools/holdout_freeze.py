@@ -10,7 +10,7 @@ Then run:
 """
 import argparse, hashlib, json, os, random, subprocess, sys
 sys.path.insert(0, "tools")
-from pilot_runner import TASKS, ARMS, REVIEWER_SYS, WRITER_SYS, RESEARCHER_SYS
+from pilot_runner import TASKS, ARMS, REVIEWER_SYS, WRITER_SYS, RESEARCHER_SYS, LOOKUP_RULE, MAX_TOKENS, LOOKUP_MODE
 
 ITEMS = ["bolts", "gaskets", "valves", "filters", "spools", "brackets", "seals", "fuses", "hinges", "clamps", "rivets", "bearings"]
 
@@ -19,8 +19,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--variants", default="V0,V1,V3,V4,V5,V6"); ap.add_argument("--n", type=int, default=10)
     ap.add_argument("--seed", type=int, default=20261107); ap.add_argument("--out", default="holdout")
-    ap.add_argument("--model", default="claude-sonnet-5-5"); ap.add_argument("--max-tokens", type=int, default=1200)
+    ap.add_argument("--model", default="claude-sonnet-5-5")
     ap.add_argument("--arms", default=",".join(ARMS), help="comma list; include current_lookup for the fourth arm")
+    ap.add_argument("--provider", default="anthropic"); ap.add_argument("--ceiling", type=float, default=None)
+    ap.add_argument("--split", default="evaluation")
     a = ap.parse_args()
     arms = a.arms.split(",")
     rng = random.Random(a.seed)
@@ -43,19 +45,26 @@ def main():
             instances.append({"tid": tid, "variant": v, "nonce": nonce, "spec": spec, "arm_order": arm_order})
             task_id = f"{tid}_{nonce}"
             for arm in arm_order:
-                manifest.append({"run_id": f"{tid}_{nonce}_{arm}_evaluation", "task_id": task_id, "condition": arm, "split": "evaluation"})
+                manifest.append({"run_id": f"{tid}_{nonce}_{arm}_{a.split}", "task_id": task_id, "condition": arm, "split": a.split})
     os.makedirs(a.out, exist_ok=True)
     mbytes = json.dumps(manifest, indent=1, sort_keys=True).encode()
     with open(f"{a.out}/manifest.json", "wb") as f: f.write(mbytes)
-    with open(f"{a.out}/instances.json", "w") as f: json.dump(instances, f, indent=1)
+    ibytes = json.dumps(instances, indent=1).encode()
+    with open(f"{a.out}/instances.json", "wb") as f: f.write(ibytes)
     try:
         commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
     except Exception:
         commit = "unknown"
-    prompts_sha = hashlib.sha256((REVIEWER_SYS + "\n" + WRITER_SYS + "\n" + RESEARCHER_SYS).encode()).hexdigest()
+    ref = os.environ.get("LORIEN_REF", r"C:/Users/Angela/Documents/Codex/2026-11-06/che/outputs/swarm_reference")
+    recorder_sha = hashlib.sha256(open(os.path.join(ref, "delivery_recorder.py"), "rb").read()).hexdigest()
+    prompts_sha = hashlib.sha256((REVIEWER_SYS + "\n" + WRITER_SYS + "\n" + RESEARCHER_SYS + "\n" + LOOKUP_RULE).encode()).hexdigest()
+    # Everything the runner re-checks BEFORE its first paid call must be here, under these exact keys.
     freeze = {"runner_commit": commit, "seed": a.seed, "variants": a.variants.split(","), "n_per_variant": a.n,
-              "arms": arms, "instances": len(instances), "runs": len(manifest), "model": a.model, "max_tokens": a.max_tokens,
-              "manifest_sha256": hashlib.sha256(mbytes).hexdigest(), "prompts_sha256": prompts_sha,
+              "arms": arms, "instances": len(instances), "runs": len(manifest), "split": a.split,
+              "model": a.model, "provider": a.provider, "max_tokens": MAX_TOKENS, "lookup_mode": LOOKUP_MODE, "ceiling": a.ceiling,
+              "manifest_sha256": hashlib.sha256(mbytes).hexdigest(), "instances_sha256": hashlib.sha256(ibytes).hexdigest(),
+              "prompts_sha256": prompts_sha, "recorder_sha256": recorder_sha,
+              "max_authorized_requests": len(manifest) * 2 + len(instances) * 6,
               "attack_budget": "one fixed opportunity per instance (replay/stale queue), identical across arms"}
     with open(f"{a.out}/FREEZE.json", "w") as f: json.dump(freeze, f, indent=1)
     print(json.dumps(freeze, indent=1))
