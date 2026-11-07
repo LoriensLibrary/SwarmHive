@@ -1,13 +1,13 @@
-"""Deterministic protocol tests for the trusted publication gate.
+"""Deterministic protocol tests for the trusted governance gate.
 
-No model calls. Drives artifacts/provenance/invalidation/publish as the real
-DB login roles, so the authority boundaries are exercised, not simulated.
-Maps to Lorien's frozen cases D1-D8. Each test prints PASS/FAIL with the gate's
-own returned reason, so a failure is legible.
+No model calls. Artifacts are created only through the trusted seal_artifact()
+(bots have no direct write), and invalidation/publication go through the
+authority-checked functions, so the real boundaries are exercised. Maps to
+Lorien's frozen cases D1-D8.
 
 Run: python -I tools/det_tests.py
 """
-import hashlib, json, sys, os
+import json, sys, os
 sys.path.insert(0, "tools")
 from hive_http import query
 
@@ -15,97 +15,101 @@ HOST = "ep-summer-paper-bbe7uhtw.c-15.us-east-1.aws.neon.tech"
 pw = json.load(open("secrets/bot_passwords.json"))
 OP = open("secrets/operator.env").read().split("=", 1)[1].strip()
 conn = lambda b: OP if b == "hive_operator" else f"postgresql://{b}:{pw[b]}@{HOST}/hive?sslmode=require"
-h = lambda s: hashlib.sha256(s.encode()).hexdigest()
 
 RES = []
 def check(name, cond, detail=""):
-    RES.append((name, cond))
-    print(f"  [{'PASS' if cond else 'FAIL'}] {name}" + (f"  <- {detail}" if detail else ""))
-
+    RES.append(cond); print(f"  [{'PASS' if cond else 'FAIL'}] {name}" + (f"  <- {detail}" if detail else ""))
 def rows(r): return r.get("rows") if isinstance(r, dict) and "error" not in r else None
 def err(r):
     if isinstance(r, dict) and "error" in r:
         e = r["error"]; return e.get("message") if isinstance(e, dict) else str(e)
     return None
+def val(r):
+    rs = rows(r); return rs[0][list(rs[0])[0]] if rs else err(r)
 
-def mk_artifact(role, aid, ver, body):
-    return query("INSERT INTO exp.artifacts(artifact_id,version,author_role,body,content_hash) "
-                 "VALUES ($1,$2,$3,$4,$5) RETURNING author_role",
-                 [aid, ver, role, body, h(body)], conn=conn(role))
-def mk_edge(role, did, dver, sid, sver):
-    return query("INSERT INTO exp.provenance VALUES ($1,$2,$3,$4)", [did, dver, sid, sver], conn=conn(role))
+def seal(author, aid, ver, body, deps=()):
+    # trusted runtime (operator) seals the artifact + its edges in one call
+    return query("SELECT exp.seal_artifact($1,$2,$3,$4,$5::jsonb) AS kind",
+                 [author, aid, ver, body, json.dumps([{"id": i, "ver": v} for i, v in deps])], conn=OP)
 def invalidate(role, aid, ver, kind):
     return query("SELECT exp.invalidate($1,$2,$3) AS epoch", [aid, ver, kind], conn=conn(role))
 def publish(role, aid, ver, attest):
     return query("SELECT exp.publish_decision($1,$2,$3::jsonb) AS result", [aid, ver, json.dumps(attest)], conn=conn(role))
-
 def reset():
-    for t in ["approvals", "invalidations", "provenance", "artifacts"]:
-        query(f"TRUNCATE exp.{t}", conn=OP)
+    for t in ["approvals", "invalidations", "provenance", "artifacts", "proposals"]:
+        query(f"TRUNCATE exp.{t} RESTART IDENTITY CASCADE", conn=OP)
 
-def decision(r):
-    rs = rows(r); return rs[0]["result"] if rs else err(r)
+A = lambda i, v, e=0: {"id": i, "ver": v, "acked_epoch": e}
+
+# ---- sealed-creation authority: a bot cannot write artifacts or seal ----
+reset()
+raw = query("INSERT INTO exp.artifacts(artifact_id,version,author_role,body,content_hash) VALUES ('X',1,'bot_writer','x','h')", conn=conn("bot_writer"))
+check("bot cannot raw-INSERT an artifact", err(raw) is not None, err(raw))
+botseal = query("SELECT exp.seal_artifact('bot_writer','X',1,'x','[]'::jsonb)", conn=conn("bot_writer"))
+check("bot cannot call seal_artifact", err(botseal) is not None, err(botseal))
 
 # ---- D1: clean workflow accepted ----
 reset()
-mk_artifact("bot_researcher", "S", 1, "metric X rose 4 percent")
-mk_artifact("bot_writer", "W", 1, "draft: X up 4pct per S")
-mk_edge("bot_writer", "W", 1, "S", 1)
-d1 = decision(publish("hive_operator", "W", 1, [{"id": "S", "ver": 1, "acked_epoch": 0}]))
-check("D1 clean workflow accepted", d1 == "approved", d1)
+seal("bot_researcher", "S", 1, "metric X rose 4 percent")
+seal("bot_writer", "W", 1, "draft from S", deps=[("S", 1)])
+check("D1 clean workflow accepted", val(publish("hive_operator", "W", 1, [A("S", 1)])) == "approved")
 
-# ---- D5: omitted dependency -> rejected, never clean by default ----
-d5 = decision(publish("hive_operator", "W", 1, []))
-check("D5 omitted dependency rejected", str(d5).startswith("rejected"), d5)
+# ---- D5: omitted dependency -> rejected ----
+check("D5 omitted dependency rejected", str(val(publish("hive_operator", "W", 1, []))).startswith("rejected"))
 
-# ---- D2: source withdrawn before publication -> descendant blocked; unrelated proceeds ----
+# ---- Dn: stripped-lineage root cannot be forged (writer can't make a free root) ----
+# The only way to create 'L' is seal; a bot raw insert is denied, and a sealed
+# root is a declared root, not a laundered derivative.
 reset()
-mk_artifact("bot_researcher", "S", 1, "false finding")
-mk_artifact("bot_writer", "W", 1, "draft from S")
-mk_edge("bot_writer", "W", 1, "S", 1)
-inv = invalidate("bot_researcher", "S", 1, "withdrawn")      # author withdraws own source
-ep = rows(inv)[0]["epoch"] if rows(inv) else None
-d2 = decision(publish("hive_operator", "W", 1, [{"id": "S", "ver": 1, "acked_epoch": 0}]))
-check("D2a withdrawn source blocks descendant", str(d2).startswith("rejected"), d2)
-mk_artifact("bot_researcher", "U", 1, "unrelated clean finding")  # independent branch
-mk_artifact("bot_writer", "UW", 1, "draft from U")
-mk_edge("bot_writer", "UW", 1, "U", 1)
-d2b = decision(publish("hive_operator", "UW", 1, [{"id": "U", "ver": 1, "acked_epoch": 0}]))
-check("D2b unrelated branch still proceeds", d2b == "approved", d2b)
+seal("bot_researcher", "S", 1, "source")
+forged = query("INSERT INTO exp.artifacts(artifact_id,version,author_role,body,content_hash,kind) VALUES ('L',1,'bot_writer','copied',' ','root')", conn=conn("bot_writer"))
+check("stripped-lineage artifact cannot be created by a bot", err(forged) is not None, err(forged))
 
-# ---- D3: stale approval replay after source revision/invalidation -> rejected ----
-d3 = decision(publish("hive_operator", "W", 1, [{"id": "S", "ver": 1, "acked_epoch": 0}]))
-check("D3 stale attestation (acked 0 < invalidation epoch) rejected", str(d3).startswith("rejected"), d3)
-# and acknowledging the current epoch does NOT clear a blocking withdrawal:
-d3b = decision(publish("hive_operator", "W", 1, [{"id": "S", "ver": 1, "acked_epoch": ep}]))
+# ---- D2: source withdrawn before publication blocks descendant; unrelated proceeds ----
+reset()
+seal("bot_researcher", "S", 1, "false finding")
+seal("bot_writer", "W", 1, "draft from S", deps=[("S", 1)])
+inv = invalidate("bot_researcher", "S", 1, "withdrawn"); ep = rows(inv)[0]["epoch"] if rows(inv) else None
+check("D2a withdrawn source blocks descendant", str(val(publish("hive_operator", "W", 1, [A("S", 1)]))).startswith("rejected"))
+seal("bot_researcher", "U", 1, "unrelated clean finding")
+seal("bot_writer", "UW", 1, "draft from U", deps=[("U", 1)])
+check("D2b unrelated branch still proceeds", val(publish("hive_operator", "UW", 1, [A("U", 1)])) == "approved")
+
+# ---- D3: stale/replayed attestation rejected ----
+check("D3 stale attestation rejected", str(val(publish("hive_operator", "W", 1, [A("S", 1, 0)]))).startswith("rejected"))
 check("D3b acking the withdrawal epoch still cannot approve a withdrawn dep",
-      str(d3b).startswith("rejected"), d3b)
+      str(val(publish("hive_operator", "W", 1, [A("S", 1, ep)]))).startswith("rejected"))
 
-# ---- D4: forged invalidation of someone else's source -> rejected ----
+# ---- transitive: withdrawn grandparent blocks a grandchild ----
 reset()
-mk_artifact("bot_researcher", "S", 1, "honest source")
-f1 = invalidate("bot_intruder", "S", 1, "withdrawn")      # intruder is not the author
-check("D4a intruder cannot withdraw another's artifact", err(f1) is not None, err(f1))
-f2 = invalidate("bot_intruder", "S", 1, "adjudicated")    # intruder is not an adjudicator
-check("D4b intruder cannot adjudicate", err(f2) is not None, err(f2))
+seal("bot_researcher", "S", 1, "source")
+seal("bot_writer", "W", 1, "draft", deps=[("S", 1)])
+seal("bot_writer", "R", 1, "report from draft", deps=[("W", 1)])
+invalidate("bot_researcher", "S", 1, "withdrawn")
+check("transitive withdrawn grandparent blocks grandchild",
+      str(val(publish("hive_operator", "R", 1, [A("W", 1)]))).startswith("rejected"))
 
-# ---- Authority: only an adjudicator may publish ----
-mk_artifact("bot_writer", "W", 1, "draft")
-mk_edge("bot_writer", "W", 1, "S", 1)
-p_bot = decision(publish("bot_reviewer", "W", 1, [{"id": "S", "ver": 1, "acked_epoch": 0}]))
-check("AUTH non-adjudicator reviewer cannot publish", err(publish("bot_reviewer","W",1,[{"id":"S","ver":1,"acked_epoch":0}])) is not None
-      or str(p_bot).startswith("ERROR") or "adjudicator" in str(p_bot), p_bot)
-
-# ---- D8: compromised author retracts own input repeatedly -> bounded, no deadlock ----
+# ---- D4: forged invalidation / provenance by intruder ----
 reset()
-mk_artifact("bot_intruder", "Z", 1, "noise")
-for _ in range(3):
-    invalidate("bot_intruder", "Z", 1, "withdrawn")       # repeated self-withdrawal
-mk_artifact("bot_researcher", "G", 1, "good work")        # unrelated work unaffected
-mk_artifact("bot_writer", "GW", 1, "draft from G")
-mk_edge("bot_writer", "GW", 1, "G", 1)
-d8 = decision(publish("hive_operator", "GW", 1, [{"id": "G", "ver": 1, "acked_epoch": 0}]))
-check("D8 repeated self-retraction does not freeze unrelated work", d8 == "approved", d8)
+seal("bot_researcher", "S", 1, "honest source")
+check("D4a intruder cannot withdraw another's artifact", err(invalidate("bot_intruder", "S", 1, "withdrawn")) is not None)
+check("D4b intruder cannot adjudicate", err(invalidate("bot_intruder", "S", 1, "adjudicated")) is not None)
+poison = query("INSERT INTO exp.provenance VALUES ('S',1,'S',1)", conn=conn("bot_intruder"))
+check("D4c intruder cannot write provenance", err(poison) is not None, err(poison))
 
-print(f"\n{sum(1 for _,c in RES if c)}/{len(RES)} checks passed")
-sys.exit(0 if all(c for _, c in RES) else 1)
+# ---- authority: only an adjudicator may publish ----
+seal("bot_writer", "W", 1, "draft", deps=[("S", 1)])
+check("AUTH non-adjudicator reviewer cannot publish", err(publish("bot_reviewer", "W", 1, [A("S", 1)])) is not None
+      or "adjudicator" in str(val(publish("bot_reviewer", "W", 1, [A("S", 1)]))))
+
+# ---- D8: repeated self-retraction does not freeze unrelated work ----
+reset()
+seal("bot_intruder", "Z", 1, "noise")
+for _ in range(3): invalidate("bot_intruder", "Z", 1, "withdrawn")
+seal("bot_researcher", "G", 1, "good work")
+seal("bot_writer", "GW", 1, "draft from G", deps=[("G", 1)])
+check("D8 repeated self-retraction does not freeze unrelated work",
+      val(publish("hive_operator", "GW", 1, [A("G", 1)])) == "approved")
+
+print(f"\n{sum(RES)}/{len(RES)} checks passed")
+sys.exit(0 if all(RES) else 1)

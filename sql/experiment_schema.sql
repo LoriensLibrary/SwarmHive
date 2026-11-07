@@ -16,8 +16,21 @@ CREATE TABLE IF NOT EXISTS exp.artifacts (
   claimed_author text,
   body        text NOT NULL,
   content_hash text NOT NULL,
+  kind        text,                 -- 'root' | 'derivative'; NULL = unsealed/unknown lineage (ineligible)
   created_at  timestamptz NOT NULL DEFAULT now(),
   PRIMARY KEY (artifact_id, version)
+);
+ALTER TABLE exp.artifacts ADD COLUMN IF NOT EXISTS kind text;
+ALTER TABLE exp.artifacts DROP CONSTRAINT IF EXISTS artifacts_kind_chk;
+ALTER TABLE exp.artifacts ADD CONSTRAINT artifacts_kind_chk CHECK (kind IS NULL OR kind IN ('root','derivative'));
+
+-- Untrusted intake. Bots may only PROPOSE here; nothing in proposals is
+-- authoritative. A trusted runtime reads proposals and seals artifacts.
+CREATE TABLE IF NOT EXISTS exp.proposals (
+  id          bigserial PRIMARY KEY,
+  proposer    text NOT NULL DEFAULT session_user,
+  submitted_at timestamptz NOT NULL DEFAULT now(),
+  payload     jsonb NOT NULL
 );
 
 -- Provenance edges: which source (id,version) was DELIVERED as input to a
@@ -75,9 +88,12 @@ BEGIN
   NEW.author_role := session_user;
   RETURN NEW;
 END $fn$;
+-- The bind_author trigger belonged to the old interface where agents inserted
+-- their own artifacts. Agents no longer write exp.artifacts at all; seal_artifact
+-- is the sole creator and carries the true author from the trusted dispatch
+-- context, so the trigger is removed (it would otherwise relabel every sealed
+-- artifact as the operator). Kept the function body for reference only.
 DROP TRIGGER IF EXISTS trg_bind_author ON exp.artifacts;
-CREATE TRIGGER trg_bind_author BEFORE INSERT ON exp.artifacts
-  FOR EACH ROW EXECUTE FUNCTION exp.bind_author();
 
 -- Enter the serialization fence: require READ COMMITTED (so the post-lock state
 -- check sees the latest committed state, not a fixed pre-withdrawal snapshot) and
@@ -140,6 +156,14 @@ BEGIN
   -- The artifact being published must exist.
   IF NOT EXISTS (SELECT 1 FROM exp.artifacts WHERE artifact_id=p_id AND version=p_ver) THEN
     reason := format('unknown artifact %s/%s', p_id, p_ver);
+    INSERT INTO exp.approvals(artifact_id,version,reviewer,decision,reason)
+      VALUES (p_id,p_ver,session_user,'rejected',reason);
+    RETURN 'rejected: '||reason;
+  END IF;
+  -- Unknown lineage is ineligible: only a sealed artifact (kind set by the
+  -- trusted runtime) can be published.
+  IF (SELECT kind FROM exp.artifacts WHERE artifact_id=p_id AND version=p_ver) IS NULL THEN
+    reason := format('artifact %s/%s has unknown lineage (not sealed)', p_id, p_ver);
     INSERT INTO exp.approvals(artifact_id,version,reviewer,decision,reason)
       VALUES (p_id,p_ver,session_user,'rejected',reason);
     RETURN 'rejected: '||reason;
@@ -220,11 +244,53 @@ DROP TRIGGER IF EXISTS trg_authz_provenance ON exp.provenance;
 CREATE TRIGGER trg_authz_provenance BEFORE INSERT ON exp.provenance
   FOR EACH ROW EXECUTE FUNCTION exp.authz_provenance();
 
--- Grants: agents may create their own artifacts and provenance, may read, may
--- EXECUTE invalidate (authority checked inside), but may NOT write approvals or
--- invalidations directly, and may NOT publish decisions unless an adjudicator.
+-- seal_artifact(): the ONLY creator of authoritative artifacts. The trusted
+-- runtime calls it, carrying the true author from the authenticated submission
+-- context. It creates the artifact AND its complete input edges in one
+-- transaction, sealing a root (no deps) or derivative (nonempty deps). Edges may
+-- point only to already-sealed, pre-existing sources, which blocks late edges
+-- and cycles. Bots cannot call it and cannot write artifacts/provenance at all.
+-- Delivered-input lineage is conservative: it records which inputs were supplied,
+-- not that a hidden source was excluded or that an input was actually used.
+CREATE OR REPLACE FUNCTION exp.seal_artifact(p_author text, p_id text, p_ver int, p_body text, p_deps jsonb DEFAULT '[]')
+  RETURNS text LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, exp, public, pg_temp AS $fn$
+DECLARE d jsonb; n int; v_kind text; max_deps int := 32;
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM exp.adjudicators WHERE role=session_user) THEN
+    RAISE EXCEPTION 'only the trusted runtime (adjudicator) may seal artifacts' USING ERRCODE = 'insufficient_privilege';
+  END IF;
+  IF p_author IS NULL OR p_author = '' THEN RAISE EXCEPTION 'author required'; END IF;
+  IF EXISTS (SELECT 1 FROM exp.artifacts WHERE artifact_id=p_id AND version=p_ver) THEN
+    RAISE EXCEPTION 'immutable artifact %/% already exists', p_id, p_ver USING ERRCODE = 'unique_violation';
+  END IF;
+  IF jsonb_typeof(p_deps) <> 'array' THEN RAISE EXCEPTION 'deps must be a json array'; END IF;
+  n := jsonb_array_length(p_deps);
+  IF n > max_deps THEN RAISE EXCEPTION 'dependency limit % exceeded', max_deps; END IF;
+  v_kind := CASE WHEN n = 0 THEN 'root' ELSE 'derivative' END;
+  FOR d IN SELECT value FROM jsonb_array_elements(p_deps) AS t(value) LOOP
+    IF (d->>'id') = p_id AND (d->>'ver')::int = p_ver THEN RAISE EXCEPTION 'self-dependency not allowed'; END IF;
+    IF NOT EXISTS (SELECT 1 FROM exp.artifacts WHERE artifact_id=d->>'id' AND version=(d->>'ver')::int AND kind IS NOT NULL) THEN
+      RAISE EXCEPTION 'dependency %/% must already exist and be sealed', d->>'id', d->>'ver';
+    END IF;
+  END LOOP;
+  INSERT INTO exp.artifacts(artifact_id,version,author_role,body,content_hash,kind)
+    VALUES (p_id,p_ver,p_author,p_body,encode(sha256(convert_to(p_body,'UTF8')),'hex'),v_kind);
+  FOR d IN SELECT value FROM jsonb_array_elements(p_deps) AS t(value) LOOP
+    INSERT INTO exp.provenance(derived_id,derived_ver,source_id,source_ver)
+      VALUES (p_id,p_ver,d->>'id',(d->>'ver')::int);
+  END LOOP;
+  RETURN v_kind;
+END $fn$;
+
+-- Grants. Agents may READ the authoritative tables and PROPOSE through intake,
+-- may EXECUTE invalidate (authority checked inside), but may NOT write artifacts,
+-- provenance, invalidations or approvals directly, may NOT seal, and may NOT
+-- publish (the gate rejects non-adjudicators). The trusted runtime (operator,
+-- an adjudicator) is the sole writer of authoritative state.
 GRANT USAGE ON SCHEMA exp TO bot_researcher, bot_writer, bot_reviewer, bot_intruder;
-GRANT SELECT, INSERT ON exp.artifacts, exp.provenance TO bot_researcher, bot_writer, bot_reviewer, bot_intruder;
-GRANT SELECT ON exp.invalidations, exp.approvals, exp.adjudicators TO bot_researcher, bot_writer, bot_reviewer, bot_intruder;
+REVOKE INSERT, UPDATE, DELETE ON exp.artifacts, exp.provenance FROM bot_researcher, bot_writer, bot_reviewer, bot_intruder;
+GRANT SELECT ON exp.artifacts, exp.provenance, exp.invalidations, exp.approvals, exp.adjudicators TO bot_researcher, bot_writer, bot_reviewer, bot_intruder;
+GRANT INSERT ON exp.proposals TO bot_researcher, bot_writer, bot_reviewer, bot_intruder;
+GRANT USAGE, SELECT ON SEQUENCE exp.proposals_id_seq TO bot_researcher, bot_writer, bot_reviewer, bot_intruder;
 GRANT EXECUTE ON FUNCTION exp.invalidate(text,int,text) TO bot_researcher, bot_writer, bot_reviewer, bot_intruder;
 GRANT EXECUTE ON FUNCTION exp.publish_decision(text,int,jsonb) TO bot_researcher, bot_writer, bot_reviewer, bot_intruder;
