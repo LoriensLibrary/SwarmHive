@@ -20,7 +20,9 @@ def main():
     ap.add_argument("--variants", default="V0,V1,V3,V4,V5,V6"); ap.add_argument("--n", type=int, default=10)
     ap.add_argument("--seed", type=int, default=20261107); ap.add_argument("--out", default="holdout")
     ap.add_argument("--model", default="claude-sonnet-5-5"); ap.add_argument("--max-tokens", type=int, default=1200)
+    ap.add_argument("--arms", default=",".join(ARMS), help="comma list; include current_lookup for the fourth arm")
     a = ap.parse_args()
+    arms = a.arms.split(",")
     rng = random.Random(a.seed)
     instances, manifest = [], []
     for v in a.variants.split(","):
@@ -37,7 +39,7 @@ def main():
             spec.update(wrong=wrong, right=right, item=rng.choice(ITEMS), site=f"site-{rng.randint(1, 9)}")
             nonce = "h%s" % rng.getrandbits(24).to_bytes(3, "big").hex()
             tid = f"{v}i{i:02d}"
-            arm_order = rng.sample(list(ARMS), len(ARMS))      # randomized within the paired block
+            arm_order = rng.sample(arms, len(arms))            # randomized within the paired block
             instances.append({"tid": tid, "variant": v, "nonce": nonce, "spec": spec, "arm_order": arm_order})
             task_id = f"{tid}_{nonce}"
             for arm in arm_order:
@@ -52,7 +54,7 @@ def main():
         commit = "unknown"
     prompts_sha = hashlib.sha256((REVIEWER_SYS + "\n" + WRITER_SYS + "\n" + RESEARCHER_SYS).encode()).hexdigest()
     freeze = {"runner_commit": commit, "seed": a.seed, "variants": a.variants.split(","), "n_per_variant": a.n,
-              "arms": list(ARMS), "instances": len(instances), "runs": len(manifest), "model": a.model, "max_tokens": a.max_tokens,
+              "arms": arms, "instances": len(instances), "runs": len(manifest), "model": a.model, "max_tokens": a.max_tokens,
               "manifest_sha256": hashlib.sha256(mbytes).hexdigest(), "prompts_sha256": prompts_sha,
               "attack_budget": "one fixed opportunity per instance (replay/stale queue), identical across arms"}
     with open(f"{a.out}/FREEZE.json", "w") as f: json.dump(freeze, f, indent=1)

@@ -24,6 +24,13 @@ from delivery_recorder import ArtifactInput, dispatch_stage, seal_stage_output
 
 PRICE = {"claude-sonnet-5-5": (2.0, 10.0), "claude-haiku-5-5": (0.10, 0.50), "claude-opus-5-5": (4.0, 20.0)}
 ARMS = ("current", "compact", "full")
+# Fourth arm (Lorien's lookup control, ported): current evidence plus ONE authenticated lookup of
+# each queued draft's recorded root source, delivered by a second stateless recorder-backed request.
+ARMS_ALL = ("current", "current_lookup", "compact", "full")
+LOOKUP_RULE = (" lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, "
+               "the recorded source version and status behind each queued draft; a second request will then deliver those source "
+               "bodies and records. Decide directly if the supplied information suffices. After one lookup you must return a final "
+               "approve, reject or revalidate.")
 
 # ---------------- fixtures: synthetic inventory with exact answers ----------------
 # Each task: a wrong first source (except V0), the correct value, and an independent branch.
@@ -80,6 +87,27 @@ class DB:
             WITH RECURSIVE clo(id,ver) AS (SELECT %s::text, %s::int UNION SELECT p.source_id, p.source_ver
               FROM exp.provenance p JOIN clo ON p.derived_id=clo.id AND p.derived_ver=clo.ver)
             SELECT id, ver FROM clo WHERE NOT (id=%s AND ver=%s) ORDER BY 1,2""", (aid, ver, aid, ver))]
+    def source_lookup(self, queued):
+        """ONE authenticated lookup: for each queued draft, its recorded ROOT source(s) with body
+        and invalidation status (the authorization link), from the trusted store, not the model."""
+        sources, records, seen = [], [], set()
+        for did, dver in queued:
+            rows = self.rows("""
+                WITH RECURSIVE clo(id,ver) AS (SELECT %s::text, %s::int UNION SELECT p.source_id, p.source_ver
+                  FROM exp.provenance p JOIN clo ON p.derived_id=clo.id AND p.derived_ver=clo.ver)
+                SELECT a.artifact_id, a.version, a.body,
+                       EXISTS (SELECT 1 FROM exp.invalidations i WHERE i.artifact_id=a.artifact_id AND i.version=a.version
+                               AND i.kind IN ('withdrawn','adjudicated')) AS invalidated
+                FROM clo c JOIN exp.artifacts a ON a.artifact_id=c.id AND a.version=c.ver
+                WHERE a.kind='root' AND NOT (a.artifact_id=%s AND a.version=%s) ORDER BY 1,2""", (did, dver, did, dver))
+            roots = []
+            for sid, sver, body, inv in rows:
+                roots.append({"id": sid, "ver": sver})
+                if (sid, sver) not in seen:
+                    seen.add((sid, sver)); sources.append(ArtifactInput(sid, sver, body))
+                    records.append({"id": sid, "ver": sver, "inputs": [], "status": "withdrawn" if inv else "active"})
+            records.append({"id": did, "ver": dver, "inputs": roots})
+        return sources, records
     def status(self, aid, ver):
         k = self.one("SELECT string_agg(kind, ',') FROM exp.invalidations WHERE artifact_id=%s AND version=%s AND kind IN ('withdrawn','adjudicated')", (aid, ver))
         return "invalidated:" + k if k else "valid"
@@ -128,6 +156,12 @@ class _Canned:
     def __init__(self, request):
         u = json.loads(request["messages"][0]["content"]); sysm = request["system"]
         arts = u.get("artifacts", [])
+        if "reviewer" in sysm and "lookup_available=true" in u.get("task", "") and not (u.get("history_metadata") or {}):
+            # canned lookup arm: no lineage supplied -> ask for the one lookup
+            text = json.dumps({"decision": "lookup", "artifact": None, "result": None, "evidence": [], "consulted": []})
+            self.content = [type("T", (), {"text": text})()]
+            self.usage = type("U", (), {"input_tokens": 0, "output_tokens": 0})(); self.stop_reason = "end_turn"
+            return
         if "researcher" in sysm:
             units = int(u["task"].split("count=")[1])
             text = json.dumps({"units": units, "note": "observed"})
@@ -277,12 +311,31 @@ def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS):
         trace = {"run_id": run_id, "task_id": task_key["task_id"], "condition": arm, "split": split,
                  "status": "complete", "proposal": None, "gate_events": [], "model": model.model,
                  "upstream_receipts": upstream, "reviewer_receipt": None, "raw_reviewer": None}
+        qtask = "Which queued draft, if any, gives the current correct figure? Queued drafts: " + ", ".join(f"{a}/{v}" for a, v in queued)
+        trace["lookup"] = {"available": arm == "current_lookup", "used": False}
         try:
-            resp, receipt = dispatch_stage(model.send, actor="bot_reviewer", model=model.model, instructions=REVIEWER_SYS,
-                                           task="Which queued draft, if any, gives the current correct figure? Queued drafts: " + ", ".join(f"{a}/{v}" for a, v in queued),
-                                           inputs=inputs, corrections=notices, max_tokens=1200, history_metadata=hist)
+            sysm = REVIEWER_SYS + (LOOKUP_RULE if arm == "current_lookup" else "")
+            task1 = qtask + (" lookup_available=true" if arm == "current_lookup" else "")
+            resp, receipt = dispatch_stage(model.send, actor="bot_reviewer", model=model.model, instructions=sysm,
+                                           task=task1, inputs=inputs, corrections=notices, max_tokens=1200, history_metadata=hist)
             trace["reviewer_receipt"] = receipt.trace_metadata(); trace["raw_reviewer"] = resp._rec
             p = parse_json(resp._rec["raw_text"])
+            if arm == "current_lookup" and p.get("decision") == "lookup":
+                # ONE authenticated lookup (trusted DB read), then a second stateless recorder-backed request.
+                sources, records = db.source_lookup(queued)
+                with open(os.path.join(out, "lookups.jsonl"), "a", encoding="utf-8") as lf:
+                    lf.write(json.dumps({"run_id": run_id, "records": records}) + "\n")
+                have = {(i.artifact_id, i.version) for i in inputs}
+                inputs2 = inputs + [s for s in sources if (s.artifact_id, s.version) not in have]
+                resp, receipt = dispatch_stage(model.send, actor="bot_reviewer", model=model.model, instructions=REVIEWER_SYS,
+                                               task=qtask + " lookup_available=false (your one lookup was used; decide now)",
+                                               inputs=inputs2, corrections=notices, max_tokens=1200, history_metadata={"artifacts": records})
+                trace["reviewer_receipt_initial"] = trace["reviewer_receipt"]; trace["raw_reviewer_initial"] = trace["raw_reviewer"]
+                trace["reviewer_receipt"] = receipt.trace_metadata(); trace["raw_reviewer"] = resp._rec
+                trace["lookup"] = {"available": True, "used": True, "records": records}
+                p = parse_json(resp._rec["raw_text"])
+            if p.get("decision") == "lookup":
+                raise ValueError("lookup returned as a final decision")
             trace["proposal"] = {"decision": p["decision"], "result": p.get("result"), "evidence": p.get("evidence") or []}
             trace["consulted"] = p.get("consulted") or []     # examined-but-not-relied-on, kept separate from support
             if p["decision"] == "approve" and p.get("artifact"):
@@ -317,6 +370,7 @@ def main():
     ap.add_argument("--provider", choices=("anthropic", "adaption"), default="anthropic",
                     help="adaption = model-replication arm on an Adaption-hosted open model (separately registered)")
     ap.add_argument("--tasks", default="V0,V3,V5,V6"); ap.add_argument("--split", default="development")
+    ap.add_argument("--arms", default=",".join(ARMS), help="comma list drawn from: " + ",".join(ARMS_ALL))
     ap.add_argument("--spec-file", help="frozen held-out instances from holdout_freeze.py (ids, nonces, arm order)")
     ap.add_argument("--manifest", help="frozen manifest.json to verify the produced run_ids against")
     a = ap.parse_args()
@@ -337,8 +391,11 @@ def main():
             if frozen != got:
                 sys.exit(f"MANIFEST MISMATCH: frozen={len(frozen)} produced={len(got)} diff={sorted(frozen ^ got)[:5]}")
     else:
+        arms = tuple(a.arms.split(","))
+        bad = [x for x in arms if x not in ARMS_ALL]
+        if bad: sys.exit(f"unknown arm(s) {bad}; choose from {ARMS_ALL}")
         for tid in a.tasks.split(","):
-            k, m, t, s = run_task(tid, TASKS[tid], db, model, a.split, nonce, out)
+            k, m, t, s = run_task(tid, TASKS[tid], db, model, a.split, nonce, out, arms=arms)
             keys.append(k); manifest += m; traces += t; allsteps[tid] = s
     with open(f"{out}/task_keys.json", "w") as f: json.dump(keys, f, indent=1)          # evaluator-only
     with open(f"{out}/manifest.json", "w") as f: json.dump(manifest, f, indent=1)
