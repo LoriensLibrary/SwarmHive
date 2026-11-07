@@ -93,14 +93,22 @@ class DB:
 
 
 class Model:
-    """Trusted send adapter. Transmits exactly the constructed request; no extra context."""
-    def __init__(self, model, dry_run, rawdir):
-        self.model, self.dry, self.rawdir, self.n, self.spend = model, dry_run, rawdir, 0, 0.0
-        self.client = None if dry_run else __import__("anthropic").Anthropic()
+    """Trusted send adapter. Transmits exactly the constructed request; no extra context.
+    provider 'anthropic' calls the Anthropic SDK; 'adaption' calls Adaption's hosted open models
+    through tools/adaption_send.py (transport-only field mapping) for the model-replication arm."""
+    def __init__(self, model, dry_run, rawdir, provider="anthropic"):
+        self.model, self.dry, self.rawdir, self.n, self.spend, self.provider = model, dry_run, rawdir, 0, 0.0, provider
+        self.client = None
+        if not dry_run and provider == "anthropic":
+            self.client = __import__("anthropic").Anthropic()
+        elif not dry_run and provider == "adaption":
+            import adaption_send; self.client = adaption_send
     def send(self, **request):
         self.n += 1; t0 = time.time()
         if self.dry:
             resp = _Canned(request)
+        elif self.provider == "adaption":
+            resp = self.client.send(**request)        # credits, not USD; tokens recorded, cost_usd stays 0
         else:
             resp = self.client.messages.create(**request)
         text = "".join(getattr(b, "text", "") for b in resp.content)
@@ -306,16 +314,18 @@ class _Echo:
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", default="claude-sonnet-5-5"); ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--provider", choices=("anthropic", "adaption"), default="anthropic",
+                    help="adaption = model-replication arm on an Adaption-hosted open model (separately registered)")
     ap.add_argument("--tasks", default="V0,V3,V5,V6"); ap.add_argument("--split", default="development")
     ap.add_argument("--spec-file", help="frozen held-out instances from holdout_freeze.py (ids, nonces, arm order)")
     ap.add_argument("--manifest", help="frozen manifest.json to verify the produced run_ids against")
     a = ap.parse_args()
-    if not a.dry_run and not _load_key.load():
+    if not a.dry_run and a.provider == "anthropic" and not _load_key.load():
         sys.exit("NO KEY: secrets/anthropic.key")
     nonce = uuid.uuid4().hex[:6]
     out = f"runs/{'holdout' if a.spec_file else 'pilot'}_{nonce}{'_dry' if a.dry_run else ''}"; os.makedirs(os.path.join(out, "raw"), exist_ok=True)
     dsn = os.environ.get("HIVE_OPERATOR_DSN") or open("secrets/operator.env").read().split("=", 1)[1].strip()
-    db = DB(dsn); model = Model(a.model, a.dry_run, os.path.join(out, "raw"))
+    db = DB(dsn); model = Model(a.model, a.dry_run, os.path.join(out, "raw"), provider=a.provider)
     keys, manifest, traces, allsteps = [], [], [], {}
     if a.spec_file:
         # Held-out: task ids, nonces and per-instance arm order come from the frozen file, never regenerated.
@@ -335,7 +345,7 @@ def main():
     with open(f"{out}/traces.jsonl", "w") as f:
         for t in traces: f.write(json.dumps(t) + "\n")
     with open(f"{out}/run_summary.json", "w") as f:
-        json.dump({"model": a.model, "dry_run": a.dry_run, "model_calls": model.n, "spend_usd": round(model.spend, 4), "steps": allsteps, "out": out}, f, indent=1)
+        json.dump({"model": a.model, "provider": a.provider, "dry_run": a.dry_run, "model_calls": model.n, "spend_usd": round(model.spend, 4), "steps": allsteps, "out": out}, f, indent=1)
     print(json.dumps({"out": out, "runs": len(traces), "model_calls": model.n, "spend_usd": round(model.spend, 4)}))
 
 
