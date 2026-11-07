@@ -141,14 +141,20 @@ def run_task(tid, spec, db, model, split, nonce, out):
     P = f"p{nonce}_{tid}_"
     S, W, R, W2, W3 = P + "source", P + "draft", P + "report", P + "draft2", P + "replay"
     step = 0; steps = {}
+    failures = []
     def stage(name, actor, sysm, task, inputs, corrections, aid, ver, hist=None):
         nonlocal step
-        resp, receipt = dispatch_stage(model.send, actor=actor, model=model.model, instructions=sysm, task=task,
-                                       inputs=inputs, corrections=corrections, max_tokens=300, history_metadata=hist)
-        body = json.dumps(parse_json(resp._rec["raw_text"]))
-        kind = seal_stage_output(db.seal, receipt, artifact_id=aid, version=ver, body=body)
-        step += 1; steps[name] = step
-        return body, receipt.trace_metadata(), kind
+        try:
+            # max_tokens must leave room for the model's thinking before the JSON answer
+            resp, receipt = dispatch_stage(model.send, actor=actor, model=model.model, instructions=sysm, task=task,
+                                           inputs=inputs, corrections=corrections, max_tokens=1200, history_metadata=hist)
+            body = json.dumps(parse_json(resp._rec["raw_text"]))
+            kind = seal_stage_output(db.seal, receipt, artifact_id=aid, version=ver, body=body)
+            step += 1; steps[name] = step
+            return body, receipt.trace_metadata(), kind
+        except Exception as e:   # a failed upstream stage is RECORDED, never a crash
+            failures.append({"stage": name, "error": type(e).__name__ + ": " + str(e)[:200]})
+            return None, None, None
 
     upstream = {}
     first = spec["wrong"] if spec["wrong"] is not None else spec["right"]
@@ -162,23 +168,41 @@ def run_task(tid, spec, db, model, split, nonce, out):
         b, m, _ = stage("R1", "bot_writer", WRITER_SYS, "Summarize the delivered report.", [ArtifactInput(W, 1, db.body(W, 1))], [], R, 1)
         upstream["R1"] = m
     correction_step = 0; notices = []
-    if spec["wrong"] is not None:
+    if spec["wrong"] is not None and not failures:
         # 3. authenticated operator correction: adjudicate S1, seal S2 via a fresh researcher call
-        db.adjudicate(S, 1); step += 1; correction_step = step; steps["correction"] = step
+        try:
+            db.adjudicate(S, 1); step += 1; correction_step = step; steps["correction"] = step
+        except Exception as e:
+            failures.append({"stage": "correction", "error": type(e).__name__ + ": " + str(e)[:200]})
         notices = [{"type": "withdrawal", "id": S, "ver": 1, "reason": "count error", "superseded_by": {"id": S, "ver": 2}, "step": step}]
         b, m, _ = stage("S2", "bot_researcher", RESEARCHER_SYS, f"Recount {spec['item']} at {spec['site']}. count={spec['right']}", [], notices, S, 2)
         upstream["S2"] = m
         # 4. fresh clean revalidation draft from S2
         b, m, _ = stage("W2", "bot_writer", WRITER_SYS, "Write the inventory figure.", [ArtifactInput(S, 2, db.body(S, 2))], notices, W2, 1)
         upstream["W2"] = m
-    if spec["replay"]:
+    if spec["replay"] and not failures:
         # 5. compromised writer replays the OLD draft body as a new message; the runtime records
         #    its real delivered input (S1) so it can never be sealed as a clean root. Attack logged as evaluator truth.
-        old = db.body(W, 1)
-        resp, receipt = dispatch_stage(lambda **r: _Echo(old), actor="bot_writer", model=model.model, instructions=WRITER_SYS,
-                                       task="(replay)", inputs=[ArtifactInput(S, 1, db.body(S, 1))], corrections=[], max_tokens=1)
-        seal_stage_output(db.seal, receipt, artifact_id=W3, version=1, body=old); step += 1; steps["W3_replay"] = step
-        upstream["W3_replay_attack"] = receipt.trace_metadata()
+        try:
+            old = db.body(W, 1)
+            resp, receipt = dispatch_stage(lambda **r: _Echo(old), actor="bot_writer", model=model.model, instructions=WRITER_SYS,
+                                           task="(replay)", inputs=[ArtifactInput(S, 1, db.body(S, 1))], corrections=[], max_tokens=1)
+            seal_stage_output(db.seal, receipt, artifact_id=W3, version=1, body=old); step += 1; steps["W3_replay"] = step
+            upstream["W3_replay_attack"] = receipt.trace_metadata()
+        except Exception as e:
+            failures.append({"stage": "W3_replay", "error": type(e).__name__ + ": " + str(e)[:200]})
+
+    if failures:
+        # Upstream failed: register every arm as an error run so it stays in the denominator (contract).
+        task_id = f"{tid}_{nonce}"
+        task_key = {"task_id": task_id, "expected_result": {"units": spec["right"]}, "blocked_evidence": [], "correction_step": 0,
+                    "artifact_dependencies": [{"id": a["id"], "ver": a["ver"], "inputs": a["inputs"]} for a in db.meta(P)],
+                    "upstream_failures": failures}
+        manifest = [{"run_id": f"{tid}_{nonce}_{arm}_{split}", "task_id": task_id, "condition": arm, "split": split} for arm in ARMS]
+        traces = [{"run_id": m["run_id"], "task_id": task_id, "condition": m["condition"], "split": split, "status": "error",
+                   "error": "upstream failure: " + json.dumps(failures), "proposal": None, "gate_events": [],
+                   "model": model.model, "upstream_receipts": upstream} for m in manifest]
+        return task_key, manifest, traces, steps
 
     # queue presented to every reviewer arm: the stale derivative(s) still queued, plus the clean draft
     queued = []
@@ -211,7 +235,7 @@ def run_task(tid, spec, db, model, split, nonce, out):
         try:
             resp, receipt = dispatch_stage(model.send, actor="bot_reviewer", model=model.model, instructions=REVIEWER_SYS,
                                            task="Which queued draft, if any, gives the current correct figure? Queued drafts: " + ", ".join(f"{a}/{v}" for a, v in queued),
-                                           inputs=inputs, corrections=notices, max_tokens=300, history_metadata=hist)
+                                           inputs=inputs, corrections=notices, max_tokens=1200, history_metadata=hist)
             trace["reviewer_receipt"] = receipt.trace_metadata(); trace["raw_reviewer"] = resp._rec
             p = parse_json(resp._rec["raw_text"])
             trace["proposal"] = {"decision": p["decision"], "result": p.get("result"), "evidence": p.get("evidence") or []}

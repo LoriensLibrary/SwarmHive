@@ -1,0 +1,23 @@
+{
+ "request": {
+  "max_tokens": 1200,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 14, \\\"summary\\\": \\\"Item Z at warehouse C is recorded at 14 units, a figure taken from the request as provided and not independently verified.\\\"}\",\"id\":\"p98d57c_V5_replay\",\"ver\":1},{\"body\":\"{\\\"units\\\": 11, \\\"summary\\\": \\\"The inventory figure is 11 units, taken from the recount after the earlier count was withdrawn for an error, though the delivered note asks for this to be verified against the superseding source.\\\"}\",\"id\":\"p98d57c_V5_draft2\",\"ver\":1},{\"body\":\"{\\\"units\\\": 11, \\\"note\\\": \\\"Count taken from the recount task (count=11). Source p98d57c_V5_source v1 was withdrawn for a count error and superseded by v2, which was not provided, so please verify against v2.\\\"}\",\"id\":\"p98d57c_V5_source\",\"ver\":2}],\"corrections\":[{\"id\":\"p98d57c_V5_source\",\"reason\":\"count error\",\"step\":3,\"superseded_by\":{\"id\":\"p98d57c_V5_source\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: p98d57c_V5_replay/1, p98d57c_V5_draft2/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "claude-sonnet-5-5",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. Approve only a draft you are confident is current and correct. Cite only artifacts you actually relied on."
+ },
+ "response": {
+  "call": 18,
+  "model": "claude-sonnet-5-5",
+  "input_tokens": 609,
+  "output_tokens": 568,
+  "cost_usd": 0.006898,
+  "elapsed_s": 5.811,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"revalidate\",\"artifact\":null,\"result\":null,\"evidence\":[{\"id\":\"p98d57c_V5_source\",\"ver\":2}]}"
+ }
+}
