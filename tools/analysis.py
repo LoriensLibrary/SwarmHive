@@ -43,7 +43,7 @@ def norm_cdf(z):
 def tango_z(n12, n21, n, d):
     """Score statistic for H0: p1 - p2 = d, with p1 = P(compact yes), p2 = P(lookup yes); n12 = compact yes & lookup no."""
     B = (n12 + n21) - d * (2 * n - n12 + n21)
-    q = (B + math.sqrt(B * B + 8 * n * n21 * d * (1 - d))) / (4 * n)        # restricted MLE of p21 under H0
+    q = (B + math.sqrt(max(0.0, B * B + 8 * n * n21 * d * (1 - d)))) / (4 * n)   # restricted MLE of p21 under H0; clamp guards float error at the d = -1 endpoint
     var = n * (2 * q + d * (1 - d))
     num = n12 - n21 - n * d
     if var <= 1e-15:
