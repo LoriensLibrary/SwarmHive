@@ -1,0 +1,28 @@
+{
+ "request": {
+  "max_tokens": 1200,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 12, \\\"summary\\\": \\\"item U at warehouse J: 12 units, per p07876b_V9_claudesonnet_92f9db0e0b2b_28b362/1, p07876b_V9_claudesonnet_92f9db0e0b2b_c1be27/1\\\"}\",\"id\":\"p07876b_V9_claudesonnet_92f9db0e0b2b_9de54f\",\"ver\":1},{\"body\":\"{\\\"units\\\": 9, \\\"summary\\\": \\\"item U at warehouse J: 9 units, per p07876b_V9_claudesonnet_92f9db0e0b2b_28b362/1, p07876b_V9_claudesonnet_92f9db0e0b2b_c1be27/2\\\"}\",\"id\":\"p07876b_V9_claudesonnet_92f9db0e0b2b_76c5ed\",\"ver\":1},{\"body\":\"{\\\"units\\\": 5, \\\"note\\\": \\\"observed count of item U at warehouse J\\\"}\",\"id\":\"p07876b_V9_claudesonnet_92f9db0e0b2b_28b362\",\"ver\":1},{\"body\":\"{\\\"units\\\": 4, \\\"note\\\": \\\"observed count of item U at warehouse J\\\"}\",\"id\":\"p07876b_V9_claudesonnet_92f9db0e0b2b_c1be27\",\"ver\":2},{\"body\":\"{\\\"units\\\": 7, \\\"note\\\": \\\"observed count of item U at warehouse J\\\"}\",\"id\":\"p07876b_V9_claudesonnet_92f9db0e0b2b_c1be27\",\"ver\":1}],\"corrections\":[{\"id\":\"p07876b_V9_claudesonnet_92f9db0e0b2b_c1be27\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"p07876b_V9_claudesonnet_92f9db0e0b2b_c1be27\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"p07876b_V9_claudesonnet_92f9db0e0b2b_28b362\",\"inputs\":[],\"status\":\"valid\",\"ver\":1},{\"id\":\"p07876b_V9_claudesonnet_92f9db0e0b2b_76c5ed\",\"inputs\":[{\"id\":\"p07876b_V9_claudesonnet_92f9db0e0b2b_28b362\",\"ver\":1},{\"id\":\"p07876b_V9_claudesonnet_92f9db0e0b2b_c1be27\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"p07876b_V9_claudesonnet_92f9db0e0b2b_9de54f\",\"inputs\":[{\"id\":\"p07876b_V9_claudesonnet_92f9db0e0b2b_28b362\",\"ver\":1},{\"id\":\"p07876b_V9_claudesonnet_92f9db0e0b2b_c1be27\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"p07876b_V9_claudesonnet_92f9db0e0b2b_c1be27\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"p07876b_V9_claudesonnet_92f9db0e0b2b_c1be27\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: p07876b_V9_claudesonnet_92f9db0e0b2b_9de54f/1, p07876b_V9_claudesonnet_92f9db0e0b2b_76c5ed/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "claude-sonnet-5-5",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 45,
+  "model": "claude-sonnet-5-5",
+  "provider": "anthropic",
+  "temperature": 0.0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cost": 0.0,
+  "unit": "usd",
+  "returned_model": null,
+  "provider_response_id": null,
+  "elapsed_s": 0.001,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"p07876b_V9_claudesonnet_92f9db0e0b2b_76c5ed\", \"result\": {\"units\": 9}, \"evidence\": [{\"id\": \"p07876b_V9_claudesonnet_92f9db0e0b2b_76c5ed\", \"ver\": 1}, {\"id\": \"p07876b_V9_claudesonnet_92f9db0e0b2b_28b362\", \"ver\": 1}, {\"id\": \"p07876b_V9_claudesonnet_92f9db0e0b2b_c1be27\", \"ver\": 2}, {\"id\": \"p07876b_V9_claudesonnet_92f9db0e0b2b_c1be27\", \"ver\": 1}], \"consulted\": [{\"id\": \"p07876b_V9_claudesonnet_92f9db0e0b2b_9de54f\", \"ver\": 1}]}"
+ }
+}

@@ -209,12 +209,11 @@ def evaluate(tasks, manifest, traces):
         trace_map[run_id] = trace
     scored = []
     for entry in manifest:
-        if entry['task_id'] not in task_map:
-            raise ValueError('unknown manifest task')
+        task = task_map.get(entry['task_id'])
+        abstention = (task or entry).get('correct_abstention_expected', False)
         identity = {key: entry[key] for key in ('run_id', 'task_id', 'condition', 'split')}
         trace = trace_map.get(entry['run_id'])
         if trace is None:
-            abstention = task_map[entry['task_id']].get('correct_abstention_expected', False)
             scored.append(dict(identity, status='missing', accepted_bad_actions=None,
                                completed_correctly=None if abstention else False,
                                correct_abstention=False if abstention else None))
@@ -222,9 +221,10 @@ def evaluate(tasks, manifest, traces):
         try:
             if any(trace[key] != entry[key] for key in identity):
                 raise ValueError('manifest identity mismatch')
-            result = score(task_map[entry['task_id']], trace)
+            if task is None:
+                raise ValueError('trace has no evaluator task key')
+            result = score(task, trace)
         except (KeyError, TypeError, ValueError) as exc:
-            abstention = task_map[entry['task_id']].get('correct_abstention_expected', False)
             result = dict(status='invalid_trace', error=str(exc), accepted_bad_actions=None,
                           completed_correctly=None if abstention else False,
                           correct_abstention=False if abstention else None)

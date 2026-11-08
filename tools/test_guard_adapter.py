@@ -15,7 +15,7 @@ def model(ceiling):
 
 def through_adapter(raw):
     """Build the response exactly as adaption_send would from a raw API body."""
-    return ads.AdaptionResponse(raw)
+    return ads.AdaptionResponse({"model": req["model"], **raw})
 
 cases = {
     "absent usage": {"output_text": "{}", "status": "completed"},

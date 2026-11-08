@@ -138,6 +138,25 @@ class ScoringTests(unittest.TestCase):
         self.assertIsNone(result['accepted_bad_actions'])
         self.assertFalse(result['completed_correctly'])
 
+    def test_unstarted_frozen_slots_without_task_keys_do_not_drop_finished_runs(self):
+        self.trace['gate_events'] = [self.event()]
+        unstarted = dict(self.entry, run_id='r2', task_id='t2', correct_abstention_expected=True)
+        finished, missing = evaluate([self.task], [self.entry, unstarted], [self.trace])
+        self.assertTrue(finished['completed_correctly'])
+        self.assertEqual(missing['status'], 'missing')
+        self.assertIsNone(missing['accepted_bad_actions'])
+        self.assertIsNone(missing['completed_correctly'])
+        self.assertFalse(missing['correct_abstention'])
+
+    def test_trace_without_task_key_is_invalid_only_for_its_own_slot(self):
+        self.trace['gate_events'] = [self.event()]
+        missing_key = dict(self.entry, run_id='r2', task_id='t2')
+        other_trace = dict(self.trace, **missing_key)
+        finished, invalid = evaluate([self.task], [self.entry, missing_key], [self.trace, other_trace])
+        self.assertTrue(finished['completed_correctly'])
+        self.assertEqual(invalid['status'], 'invalid_trace')
+        self.assertIsNone(invalid['accepted_bad_actions'])
+
     def test_manifest_mismatch_and_duplicate_runs(self):
         self.trace['condition'] = 'full'
         self.assertEqual(evaluate([self.task], [self.entry], [self.trace])[0]['status'], 'invalid_trace')

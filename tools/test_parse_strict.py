@@ -19,6 +19,10 @@ bad = {
     "evidence not a list": '{"decision": "approve", "artifact": "x", "result": {"units": 3}, "evidence": {"id": "x", "ver": 1}}',
     "evidence entry malformed": '{"decision": "approve", "artifact": "x", "result": {"units": 3}, "evidence": [{"id": "x", "ver": "1"}]}',
     "result not object": '{"decision": "approve", "artifact": "x", "result": 3, "evidence": []}',
+    "NaN units": '{"decision": "approve", "artifact": "x", "result": {"units": NaN}}',
+    "boolean units": '{"decision": "approve", "artifact": "x", "result": {"units": true}}',
+    "missing result": '{"decision": "approve", "artifact": "x"}',
+    "lookup carries a publish result": '{"decision": "lookup", "artifact": "x", "result": {"units": 3}}',
 }
 for name, text in bad.items():
     try:
@@ -28,3 +32,4 @@ for name, text in bad.items():
     except Exception as e:
         print("FAIL wrong exception:", name, type(e).__name__); ok = False
 print("ALL OK" if ok else "SOME FAILED")
+sys.exit(0 if ok else 1)

@@ -22,6 +22,7 @@ sys.path.insert(0, "tools")
 VENDOR = os.environ.get("LORIEN_REF") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "vendor")   # Lorien's recorder + scorer, vendored byte-identical (tools/vendor/NOTICE)
 sys.path.insert(0, VENDOR)
 import _load_key
+from gate_preflight import snapshot as gate_snapshot
 from delivery_recorder import ArtifactInput, dispatch_stage, seal_stage_output
 
 # Explicit per-model spec. A PAID run with a model not listed here exits before connecting: no fallback rates,
@@ -135,7 +136,8 @@ class DB:
     def seal(self, author, aid, ver, body, deps):
         if self.authorship == "authenticated":
             pr = self.propose(author, aid, ver, body)
-            kind = self.one("SELECT exp.seal_from_receipt(%s,%s,%s,%s::jsonb)", (pr["receipt"], author, pr["body_sha256"], json.dumps(deps)))
+            kind = self.one("SELECT exp.seal_from_receipt(%s,%s,%s,%s,%s,%s::jsonb)",
+                            (pr["receipt"], author, aid, ver, pr["body_sha256"], json.dumps(deps)))
             row = self.rows("SELECT id, proposer FROM exp.proposals WHERE payload->>'receipt' = %s", (pr["receipt"],))[0]
             self.last_seal = {"authorship": "authenticated", "proposal_id": row[0], "proposer": row[1], "receipt_sha256": hashlib.sha256(pr["receipt"].encode()).hexdigest(),
                               "body_sha256": pr["body_sha256"], "author_in_store": self.one("SELECT author_role FROM exp.artifacts WHERE artifact_id=%s AND version=%s", (aid, ver))}
@@ -236,6 +238,7 @@ class Model:
         self.temperature = temperature
         self.ceiling, self.ledger, self.max_attempts, self.retries = ceiling, ledger, max_attempts, retries
         self.attempts = 0                                 # provider attempts actually sent (dry: 0)
+        self.integrity_stop = None                        # sticky for this cohort
         spec = MODEL_SPEC.get(model)
         if not dry_run:
             if spec is None or spec["provider"] != provider:
@@ -249,7 +252,10 @@ class Model:
         if not dry_run and provider == "anthropic":
             self.client = __import__("anthropic").Anthropic(max_retries=0)   # no silent SDK retries
         elif not dry_run and provider == "adaption":
-            import adaption_send; self.client = adaption_send
+            import adaption_send
+            if adaption_send.BASE != adaption_send.HOSTED_BASE_URL:
+                raise SystemExit("paid runs require the registered Adaption hosted endpoint")
+            self.client = adaption_send
     def unit_price(self):
         return self.price
     def reserve(self, request):
@@ -262,6 +268,10 @@ class Model:
     RETRY_STATUS = (408, 409, 429, 500, 502, 503, 504)
     def _attempt(self, request):
         """One provider attempt: cap check, ceiling check, debit, send, reconcile. Fails closed at every step."""
+        if self.integrity_stop:
+            raise BudgetStop(f"budget_stopped: provider billing integrity failure ({self.integrity_stop})")
+        if request.get("model") != self.model:
+            raise BudgetStop("budget_stopped: request model differs from the registered billing model")
         if self.max_attempts is not None and self.attempts >= self.max_attempts:
             self._ledger({"call": self.n, "event": "attempt_cap", "attempts": self.attempts, "max": self.max_attempts})
             raise BudgetStop(f"budget_stopped: attempt cap {self.max_attempts} reached")
@@ -282,11 +292,19 @@ class Model:
         usage = getattr(resp, "usage", None)
         it, ot = getattr(usage, "input_tokens", None), getattr(usage, "output_tokens", None)
         if usage is None or type(it) is not int or type(ot) is not int or it < 0 or ot < 0:   # bool is not int here; negatives fail
+            self.integrity_stop = "missing_usage"
             self._ledger({"call": self.n, "event": "missing_usage", "attempt": self.attempts, "reserve_kept": round(res, 6)})
             raise RuntimeError("usage counters missing from the provider response; reserve kept, call failed closed")
         if it > self.context or ot > int(request.get("max_tokens") or MAX_TOKENS):
+            self.integrity_stop = "usage_exceeds_reserve"
             self._ledger({"call": self.n, "event": "usage_exceeds_reserve", "attempt": self.attempts, "input_tokens": it, "output_tokens": ot, "reserve_kept": round(res, 6)})
             raise RuntimeError("usage exceeds the reserved maximum; reserve kept, call failed closed")
+        returned_model = getattr(resp, "model", None)
+        if returned_model != self.model:
+            self.integrity_stop = "unrecognized_billing_model"
+            self._ledger({"call": self.n, "event": self.integrity_stop, "attempt": self.attempts,
+                          "returned_model": str(returned_model)[:160], "reserve_kept": round(res, 6)})
+            raise RuntimeError("response model does not match the registered billing model; reserve kept")
         pi, po = self.price; cost = (it * pi + ot * po) / 1e6
         self.spend += cost - res                           # reconcile the debit to verified usage at the explicit rate
         self._ledger({"call": self.n, "event": "actual", "attempt": self.attempts, "input_tokens": it, "output_tokens": ot, "cost": round(cost, 6), "spend_after": round(self.spend, 6), "unit": self.unit})
@@ -374,6 +392,10 @@ def _no_dup_pairs(pairs):
     return d
 
 
+def _reject_json_constant(value):
+    raise InvalidOutput(f"non-JSON constant {value!r}")
+
+
 def parse_json(text):
     """Strict: the whole reply (after an optional ``` fence) must be ONE JSON object with no duplicate keys.
     Mixed prose + JSON is invalid output, recorded with the raw text and provider stop reason; never guessed."""
@@ -382,7 +404,7 @@ def parse_json(text):
         t = t.strip("`").strip()
         if t.lower().startswith("json"): t = t[4:].strip()
     try:
-        obj = json.loads(t, object_pairs_hook=_no_dup_pairs)
+        obj = json.loads(t, object_pairs_hook=_no_dup_pairs, parse_constant=_reject_json_constant)
     except json.JSONDecodeError as e:
         raise InvalidOutput(f"not a single JSON object: {str(e)[:80]}")
     if not isinstance(obj, dict): raise InvalidOutput("reply is not a JSON object")
@@ -396,16 +418,23 @@ def validate_proposal(p):
     for k in ("evidence", "consulted"):
         if p.get(k) is not None and not isinstance(p[k], list): raise InvalidOutput(f"{k} must be a list")
         for e in p.get(k) or []:
-            if not isinstance(e, dict) or not isinstance(e.get("id"), str) or type(e.get("ver")) is not int:
+            if (not isinstance(e, dict) or not isinstance(e.get("id"), str) or not e["id"]
+                    or type(e.get("ver")) is not int or e["ver"] < 1):
                 raise InvalidOutput(f"{k} entries must be {{id: str, ver: int}}")
-    if p.get("result") is not None and not isinstance(p["result"], dict): raise InvalidOutput("result must be an object or null")
+    result = p.get("result")
     sel = p.get("artifact")
     if p["decision"] == "approve":
+        if not isinstance(result, dict) or set(result) != {"units"} or type(result["units"]) is not int:
+            raise InvalidOutput("approve requires result with integer units")
         if isinstance(sel, dict):
-            if not isinstance(sel.get("id"), str) or type(sel.get("ver")) is not int: raise InvalidOutput("artifact must be {id: str, ver: int}")
+            if (not isinstance(sel.get("id"), str) or not sel["id"]
+                    or type(sel.get("ver")) is not int or sel["ver"] < 1):
+                raise InvalidOutput("artifact must be {id: str, ver: positive int}")
             return (sel["id"], sel["ver"])
         if isinstance(sel, str) and sel: return (sel, 1)          # bare id = version 1 (the prompt's documented shorthand)
         raise InvalidOutput("approve without a selected artifact")
+    if sel is not None or result is not None:
+        raise InvalidOutput("non-approval requires null artifact and result")
     return None
 
 
@@ -420,8 +449,10 @@ def code_hashes():
     """Byte hashes of the code that produces or scores a run; frozen and re-checked before the first paid call."""
     here = os.path.dirname(os.path.abspath(__file__))
     files = {"runner_sha256": os.path.join(here, "pilot_runner.py"), "adapter_sha256": os.path.join(here, "adaption_send.py"),
+             "gate_preflight_sha256": os.path.join(here, "gate_preflight.py"),
              "recorder_sha256": os.path.join(VENDOR, "delivery_recorder.py"), "scorer_sha256": os.path.join(VENDOR, "score_runs.py"),
-             "gate_sha256": os.path.join(here, "..", "sql", "experiment_schema.sql"), "gate_addendum_sha256": os.path.join(here, "..", "sql", "seal_from_proposal.sql"), "gate_hardening_sha256": os.path.join(here, "..", "sql", "gate_hardening.sql"), "gate_hardening_2_sha256": os.path.join(here, "..", "sql", "gate_hardening_2.sql")}
+             "gate_sha256": os.path.join(here, "..", "sql", "experiment_schema.sql"), "gate_addendum_sha256": os.path.join(here, "..", "sql", "seal_from_proposal.sql"), "gate_hardening_sha256": os.path.join(here, "..", "sql", "gate_hardening.sql"), "gate_hardening_2_sha256": os.path.join(here, "..", "sql", "gate_hardening_2.sql"),
+             "gate_exact_receipt_sha256": os.path.join(here, "..", "sql", "gate_exact_receipt.sql")}
     return {k: hashlib.sha256(open(v, "rb").read()).hexdigest() for k, v in files.items()}
 
 
@@ -445,8 +476,9 @@ def _units(body):
     return json.loads(body)["units"]
 
 
-def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS, cohort="", upstream_mode="model"):
-    P = f"p{nonce}_{tid}_{cohort}_" if cohort else f"p{nonce}_{tid}_"   # cohort tag: no prefix collisions across model cohorts on one DB
+def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS, cohort="", upstream_mode="model",
+             on_task_key=None, on_trace=None):
+    P = f"p{nonce}_{tid}_{cohort}_{uuid.uuid4().hex[:12]}_"
     oid = lambda: P + uuid.uuid4().hex[:6]            # opaque ids: no role or recency leaks to the model
     S, W, R, W2, W3, U, T, R2 = (oid() for _ in range(8))
     names = {S: "source", W: "draft_from_v1", R: "report_from_draft", W2: "draft_from_v2", W3: "replay_of_draft_v1",
@@ -606,11 +638,18 @@ def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS, cohort="", upst
         task_id = f"{tid}_{nonce}"
         task_key = {"task_id": task_id, "expected_result": expected, "blocked_evidence": blocked, "correction_step": 0,
                     "artifact_dependencies": [{"id": a["id"], "ver": a["ver"], "inputs": a["inputs"]} for a in db.meta(P)],
-                    "upstream_failures": failures, "names": names}
+                    "upstream_failures": failures, "names": names,
+                    "correct_abstention_expected": bool(spec.get("bad_draft"))}
         manifest = [{"run_id": f"{tid}_{nonce}_{arm}_{split}", "task_id": task_id, "condition": arm, "split": split} for arm in arms]
         traces = [{"run_id": m["run_id"], "task_id": task_id, "condition": m["condition"], "split": split, "status": "error",
                    "error": "upstream failure: " + json.dumps(failures), "proposal": None, "gate_events": [],
-                   "model": model.model, "upstream_mode": upstream_mode, "upstream_receipts": upstream} for m in manifest]
+                   "model": model.model, "upstream_mode": upstream_mode, "upstream_receipts": upstream,
+                   "gate_called": False, "harness_test": model.dry} for m in manifest]
+        if on_task_key is not None:
+            on_task_key(task_key)
+        if on_trace is not None:
+            for trace in traces:
+                on_trace(trace)
         return task_key, manifest, traces, steps
 
     # Queue presented to every reviewer arm. Order is counterbalanced per instance from the freeze and IDENTICAL
@@ -632,6 +671,8 @@ def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS, cohort="", upst
                 "reviewer_notice": not spec.get("no_notice"), "prose_names": bool(spec.get("prose_names", True)), "authorship": db.authorship,
                 "bodies_identical": bool(stale) and db.body(*stale[-1]) == db.body(*fresh), "correct_abstention_expected": bool(spec.get("bad_draft")),
                 "lookup_equivalence_preflight": hashlib.sha256(json.dumps(db.source_lookup(queued, current_sources[0], mode=LOOKUP_MODE)[1] if LOOKUP_MODE != "direct" else db.reachable_records(list(queued) + list(current_sources)), sort_keys=True).encode()).hexdigest() == reach_sha}
+    if on_task_key is not None:
+        on_task_key(task_key)
     manifest, traces = [], []
     for arm in arms:                                   # frozen, randomized order per instance in held-out mode
         run_id = f"{tid}_{nonce}_{arm}_{split}"
@@ -662,7 +703,8 @@ def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS, cohort="", upst
                     def supported(c):
                         srcs = [i for i in db.direct_inputs(*c) if db.status(i["id"], i["ver"]) == "valid"]
                         vals = [_units(db.body(i["id"], i["ver"])) for i in srcs]
-                        return bool(vals) and _units(db.body(*c)) in (sum(vals), *vals)
+                        required_sources = 2 if spec.get("two_sources") else 1
+                        return len(vals) == required_sources and _units(db.body(*c)) == sum(vals)
                     elig = [c for c in elig if supported(c)]
                 if len(elig) > 1:
                     direct = [c for c in elig if any((i["id"], i["ver"]) in current_sources for i in db.direct_inputs(*c))]
@@ -724,12 +766,13 @@ def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS, cohort="", upst
                 committed = db.approval_by_pk(attempt) if attempt else None   # separate post-commit read by primary key
                 step += 1
                 ev = {"step": step, "db_verified": committed is not None, "decision": committed, "gate_reply": gate,
-                      "artifact": {"id": aid, "ver": ver}, "attempt": attempt,
-                      "closure": db.closure(aid, ver)}            # authoritative transitive lineage, reported regardless of outcome
+                      "artifact": {"id": aid, "ver": ver}, "attempt": attempt}
                 if committed == "approved":
-                    ev["result"] = {"units": _units(db.body(aid, ver))}   # from the SEALED body, not the claimed result
-                    ev["evidence"] = db.direct_inputs(aid, ver)       # authoritative, not model-claimed
+                    ev["result"] = next(c["result"] for c in task_key["queued_candidate_results"]
+                                        if (c["id"], c["ver"]) == (aid, ver))
+                    ev["evidence"] = ack
                 trace["gate_events"].append(ev)
+                ev["closure"] = db.closure(aid, ver)
                 if committed is None:
                     trace["status"] = "error"; trace["error"] = "gate reply without a committed row for this attempt"
         except (json.JSONDecodeError, KeyError, ValueError) as e:   # InvalidOutput is a ValueError
@@ -738,6 +781,8 @@ def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS, cohort="", upst
         except Exception as e:
             trace["status"] = "error"; trace["error"] = type(e).__name__ + ": " + str(e)[:200]
         traces.append(trace)
+        if on_trace is not None:
+            on_trace(trace)
     return task_key, manifest, traces, steps
 
 
@@ -763,6 +808,9 @@ def main():
     ap.add_argument("--cohort", default=None, help="cohort tag for artifact prefixes and the output dir; defaults to the model id, sanitized")
     ap.add_argument("--retries", type=int, default=0, help="automatic retries per call on retryable statuses; each attempt is reserved and counted separately (default 0)")
     a = ap.parse_args()
+    declared_dsn = os.environ.get("HIVE_OPERATOR_DSN")
+    if not a.dry_run and (not a.spec_file or not declared_dsn):
+        sys.exit("paid runs require a frozen spec and an explicit HIVE_OPERATOR_DSN")
     if not a.dry_run and a.provider == "anthropic" and not _load_key.load():
         sys.exit("NO KEY: secrets/anthropic.key")
     if not a.dry_run and (a.ceiling is None or not (math.isfinite(a.ceiling) and a.ceiling > 0)):
@@ -770,7 +818,7 @@ def main():
     nonce = uuid.uuid4().hex[:6]
     cohort = a.cohort or re.sub(r"[^a-z0-9]+", "", a.model.lower())[:12]
     out = f"runs/{'holdout' if a.spec_file else 'pilot'}_{cohort}_{nonce}{'_dry' if a.dry_run else ''}"; os.makedirs(os.path.join(out, "raw"), exist_ok=True)
-    dsn = os.environ.get("HIVE_OPERATOR_DSN") or open("secrets/operator.env").read().split("=", 1)[1].strip()
+    dsn = declared_dsn or open("secrets/operator.env").read().split("=", 1)[1].strip()
     db = DB(dsn, authorship=a.authorship)
     keys, manifest, traces, allsteps = [], [], [], {}
     if a.spec_file:
@@ -785,7 +833,9 @@ def main():
         fdir = os.path.dirname(os.path.abspath(a.spec_file)); fpath = os.path.join(fdir, "FREEZE.json")
         if not os.path.exists(fpath): sys.exit("frozen run requires FREEZE.json beside the spec file")
         frz = json.load(open(fpath))
-        expected = [{"run_id": f"{i['tid']}_{i['nonce']}_{arm}_{a.split}", "task_id": f"{i['tid']}_{i['nonce']}", "condition": arm, "split": a.split}
+        expected = [{"run_id": f"{i['tid']}_{i['nonce']}_{arm}_{a.split}", "task_id": f"{i['tid']}_{i['nonce']}",
+                     "condition": arm, "split": a.split,
+                     "correct_abstention_expected": bool(i["spec"].get("bad_draft"))}
                     for i in instances for arm in i["arm_order"]]
         if a.manifest:
             frozen_list = json.load(open(a.manifest))
@@ -793,6 +843,8 @@ def main():
                 sys.exit("MANIFEST MISMATCH (ordered): the frozen manifest does not match the instances' run order")
         mpath = os.path.join(fdir, "manifest.json")
         if not os.path.exists(mpath): sys.exit("frozen run requires manifest.json beside the spec file")
+        if json.load(open(mpath)) != expected:
+            sys.exit("frozen manifest identities or dispositions do not match the instances")
         checks = {
             "manifest_sha256": hashlib.sha256(open(mpath, "rb").read()).hexdigest(),
             "instances_sha256": hashlib.sha256(open(a.spec_file, "rb").read()).hexdigest(),
@@ -809,6 +861,19 @@ def main():
         if bad: sys.exit(f"FREEZE MISMATCH before any paid call: {bad}")
         if "freeze_id" not in frz: sys.exit("FREEZE.json has no freeze_id")
         if frz["freeze_id"] != freeze_digest(frz): sys.exit("FREEZE.json content does not match its freeze_id digest (edited after freezing)")
+        deployment = frz.get("gate_deployment")
+        if not a.dry_run and deployment is None:
+            sys.exit("paid freeze requires the reviewed target and live gate fingerprint")
+        if deployment is not None:
+            try:
+                with db.c.transaction():
+                    db.c.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY")
+                    live_deployment = gate_snapshot(db.c, dsn)
+            except Exception as exc:
+                sys.exit(f"gate preflight failed ({type(exc).__name__}, SQLSTATE {getattr(exc, 'sqlstate', None)})")
+            if live_deployment != deployment:
+                sys.exit("live gate target or deployed schema differs from the freeze")
+            checks["gate_deployment"] = live_deployment
         if frz.get("cohort") and a.cohort and a.cohort != frz["cohort"]: sys.exit(f"cohort {a.cohort!r} is not the frozen cohort {frz['cohort']!r}")
         if frz.get("cohort"): cohort = frz["cohort"]
         execution_id = uuid.uuid4().hex
@@ -828,12 +893,28 @@ def main():
             json.dump({"execution_id": execution_id, "freeze_id": frz["freeze_id"], "cohort": cohort, "dry_run": a.dry_run, "checks": checks}, f, indent=1)
         # the registered denominator is written BEFORE any review dispatch: every frozen slot is scoreable (as missing) from the start
         with open(f"{out}/manifest.json", "w") as f: json.dump(expected, f, indent=1)
+        task_keys_path = f"{out}/task_keys.json"
+        with open(task_keys_path, "w") as f:
+            json.dump([], f)
+        with open(f"{out}/traces.jsonl", "x"):
+            pass
+
+        def persist_task_key(key):
+            keys.append(key)
+            temporary_path = task_keys_path + ".tmp"
+            with open(temporary_path, "w") as f:
+                json.dump(keys, f, indent=1)
+            os.replace(temporary_path, task_keys_path)
+
+        def persist_trace(trace):
+            with open(f"{out}/traces.jsonl", "a") as f:
+                f.write(json.dumps(trace) + "\n")
+
         for inst in instances:
-            k, m, t, s = run_task(inst["tid"], inst["spec"], db, model, a.split, inst["nonce"], out, arms=inst["arm_order"], cohort=cohort, upstream_mode=a.upstream)
-            keys.append(k); manifest += m; traces += t; allsteps[inst["tid"]] = s
-            with open(f"{out}/traces.jsonl", "a") as f:                 # persist incrementally: a crash or budget stop keeps what ran
-                for tr in t: f.write(json.dumps(tr) + "\n")
-            with open(f"{out}/task_keys.json", "w") as f: json.dump(keys, f, indent=1)   # evaluator-only, kept current per instance
+            _, m, t, s = run_task(inst["tid"], inst["spec"], db, model, a.split, inst["nonce"], out,
+                                  arms=inst["arm_order"], cohort=cohort, upstream_mode=a.upstream,
+                                  on_task_key=persist_task_key, on_trace=persist_trace)
+            manifest += m; traces += t; allsteps[inst["tid"]] = s
         if [e["run_id"] for e in manifest] != [e["run_id"] for e in expected]:
             sys.exit("MANIFEST MISMATCH after run: produced order differs from the freeze")
     else:
@@ -843,9 +924,9 @@ def main():
         for tid in a.tasks.split(","):
             k, m, t, s = run_task(tid, TASKS[tid], db, model, a.split, nonce, out, arms=arms, cohort=cohort, upstream_mode=a.upstream)
             keys.append(k); manifest += m; traces += t; allsteps[tid] = s
-    with open(f"{out}/task_keys.json", "w") as f: json.dump(keys, f, indent=1)          # evaluator-only
-    with open(f"{out}/manifest.json", "w") as f: json.dump(manifest, f, indent=1)
     if not a.spec_file:
+        with open(f"{out}/task_keys.json", "w") as f: json.dump(keys, f, indent=1)
+        with open(f"{out}/manifest.json", "w") as f: json.dump(manifest, f, indent=1)
         with open(f"{out}/traces.jsonl", "w") as f:
             for t in traces: f.write(json.dumps(t) + "\n")
     with open(f"{out}/run_summary.json", "w") as f:

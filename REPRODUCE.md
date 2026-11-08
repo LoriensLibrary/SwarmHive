@@ -23,12 +23,20 @@ Connect as `hive_operator` and apply, in one transaction each:
 ```
 psql "$HIVE_OPERATOR_DSN" -1 -f sql/experiment_schema.sql       # the frozen gate (commit d2df880)
 psql "$HIVE_OPERATOR_DSN" -1 -f sql/seal_from_proposal.sql      # additive: authenticated authorship via intake
+psql "$HIVE_OPERATOR_DSN" -1 -f sql/gate_hardening.sql          # see role-admin note below
+psql "$HIVE_OPERATOR_DSN" -1 -f sql/gate_hardening_2.sql        # separate advisory keyspace and receipt tokens
+psql "$HIVE_OPERATOR_DSN" -1 -f sql/gate_exact_receipt.sql      # bind exact ID, version, author and body digest
 psql "$HIVE_OPERATOR_DSN" -c "INSERT INTO exp.adjudicators(role) VALUES ('hive_operator') ON CONFLICT DO NOTHING;"
 ```
+
+For a limited operator, run the `ALTER ROLE` statements in `gate_hardening.sql` under the role administrator
+and the schema statements under the schema owner. Bot timeouts are session defaults.
 
 Secrets the tools read (never committed): `secrets/operator.env` holding `HIVE_OPERATOR_DSN=postgresql://hive_operator:...@host/hive`,
 `secrets/bot_passwords.json` as `{"bot_researcher": "...", "bot_writer": "...", "bot_reviewer": "...", "bot_intruder": "..."}`,
 `secrets/anthropic.key` and/or `secrets/adaption.key`.
+Set `secrets/branch_operator.env` to a dedicated scratch endpoint distinct from main.
+The deterministic checks use unique fixture IDs and retain their rows.
 
 ## 2. Gate checks (no model calls)
 
@@ -52,8 +60,11 @@ python -I tools/vendor/score_runs.py --tasks runs/<out>/task_keys.json --manifes
 ## 4. Frozen evaluation
 
 ```
+# HIVE_OPERATOR_DSN must explicitly point to the reviewed evaluation branch.
+python tools/gate_preflight.py > gate-target.json
 python -I tools/holdout_freeze.py --variants V6,V1 --n 120 --seed <seed> --arms current,current_lookup,compact,full,rule \
-    --upstream fixture --prose-names off --model gemma-4-31b-it --provider adaption --ceiling <credits> --out holdout/<name>
+    --upstream fixture --prose-names off --model gemma-4-31b-it --provider adaption --ceiling <credits> \
+    --gate-deployment gate-target.json --out holdout/<name>
 # post holdout/<name>/FREEZE.json before executing anything
 python -I tools/pilot_runner.py --spec-file holdout/<name>/instances.json --manifest holdout/<name>/manifest.json --split evaluation \
     --upstream fixture --model gemma-4-31b-it --provider adaption --ceiling <credits>

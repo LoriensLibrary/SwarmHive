@@ -28,6 +28,7 @@ def main():
     ap.add_argument("--temperature", type=float, default=TEMPERATURE)
     ap.add_argument("--authorship", choices=("authenticated", "asserted"), default="authenticated")
     ap.add_argument("--cohort", default=None, help="execution namespace bound into the freeze; default = sanitized model id")
+    ap.add_argument("--gate-deployment", help="reviewed credential-free gate_preflight.py receipt, required for a paid freeze")
     a = ap.parse_args()
     arms = a.arms.split(",")
     rng = random.Random(a.seed)
@@ -58,7 +59,9 @@ def main():
             instances.append({"tid": tid, "variant": v, "nonce": nonce, "spec": spec, "arm_order": arm_order})
             task_id = f"{tid}_{nonce}"
             for arm in arm_order:
-                manifest.append({"run_id": f"{tid}_{nonce}_{arm}_{a.split}", "task_id": task_id, "condition": arm, "split": a.split})
+                manifest.append({"run_id": f"{tid}_{nonce}_{arm}_{a.split}", "task_id": task_id,
+                                 "condition": arm, "split": a.split,
+                                 "correct_abstention_expected": bool(spec.get("bad_draft"))})
     os.makedirs(a.out, exist_ok=True)
     mbytes = json.dumps(manifest, indent=1, sort_keys=True).encode()
     with open(f"{a.out}/manifest.json", "wb") as f: f.write(mbytes)
@@ -82,6 +85,9 @@ def main():
               "attack_budget": "one fixed opportunity per instance (replay/stale queue), identical across arms"}
     import re, time
     freeze["cohort"] = a.cohort or re.sub(r"[^a-z0-9]+", "", a.model.lower())[:12]
+    if a.gate_deployment:
+        with open(a.gate_deployment, encoding="utf-8-sig") as stream:
+            freeze["gate_deployment"] = json.load(stream)
     freeze["frozen_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
     freeze["freeze_id"] = freeze_digest(freeze)      # canonical content digest; the runner recomputes and compares it
     with open(f"{a.out}/FREEZE.json", "w") as f: json.dump(freeze, f, indent=1)

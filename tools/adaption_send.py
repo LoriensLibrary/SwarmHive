@@ -22,7 +22,8 @@ Credits (not USD) are the unit of cost; recorded as usage tokens for the manifes
 """
 import json, os, urllib.request
 
-BASE = os.environ.get("ADAPTION_BASE_URL", "https://api.prod.adaptionlabs.ai")
+HOSTED_BASE_URL = "https://api.prod.adaptionlabs.ai"
+BASE = os.environ.get("ADAPTION_BASE_URL", HOSTED_BASE_URL)
 
 
 def _key():

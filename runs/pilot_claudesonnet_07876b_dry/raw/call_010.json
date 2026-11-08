@@ -1,0 +1,28 @@
+{
+ "request": {
+  "max_tokens": 1200,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 7, \\\"summary\\\": \\\"item P at warehouse E: 7 units, per p07876b_V1_claudesonnet_5e7512336e1b_f9bf27/1\\\"}\",\"id\":\"p07876b_V1_claudesonnet_5e7512336e1b_82d2d2\",\"ver\":1},{\"body\":\"{\\\"units\\\": 7, \\\"note\\\": \\\"observed count of item P at warehouse E\\\"}\",\"id\":\"p07876b_V1_claudesonnet_5e7512336e1b_f9bf27\",\"ver\":1},{\"body\":\"{\\\"units\\\": 3, \\\"note\\\": \\\"observed count of item P at warehouse E\\\"}\",\"id\":\"p07876b_V1_claudesonnet_5e7512336e1b_508d8e\",\"ver\":2}],\"corrections\":[{\"id\":\"p07876b_V1_claudesonnet_5e7512336e1b_508d8e\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"p07876b_V1_claudesonnet_5e7512336e1b_508d8e\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"p07876b_V1_claudesonnet_5e7512336e1b_508d8e\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"p07876b_V1_claudesonnet_5e7512336e1b_82d2d2\",\"inputs\":[{\"id\":\"p07876b_V1_claudesonnet_5e7512336e1b_f9bf27\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"p07876b_V1_claudesonnet_5e7512336e1b_f9bf27\",\"inputs\":[],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: p07876b_V1_claudesonnet_5e7512336e1b_82d2d2/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "claude-sonnet-5-5",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 10,
+  "model": "claude-sonnet-5-5",
+  "provider": "anthropic",
+  "temperature": 0.0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cost": 0.0,
+  "unit": "usd",
+  "returned_model": null,
+  "provider_response_id": null,
+  "elapsed_s": 0.0,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"p07876b_V1_claudesonnet_5e7512336e1b_82d2d2\", \"result\": {\"units\": 7}, \"evidence\": [{\"id\": \"p07876b_V1_claudesonnet_5e7512336e1b_82d2d2\", \"ver\": 1}, {\"id\": \"p07876b_V1_claudesonnet_5e7512336e1b_f9bf27\", \"ver\": 1}, {\"id\": \"p07876b_V1_claudesonnet_5e7512336e1b_508d8e\", \"ver\": 2}], \"consulted\": []}"
+ }
+}

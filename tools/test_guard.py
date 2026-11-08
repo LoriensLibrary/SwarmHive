@@ -8,6 +8,7 @@ req = dict(model="gemma-4-31b-it", system="x", max_tokens=pr.MAX_TOKENS, message
 
 class Resp:
     def __init__(self, it=300, ot=80, usage=True):
+        self.model = req["model"]
         self.content = [type("T", (), {"text": "{}"})()]; self.stop_reason = "end_turn"
         self.usage = type("U", (), {"input_tokens": it, "output_tokens": ot})() if usage else None
 
@@ -41,6 +42,28 @@ assert abs(m.spend - res) < 1e-9
 m, led = model(ceiling=1.0); m.client = type("C", (), {"send": staticmethod(lambda **r: Resp(ot=5000))})()
 try: m.send(**req); print("FAIL 3"); ok = False
 except RuntimeError as e: print("3 OK: usage over reserve failed closed; spend", round(m.spend, 6))
+try:
+    m.send(**req)
+    print("FAIL 3: sent after provider broke reserve bounds"); ok = False
+except pr.BudgetStop:
+    assert m.attempts == 1 and abs(m.spend - res) < 1e-9
+    print("3 OK: provider integrity stop remains latched")
+
+m, led = model(ceiling=1.0)
+other = Resp()
+other.model = "unexpected-billing-model"
+m.client = type("C", (), {"send": staticmethod(lambda **r: other)})()
+try:
+    m.send(**req)
+    print("FAIL model: reconciled an unknown billing model"); ok = False
+except RuntimeError:
+    assert m.attempts == 1 and abs(m.spend - res) < 1e-9
+    print("OK unregistered billing model keeps reserve")
+try:
+    m.send(**req)
+    print("FAIL model: sent after unregistered billing model"); ok = False
+except pr.BudgetStop:
+    assert m.attempts == 1
 
 # 4. Attempt cap enforced: max_attempts=2, third call stops before send.
 m, led = model(ceiling=1.0, max_attempts=2); sent = []
