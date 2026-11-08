@@ -43,7 +43,7 @@ def main():
                 wrong = right                                   # same number, authority changes
             else:
                 wrong = right + rng.choice([-7, -4, 3, 6, 9]); wrong = max(1, wrong)
-            has_stale = base.get("hops") == 2 or base.get("replay") or base.get("stale_queued") or base.get("two_sources") or (base["wrong"] is not None)
+            has_stale = bool(base.get("hops") == 2 or base.get("replay") or base.get("stale_queued") or base.get("two_sources"))   # a stale candidate is actually queued
             # counterbalanced queue order within each stratum, fixed per instance, identical across arms in the block
             spec["queue_order"] = ("stale_first" if i % 2 == 0 else "fresh_first") if has_stale else "single"
             spec.update(wrong=wrong, right=right, item=rng.choice(ITEMS), site=f"site-{rng.randint(1, 9)}")
