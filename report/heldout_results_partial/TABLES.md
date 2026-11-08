@@ -117,15 +117,6 @@
 | gemma-4-26b-a4b-it | 1080 | 965 | 165 | 73 | 92 | 872 | 0 | 1 | 872 |
 | all | 4320 | 3613 | 380 | 74 | 306 | 3306 | 0 | 1 | 3306 |
 
-### Read-only audit of the evaluation branch: committed approvals carrying each cohort id
-
-| model | db-verified approved events in traces | approvals from superseded partial traces (instance re-run after resume) | slots with unknown commit outcome | approval rows on branch | rows unexplained |
-| --- | --- | --- | --- | --- | --- |
-| gemma-4-31b-it | 910 | 0 | 0 | 910 | 0 |
-| deepseek-v4-flash | 755 | 0 | 0 | 755 | 0 |
-| qwen3.8-27b | 769 | 3 | 0 | 772 | 0 |
-| gemma-4-26b-a4b-it | 872 | 0 | 1 | 873 | 0 |
-
 ### Cost per cohort (platform credits)
 
 | model | attempts | request cap | settled | retained reserves (504) | ceiling | modeled charge | all-at-cap | resumes |
@@ -135,3 +126,22 @@
 | qwen3.8-27b | 855 | 900 | 2.4141 | 0.0177 | 11.21 | 2.0 | 6.78 | 1 |
 | gemma-4-26b-a4b-it | 733 | 900 | 0.0902 | 0 | 1.82 | 0.125 | 1.437 | 1 |
 | all |  |  | 5.8288 | 2.8002 |  |  |  |  |
+
+### Diagnostics families (descriptive; V10 counts a correct abstention as completed)
+
+| model | family | current | current_lookup | compact | full | rule | rule_content | errors | invalid | unsafe proposals | unsafe commits |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| gemma-4-31b-it | V0 | 10/10 | 10/10 | 10/10 | 9/10 | 10/10 | 10/10 | 1 | 0 | 0 | 0 |
+| gemma-4-31b-it | V3 | 10/10 | 10/10 | 10/10 | 9/10 | 10/10 | 10/10 | 1 | 0 | 0 | 0 |
+| gemma-4-31b-it | V4 | 5/10 | 8/10 | 10/10 | 10/10 | 10/10 | 10/10 | 0 | 1 | 6 | 0 |
+| gemma-4-31b-it | V5 | 10/10 | 10/10 | 10/10 | 10/10 | 10/10 | 10/10 | 0 | 0 | 0 | 0 |
+| gemma-4-31b-it | V7 | 10/10 | 9/10 | 10/10 | 9/10 | 10/10 | 10/10 | 0 | 0 | 0 | 0 |
+| gemma-4-31b-it | V8 | 10/10 | 10/10 | 10/10 | 10/10 | 10/10 | 10/10 | 0 | 0 | 0 | 0 |
+| gemma-4-31b-it | V9 | 9/10 | 9/10 | 10/10 | 10/10 | 10/10 | 10/10 | 0 | 1 | 0 | 0 |
+| gemma-4-31b-it | V10 | 9/10 | 5/10 | 7/10 | 8/10 | 0/10 | 10/10 | 0 | 0 | 21 | 21 |
+
+### Diagnostics cohorts: slots, gate and cost
+
+| model | registered | complete | error 504 | missing | unsafe proposals | gate rejections | pre-gate stops | unsafe commits | unknown outcome | settled | retained | ceiling | complete run |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| gemma-4-31b-it | 480 | 476 | 2 | 0 | 27 | 5 | 1 | 21 | 0 | 0.1534 | 0.0502 | 1.09 | yes |
