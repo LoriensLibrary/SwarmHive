@@ -23,9 +23,17 @@ sys.path.insert(0, os.environ.get("LORIEN_REF", r"C:/Users/Angela/Documents/Code
 import _load_key
 from delivery_recorder import ArtifactInput, dispatch_stage, seal_stage_output
 
-PRICE = {"claude-sonnet-5-5": (2.0, 10.0), "claude-haiku-5-5": (0.10, 0.50), "claude-opus-5-5": (4.0, 20.0)}   # USD per Mtok in/out
-CREDIT_PRICE = {"glm-5.2": (1.40, 4.40)}            # Adaption credits per Mtok, from docs; unknown models use the conservative default
-DEFAULT_CREDIT_PRICE = (3.0, 9.0)
+# Explicit per-model spec. A PAID run with a model not listed here exits before connecting: no fallback rates,
+# no assumed context. price = (input, output) per Mtok in the provider's unit; context = documented max input tokens,
+# used as the worst-case pre-call reserve.
+MODEL_SPEC = {
+    "claude-sonnet-5-5": dict(provider="anthropic", unit="usd", price=(2.0, 10.0), context=200000),
+    "claude-haiku-5-5":  dict(provider="anthropic", unit="usd", price=(0.10, 0.50), context=200000),
+    "claude-opus-5-5":   dict(provider="anthropic", unit="usd", price=(4.0, 20.0), context=200000),
+    # Adaption posted rates, https://docs.adaptionlabs.ai/inference-stacks/models/ (read by Lorien 2026-11-08 00:03Z)
+    "gemma-4-31b-it":    dict(provider="adaption", unit="credits", price=(0.09, 0.34), context=256000),
+    "glm-5.2":           dict(provider="adaption", unit="credits", price=(1.40, 4.40), context=200000),
+}
 MAX_TOKENS = 1200                                    # frozen per-call output cap (thinking + answer)
 
 
@@ -152,64 +160,86 @@ class DB:
 
 class Model:
     """Trusted send adapter. Transmits exactly the constructed request; no extra context.
-    provider 'anthropic' calls the Anthropic SDK; 'adaption' calls Adaption's hosted open models
-    through tools/adaption_send.py (transport-only field mapping) for the model-replication arm."""
-    def __init__(self, model, dry_run, rawdir, provider="anthropic", ceiling=None, ledger=None):
+    Spend accounting (Lorien's guard contract): every provider ATTEMPT is reserved and counted BEFORE it is sent,
+    at the documented context length x input rate + the output cap x output rate. The reserve is debited to the
+    ledger first; a returned usage block reconciles it to the verified rate; a lost, errored or usage-less response
+    keeps the full reserve as spent, because the provider may have charged it. No automatic retries by default.
+    Attempts are bounded by max_attempts (the freeze's max_authorized_requests). The ceiling is finite and positive."""
+    def __init__(self, model, dry_run, rawdir, provider="anthropic", ceiling=None, ledger=None, max_attempts=None, retries=0):
         self.model, self.dry, self.rawdir, self.n, self.spend, self.provider = model, dry_run, rawdir, 0, 0.0, provider
-        self.ceiling, self.ledger = ceiling, ledger          # ceiling in USD (anthropic) or credits (adaption)
-        self.unit = "credits" if provider == "adaption" else "usd"
+        self.ceiling, self.ledger, self.max_attempts, self.retries = ceiling, ledger, max_attempts, retries
+        self.attempts = 0                                 # provider attempts actually sent (dry: 0)
+        spec = MODEL_SPEC.get(model)
+        if not dry_run:
+            if spec is None or spec["provider"] != provider:
+                raise SystemExit(f"no explicit rate/context for model {model!r} on provider {provider!r}; add it to MODEL_SPEC from the provider's posted pricing")
+            if ceiling is None or not (ceiling > 0):
+                raise SystemExit("a paid run requires a finite positive --ceiling")
+        self.unit = spec["unit"] if spec else ("credits" if provider == "adaption" else "usd")
+        self.price = spec["price"] if spec else (0.0, 0.0)
+        self.context = spec["context"] if spec else 0
         self.client = None
         if not dry_run and provider == "anthropic":
-            self.client = __import__("anthropic").Anthropic(max_retries=0)   # no silent SDK retries against the ceiling
+            self.client = __import__("anthropic").Anthropic(max_retries=0)   # no silent SDK retries
         elif not dry_run and provider == "adaption":
             import adaption_send; self.client = adaption_send
     def unit_price(self):
-        return CREDIT_PRICE.get(self.model, DEFAULT_CREDIT_PRICE) if self.provider == "adaption" else PRICE.get(self.model, (0.0, 0.0))
+        return self.price
     def reserve(self, request):
-        """Conservative pre-call cost: chars/3 for input, the full output cap for output."""
-        pi, po = self.unit_price()
-        est_in = len(json.dumps(request)) // 3 + 100
-        est_out = int(request.get("max_tokens") or MAX_TOKENS)
-        return (est_in * pi + est_out * po) / 1e6
+        """Worst case for ONE attempt: documented context as input, the full output cap as output."""
+        pi, po = self.price
+        return (self.context * pi + int(request.get("max_tokens") or MAX_TOKENS) * po) / 1e6
     def _ledger(self, row):
         if self.ledger:
             with open(self.ledger, "a", encoding="utf-8") as f: f.write(json.dumps(row) + "\n")
     RETRY_STATUS = (408, 409, 429, 500, 502, 503, 504)
-    MAX_ATTEMPTS = 5
-    def _call_with_backoff(self, request):
-        """Sequential, one request in flight. On a rate-limit or transient server status, back off 2/4/8/16 s and
-        retry up to MAX_ATTEMPTS, each attempt written to the ledger. The ceiling was checked for this call's
-        reserve once before the first attempt; a retry re-sends the same request and cannot exceed that reserve."""
-        import urllib.error
-        for attempt in range(1, self.MAX_ATTEMPTS + 1):
-            try:
-                if self.provider == "adaption":
-                    return self.client.send(**request)
-                return self.client.messages.create(**request)
-            except Exception as e:
-                code = getattr(e, "code", None) or getattr(e, "status_code", None) or getattr(getattr(e, "response", None), "status_code", None)
-                if code not in self.RETRY_STATUS or attempt == self.MAX_ATTEMPTS:
-                    self._ledger({"call": self.n, "event": "failed", "attempt": attempt, "status": code, "error": type(e).__name__})
-                    raise
-                wait = 2 ** attempt
-                self._ledger({"call": self.n, "event": "retry", "attempt": attempt, "status": code, "wait_s": wait})
-                time.sleep(wait)
+    def _attempt(self, request):
+        """One provider attempt: cap check, ceiling check, debit, send, reconcile. Fails closed at every step."""
+        if self.max_attempts is not None and self.attempts >= self.max_attempts:
+            self._ledger({"call": self.n, "event": "attempt_cap", "attempts": self.attempts, "max": self.max_attempts})
+            raise BudgetStop(f"budget_stopped: attempt cap {self.max_attempts} reached")
+        res = self.reserve(request)
+        if self.spend + res > self.ceiling:
+            self._ledger({"call": self.n, "event": "budget_stop", "spend": round(self.spend, 6), "reserve": round(res, 6), "ceiling": self.ceiling, "unit": self.unit})
+            raise BudgetStop(f"budget_stopped: spent {self.spend:.6f} + reserve {res:.6f} would cross ceiling {self.ceiling} {self.unit}")
+        self.attempts += 1
+        self.spend += res                                  # DEBIT before the request leaves
+        self._ledger({"call": self.n, "event": "debit", "attempt": self.attempts, "reserve": round(res, 6), "spend_after_debit": round(self.spend, 6), "unit": self.unit})
+        try:
+            resp = self.client.send(**request) if self.provider == "adaption" else self.client.messages.create(**request)
+        except Exception as e:
+            code = getattr(e, "code", None) or getattr(e, "status_code", None) or getattr(getattr(e, "response", None), "status_code", None)
+            self._ledger({"call": self.n, "event": "unresolved", "attempt": self.attempts, "status": code, "error": type(e).__name__, "reserve_kept": round(res, 6)})
+            e.retryable = code in self.RETRY_STATUS; raise                       # reserve stays spent: it may have been charged
+        usage = getattr(resp, "usage", None)
+        it, ot = getattr(usage, "input_tokens", None), getattr(usage, "output_tokens", None)
+        if usage is None or not isinstance(it, int) or not isinstance(ot, int):
+            self._ledger({"call": self.n, "event": "missing_usage", "attempt": self.attempts, "reserve_kept": round(res, 6)})
+            raise RuntimeError("usage counters missing from the provider response; reserve kept, call failed closed")
+        if it > self.context or ot > int(request.get("max_tokens") or MAX_TOKENS):
+            self._ledger({"call": self.n, "event": "usage_exceeds_reserve", "attempt": self.attempts, "input_tokens": it, "output_tokens": ot, "reserve_kept": round(res, 6)})
+            raise RuntimeError("usage exceeds the reserved maximum; reserve kept, call failed closed")
+        pi, po = self.price; cost = (it * pi + ot * po) / 1e6
+        self.spend += cost - res                           # reconcile the debit to verified usage at the explicit rate
+        self._ledger({"call": self.n, "event": "actual", "attempt": self.attempts, "input_tokens": it, "output_tokens": ot, "cost": round(cost, 6), "spend_after": round(self.spend, 6), "unit": self.unit})
+        return resp, it, ot, cost
     def send(self, **request):
         self.n += 1; t0 = time.time()
-        res = 0.0 if self.dry else self.reserve(request)
-        if self.ceiling is not None and not self.dry and self.spend + res > self.ceiling:
-            self._ledger({"call": self.n, "event": "budget_stop", "spend": round(self.spend, 6), "reserve": round(res, 6), "ceiling": self.ceiling, "unit": self.unit})
-            raise BudgetStop(f"budget_stopped: spent {self.spend:.4f} + reserve {res:.4f} would cross ceiling {self.ceiling} {self.unit}")
-        self._ledger({"call": self.n, "event": "reserve", "reserve": round(res, 6), "spend_before": round(self.spend, 6), "unit": self.unit})
         if self.dry:
-            resp = _Canned(request)
+            resp, it, ot, cost = _Canned(request), 0, 0, 0.0
         else:
-            resp = self._call_with_backoff(request)
+            tries = 0
+            while True:
+                try:
+                    resp, it, ot, cost = self._attempt(request); break
+                except BudgetStop:
+                    raise
+                except Exception as e:
+                    tries += 1
+                    if not getattr(e, "retryable", False) or tries > self.retries:
+                        raise                               # the run records an error trace; the denominator keeps it
+                    wait = 2 ** tries; self._ledger({"call": self.n, "event": "retry_wait", "wait_s": wait}); time.sleep(wait)
         text = "".join(getattr(b, "text", "") for b in resp.content)
-        usage = getattr(resp, "usage", None)
-        it, ot = (usage.input_tokens, usage.output_tokens) if usage else (0, 0)
-        pi, po = self.unit_price(); cost = (it * pi + ot * po) / 1e6; self.spend += cost
-        self._ledger({"call": self.n, "event": "actual", "input_tokens": it, "output_tokens": ot, "cost": round(cost, 6), "spend_after": round(self.spend, 6), "unit": self.unit})
         rec = {"call": self.n, "model": self.model, "provider": self.provider, "input_tokens": it, "output_tokens": ot, "cost": round(cost, 6), "unit": self.unit,
                "elapsed_s": round(time.time() - t0, 3), "stop_reason": getattr(resp, "stop_reason", None), "raw_text": text}
         with open(os.path.join(self.rawdir, f"call_{self.n:03d}.json"), "w", encoding="utf-8") as f:
@@ -265,6 +295,12 @@ def parse_json(text):
     if t.startswith("```"):
         t = t.strip("`"); t = t[t.find("{"):]
     return json.loads(t[t.find("{"): t.rfind("}") + 1])
+
+
+def requests_for(spec, arms):
+    """Exact maximum provider requests for one instance: upstream stages + one reviewer call per arm + one lookup follow-up."""
+    up = 2 + (1 if spec["hops"] == 2 else 0) + (2 if spec.get("unrelated_correction") else 0) + (2 if spec["wrong"] is not None else 0)
+    return up + len(arms) + (1 if "current_lookup" in arms else 0)
 
 
 def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS):
@@ -403,6 +439,8 @@ def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS):
                                          "eager_lookup_equivalent_to_compact": rec_sha == reach_sha}) + "\n")
                 trace["lookup"] = {"available": True, "used": True, "mode": LOOKUP_MODE, "records": records,
                                    "eager_lookup_equivalent_to_compact": rec_sha == reach_sha}   # recorded even if the 2nd call fails
+                if LOOKUP_MODE == "direct" and rec_sha != reach_sha:
+                    raise RuntimeError("implementation_error: lookup records differ from the compact preload for this task")
                 have = {(i.artifact_id, i.version) for i in inputs}
                 inputs2 = inputs + [s for s in sources if (s.artifact_id, s.version) not in have]
                 resp, receipt = dispatch_stage(model.send, actor="bot_reviewer", model=model.model, instructions=REVIEWER_SYS,
@@ -466,19 +504,26 @@ def main():
     ap.add_argument("--spec-file", help="frozen held-out instances from holdout_freeze.py (ids, nonces, arm order)")
     ap.add_argument("--manifest", help="frozen manifest.json; the produced run_ids must match it IN ORDER, checked before any paid call")
     ap.add_argument("--ceiling", type=float, default=None, help="hard spend ceiling: USD for anthropic, credits for adaption; enforced BEFORE each call")
+    ap.add_argument("--retries", type=int, default=0, help="automatic retries per call on retryable statuses; each attempt is reserved and counted separately (default 0)")
     a = ap.parse_args()
     if not a.dry_run and a.provider == "anthropic" and not _load_key.load():
         sys.exit("NO KEY: secrets/anthropic.key")
-    if not a.dry_run and a.ceiling is None:
-        sys.exit("A paid run requires --ceiling (USD for anthropic, credits for adaption).")
+    if not a.dry_run and (a.ceiling is None or not a.ceiling > 0):
+        sys.exit("A paid run requires a finite positive --ceiling (USD for anthropic, credits for adaption).")
     nonce = uuid.uuid4().hex[:6]
     out = f"runs/{'holdout' if a.spec_file else 'pilot'}_{nonce}{'_dry' if a.dry_run else ''}"; os.makedirs(os.path.join(out, "raw"), exist_ok=True)
     dsn = os.environ.get("HIVE_OPERATOR_DSN") or open("secrets/operator.env").read().split("=", 1)[1].strip()
-    db = DB(dsn); model = Model(a.model, a.dry_run, os.path.join(out, "raw"), provider=a.provider, ceiling=a.ceiling, ledger=os.path.join(out, "ledger.jsonl"))
+    db = DB(dsn)
     keys, manifest, traces, allsteps = [], [], [], {}
     if a.spec_file:
         # Held-out: EVERYTHING is validated against the freeze BEFORE the first paid call.
         instances = json.load(open(a.spec_file))
+        max_req = sum(requests_for(i["spec"], i["arm_order"]) for i in instances)
+    else:
+        max_req = sum(requests_for(TASKS[t], tuple(a.arms.split(","))) for t in a.tasks.split(","))
+    model = Model(a.model, a.dry_run, os.path.join(out, "raw"), provider=a.provider, ceiling=a.ceiling,
+                  ledger=os.path.join(out, "ledger.jsonl"), max_attempts=max_req, retries=a.retries)
+    if a.spec_file:
         fdir = os.path.dirname(os.path.abspath(a.spec_file)); fpath = os.path.join(fdir, "FREEZE.json")
         if not os.path.exists(fpath): sys.exit("frozen run requires FREEZE.json beside the spec file")
         frz = json.load(open(fpath))
@@ -497,6 +542,9 @@ def main():
             "recorder_sha256": hashlib.sha256(open(os.path.join(os.environ.get("LORIEN_REF", r"C:/Users/Angela/Documents/Codex/2026-11-06/che/outputs/swarm_reference"), "delivery_recorder.py"), "rb").read()).hexdigest(),
             "model": a.model, "provider": a.provider, "max_tokens": MAX_TOKENS, "lookup_mode": LOOKUP_MODE, "split": a.split,
             "ceiling": a.ceiling,                       # the authorized ceiling is part of the freeze
+            "max_authorized_requests": max_req, "retries": a.retries,
+            "rates": list(MODEL_SPEC[a.model]["price"]) if a.model in MODEL_SPEC else None,
+            "context_tokens": MODEL_SPEC[a.model]["context"] if a.model in MODEL_SPEC else None,
         }
         bad = {k: (frz.get(k), v) for k, v in checks.items() if frz.get(k) != v}
         if bad: sys.exit(f"FREEZE MISMATCH before any paid call: {bad}")
@@ -522,6 +570,7 @@ def main():
     with open(f"{out}/run_summary.json", "w") as f:
         json.dump({"model": a.model, "provider": a.provider, "dry_run": a.dry_run, "model_calls": model.n, "spend": round(model.spend, 4), "unit": model.unit,
                    "ceiling": a.ceiling, "lookup_mode": LOOKUP_MODE, "max_tokens": MAX_TOKENS, "steps": allsteps, "out": out,
+                   "provider_attempts": model.attempts, "max_authorized_requests": max_req, "retries": a.retries, "rates": list(model.price), "context_tokens": model.context,
                    "budget_stopped_runs": sum(1 for t in traces if "budget_stopped" in str(t.get("error", "")))}, f, indent=1)
     print(json.dumps({"out": out, "runs": len(traces), "model_calls": model.n, "spend": round(model.spend, 4), "unit": model.unit}))
 
