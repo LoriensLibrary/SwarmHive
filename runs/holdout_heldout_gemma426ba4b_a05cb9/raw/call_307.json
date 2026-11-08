@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 32, \\\"summary\\\": \\\"hinges at site-5: 32 units\\\"}\",\"id\":\"ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_e8adea\",\"ver\":1},{\"body\":\"{\\\"units\\\": 32, \\\"summary\\\": \\\"hinges at site-5: 32 units\\\"}\",\"id\":\"ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_64c26e\",\"ver\":1},{\"body\":\"{\\\"units\\\": 32, \\\"note\\\": \\\"observed count of hinges at site-5\\\"}\",\"id\":\"ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_fc7e3a\",\"ver\":2}],\"corrections\":[{\"id\":\"ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_fc7e3a\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_fc7e3a\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_64c26e\",\"inputs\":[{\"id\":\"ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_fc7e3a\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_e8adea\",\"inputs\":[{\"id\":\"ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_fc7e3a\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_fc7e3a\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_fc7e3a\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_e8adea/1, ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_64c26e/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-26b-a4b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 307,
+  "model": "gemma-4-26b-a4b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 1007,
+  "output_tokens": 238,
+  "cost": 0.000138,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-26b-a4b-it",
+  "provider_response_id": "resp_59eylZl9NhnBRJCdaJh2v75q1VY51XV6oHaWHPZj6KDvR4b-D-pOu7N3JDPJr9Y90qXul5aDkvwG-VdV8r-T2sXe1ZAnJ-iGcjZ15HRbr1rhi6QeTEZxZDKilwG2jwKa_WUcdpctFb3vdjOJGFQWIKZ1TbfHT08eQX6asrbq2PrSDMW3JMW5Z2iZMABaeiRBbRqbLmudKB3pHp9hth2C2u312d6nuKa5-fPmeKwioClwhmiADF0JapfLalH2bhsguiIQdPg2Ws8VqCAX-WBT8LC-s6TkRQMlbKC7v3QdKmA6j-NL0r5zIQf11Z-bWEP8OCSoCoLC4utku-kfTmoTWBFACI31yqUJ5dWuA6svrK5fDTv0Kn2M9pwV_U2v3q2CVB7kYAcGjYDsNjzTdtLzim0WIJMy0ITtn-gqBkJ54opYQj0yw9wA-6LXEWY63E60eSBHPbeqUIXuTuo8tvW1ljDMG1fFG1jHLaLaJ3YvUuJlUAiByBgBI90kR_W24YukoyNHhUjg7e_1HSljan0Pkx7f4GY=",
+  "elapsed_s": 1.3,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_e8adea\", \"result\": {\"units\": 32}, \"evidence\": [{\"id\": \"ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_e8adea\", \"ver\": 1}, {\"id\": \"ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_fc7e3a\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph742939_V6i25_heldout_gemma426ba4b_c947757ba8d4_64c26e\", \"ver\": 1}]}\n```"
+ }
+}

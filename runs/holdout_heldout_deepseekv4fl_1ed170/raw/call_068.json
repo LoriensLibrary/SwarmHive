@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 33, \\\"summary\\\": \\\"valves at site-7: 33 units\\\"}\",\"id\":\"phb1132b_V1i04_heldout_deepseekv4fl_17471050e89e_fc0156\",\"ver\":1},{\"body\":\"{\\\"units\\\": 33, \\\"note\\\": \\\"observed count of valves at site-7\\\"}\",\"id\":\"phb1132b_V1i04_heldout_deepseekv4fl_17471050e89e_ea4370\",\"ver\":1},{\"body\":\"{\\\"units\\\": 3, \\\"note\\\": \\\"observed count of valves at site-7\\\"}\",\"id\":\"phb1132b_V1i04_heldout_deepseekv4fl_17471050e89e_dff08d\",\"ver\":2}],\"corrections\":[{\"id\":\"phb1132b_V1i04_heldout_deepseekv4fl_17471050e89e_dff08d\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"phb1132b_V1i04_heldout_deepseekv4fl_17471050e89e_dff08d\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phb1132b_V1i04_heldout_deepseekv4fl_17471050e89e_fc0156/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 68,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 712,
+  "output_tokens": 220,
+  "cost": 6.1e-05,
+  "unit": "credits",
+  "reasoning_tokens": 212,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_8Wd2zBpr3DyiJNcJcYCdjoZoZtaAysRBl2QpuzBvUDnkGUXhYiXjij4yRl9RVTHGmbESRVSvh6DjKMA41Gx3SxijElJqz9Yepa_PS9-uGBmgiHHTe4U9xqAldbZD7ExrYXRh6eR01hrFvnqUwaGfSg1n5V-JHRxwLx0M3sj0Sc_e83giojDG-kYSHXaPHwkQcl4FPyMO6ePKjpMsscBCs0EBUolNOIX9pEfp2CU6anQqnkJpxXM3-NEiBj63GVF5Woni5tbt0QYRtDIpnTv54X6tuLbAa9uvqVoeMhWCKohmHJAXbvt3lMDqOAsDxfqM9JgGsamqnDZshSh-2pJFlTrNh9HOfiPyW7F4pse6fXP3ISmVs5YdLZ5XOpdyCD4Sl9790KzdvfBrtPuDs5aUkxWRBIKDN2707hA0InLgNzmzu3QOvysUbTMKjxdnJo3Loh4u6qLMg1c41iAI8pc5kh7geG57JIv_Mh7G4RE5f_aMYSmJebmf1ZQ1qfaXPyMB3CBBwNQe8H1NSAyG_4f3CLltozc=",
+  "elapsed_s": 2.64,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"lookup\"}"
+ }
+}

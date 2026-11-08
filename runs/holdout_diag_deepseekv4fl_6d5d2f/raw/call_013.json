@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 29, \\\"summary\\\": \\\"valves at site-4: 29 units, per phdec6bb_V5i00_diag_deepseekv4fl_e000d80f4195_e61de8/1\\\"}\",\"id\":\"phdec6bb_V5i00_diag_deepseekv4fl_e000d80f4195_0aa5e2\",\"ver\":1},{\"body\":\"{\\\"units\\\": 36, \\\"summary\\\": \\\"valves at site-4: 36 units, per phdec6bb_V5i00_diag_deepseekv4fl_e000d80f4195_e61de8/2\\\"}\",\"id\":\"phdec6bb_V5i00_diag_deepseekv4fl_e000d80f4195_d7a390\",\"ver\":1},{\"body\":\"{\\\"units\\\": 36, \\\"note\\\": \\\"observed count of valves at site-4\\\"}\",\"id\":\"phdec6bb_V5i00_diag_deepseekv4fl_e000d80f4195_e61de8\",\"ver\":2}],\"corrections\":[{\"id\":\"phdec6bb_V5i00_diag_deepseekv4fl_e000d80f4195_e61de8\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"phdec6bb_V5i00_diag_deepseekv4fl_e000d80f4195_e61de8\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phdec6bb_V5i00_diag_deepseekv4fl_e000d80f4195_0aa5e2/1, phdec6bb_V5i00_diag_deepseekv4fl_e000d80f4195_d7a390/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 13,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 807,
+  "output_tokens": 680,
+  "cost": 0.000127,
+  "unit": "credits",
+  "reasoning_tokens": 483,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_STcsJmcRuHg3eholVNjN0DfqAGKq9cBQGERHSPQ-WdLFmI5GeT56mRK_qkno12Spc98drTOcnokyWWO1nuMvWJtugEg3w916K7rYGgbpXHXh7tuUA2Tt_OWetGlKspTPO48VU-TGExeNuFNnQikNNpLcJA_sdkqtfXqXHKUxtOCYo9j6kwislqHT-vuXRzxFvsdbqLc9iNBlYl6QlXv9n7zndUFqkyFoCl48txVQ5bBCAKWxVMSAxUWC8kHrVmGqSnG5wjWqLAp1rHswC1CtWRtyo1ZjsFBfJyNWclS1a6KiI9kZEnOIcU-liw5mfdeYoG8nL39k5z-jvWHfBlkNlM90vCbc7cH6IML2ATJf7YXKKpp1224Tt1ojFqGiEg3LBf901HdkbWjyrcBJOvceXj-h77XpxwEKVpdO0NqKteo8ZCdmX47tuep3h1pIrPYB4ZTCS4oT-n4Q40aKKyDHW9yqOmKGhz3UXgdCUjXN0BWXsksQrQMkVPiaLxZvjMw_yVD2hvkw2-qlFMiI5Ig7FXb1IQs=",
+  "elapsed_s": 6.737,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"phdec6bb_V5i00_diag_deepseekv4fl_e000d80f4195_d7a390\",\"result\":{\"units\":36},\"evidence\":[{\"id\":\"phdec6bb_V5i00_diag_deepseekv4fl_e000d80f4195_d7a390\",\"ver\":1},{\"id\":\"phdec6bb_V5i00_diag_deepseekv4fl_e000d80f4195_e61de8\",\"ver\":2}],\"consulted\":[{\"id\":\"phdec6bb_V5i00_diag_deepseekv4fl_e000d80f4195_0aa5e2\",\"ver\":1},{\"id\":\"phdec6bb_V5i00_diag_deepseekv4fl_e000d80f4195_e61de8\",\"ver\":1}]}"
+ }
+}

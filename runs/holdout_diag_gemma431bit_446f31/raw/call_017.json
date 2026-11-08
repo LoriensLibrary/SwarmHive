@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 29, \\\"summary\\\": \\\"valves at site-4: 29 units, per phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_2965d2/1\\\"}\",\"id\":\"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_659294\",\"ver\":1},{\"body\":\"{\\\"units\\\": 36, \\\"summary\\\": \\\"valves at site-4: 36 units, per phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_2965d2/2\\\"}\",\"id\":\"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_747ca9\",\"ver\":1},{\"body\":\"{\\\"units\\\": 36, \\\"note\\\": \\\"observed count of valves at site-4\\\"}\",\"id\":\"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_2965d2\",\"ver\":2},{\"body\":\"{\\\"units\\\": 29, \\\"note\\\": \\\"observed count of valves at site-4\\\"}\",\"id\":\"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_2965d2\",\"ver\":1}],\"corrections\":[{\"id\":\"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_2965d2\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_2965d2\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_2965d2\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_2965d2\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_659294\",\"inputs\":[{\"id\":\"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_2965d2\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_747ca9\",\"inputs\":[{\"id\":\"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_2965d2\",\"ver\":2}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_659294/1, phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_747ca9/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 17,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 1108,
+  "output_tokens": 333,
+  "cost": 0.000213,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-31b-it",
+  "provider_response_id": "resp_9Sf7_QI3mDAyiALC_-XiLvLjE2xC0a2jozhEfTouGMOToJjDFKFdT0_PcsdHxLkF7_km4-dxcn6jnoxfIO5Y1A58uo6xg851qfvwtLfcLgy8RWfqtuH7uageystGIAV7yaZ73JxWjz1E1qU6yzBLQAgn-by0p502t9NSY2ELUeWC4VOqMOCeRRlNLtGyCnkSrWwm5gz_vN5OQcszdzRHBC74NcFfPI-h2B0Iew0CFN-AljsoMBBInvkryb_z_XxezpCEkNa8QgEj5woIuEN6k73eBTKLxFt-uQOGlR_p7ffzjrdPwOJe6MEvTh3jdtWAAa72R3aGCFWPN4VAuOhS9utsNb70JBstHubDIbeRkl6iyngEf8jYBjRcmPgQZfbH06zXT5j5-WG1oDmS7PQztA06EiXojGY7E85VmMd6VNiL72BmC3JITMRWh1noe0eVZ1KWeNBE7Qkx6dHVxiHaBHTNGA9tLV-YXuYOM4TT5T3q36RueeUoFBRTQv475PDvTIASO9s89tq6Y9jCzr8a2xO8lI8=",
+  "elapsed_s": 3.907,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\n  \"decision\": \"approve\",\n  \"artifact\": \"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_747ca9\",\n  \"result\": {\n    \"units\": 36\n  },\n  \"evidence\": [\n    {\n      \"id\": \"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_747ca9\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_2965d2\",\n      \"ver\": 2\n    }\n  ],\n  \"consulted\": [\n    {\n      \"id\": \"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_659294\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"phdec6bb_V5i00_diag_gemma431bit_4b28c14f8c74_2965d2\",\n      \"ver\": 1\n    }\n  ]\n}\n```"
+ }
+}

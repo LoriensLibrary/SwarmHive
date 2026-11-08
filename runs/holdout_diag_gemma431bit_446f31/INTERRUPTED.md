@@ -1,0 +1,1 @@
+Paused by the operator at 2026-11-08T05:28:48Z to remove endpoint contention with the inferential cohort on the same model (primary gemma-4-31b-it was timing out on 3 of 9 attempts while two processes shared its endpoint). Slots not reached stay registered as missing in the denominator. Diagnostics will be re-frozen and run after the primaries finish.

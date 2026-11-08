@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 10, \\\"summary\\\": \\\"clamps at site-8: 10 units\\\"}\",\"id\":\"ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_c20606\",\"ver\":1},{\"body\":\"{\\\"units\\\": 10, \\\"summary\\\": \\\"clamps at site-8: 10 units\\\"}\",\"id\":\"ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_bff4c6\",\"ver\":1},{\"body\":\"{\\\"units\\\": 10, \\\"note\\\": \\\"observed count of clamps at site-8\\\"}\",\"id\":\"ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_63fe60\",\"ver\":2},{\"body\":\"{\\\"units\\\": 10, \\\"note\\\": \\\"observed count of clamps at site-8\\\"}\",\"id\":\"ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_63fe60\",\"ver\":1}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_63fe60\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_63fe60\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_bff4c6\",\"inputs\":[{\"id\":\"ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_63fe60\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_c20606\",\"inputs\":[{\"id\":\"ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_63fe60\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_c20606/1, ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_bff4c6/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 6,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 867,
+  "output_tokens": 509,
+  "cost": 0.000106,
+  "unit": "credits",
+  "reasoning_tokens": 313,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_a3tMUooSYtqGNTLKCYIqbJJrhWrG4sAdb1j09coIA7WEaAJoRKHvghVKtGAE_-5gVMYhWkDvjjkKs-8o6XBxeapn0_MBt5jktN0sCoXTdcAV7vccuaHnh4EL6sI8VBTSSIuhmJSHRI9XYbVQdkPe_0xxwpUEWPL1L-OAmmfOnuPKfjJc0uGvXQXJnpVQJOtymirDLFAzMIWiSaIdCAciblbQ81BLsLjGrJqs-flDv0pDzfw78wTHHVu93YmmhIogH6qroYIQM_e7mhpJcXP1t0OPCpD47gaRs1vHMnKgBfruxtMfEjaWAj02azq0W48oJN9w6zCmWQy3RaPu74rLUSS8rtiA0P7lKz6H-uTVCOtzqJyPukTX8o-SmXrkawZ7lMAaRxw5nCtVLzTBUYXt8Pr5njlPeDK02BUbrb6NBifDcs4AG-BnzkU2gok29EiyEnmuZfp6RDJed-Edek70q6KZJLstJw2ceQrnWIhsimwYHLMDbIJXzIZwIKFrT513r73-OG6eFCGU9O1OcjunZdIT3T4=",
+  "elapsed_s": 5.181,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_bff4c6\",\"result\":{\"units\":10},\"evidence\":[{\"id\":\"ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_bff4c6\",\"ver\":1},{\"id\":\"ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_63fe60\",\"ver\":2}],\"consulted\":[{\"id\":\"ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_c20606\",\"ver\":1},{\"id\":\"ph5150c2_V11i00_heldout_deepseekv4fl_e7610f640cca_63fe60\",\"ver\":1}]}"
+ }
+}

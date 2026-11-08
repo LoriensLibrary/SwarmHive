@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 10, \\\"summary\\\": \\\"clamps at site-8: 10 units\\\"}\",\"id\":\"ph5150c2_V11i00_heldout_qwen3827b_58f0f49d26be_d48c47\",\"ver\":1},{\"body\":\"{\\\"units\\\": 10, \\\"summary\\\": \\\"clamps at site-8: 10 units\\\"}\",\"id\":\"ph5150c2_V11i00_heldout_qwen3827b_58f0f49d26be_c548a0\",\"ver\":1},{\"body\":\"{\\\"units\\\": 10, \\\"note\\\": \\\"observed count of clamps at site-8\\\"}\",\"id\":\"ph5150c2_V11i00_heldout_qwen3827b_58f0f49d26be_33757d\",\"ver\":2}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph5150c2_V11i00_heldout_qwen3827b_58f0f49d26be_33757d\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph5150c2_V11i00_heldout_qwen3827b_58f0f49d26be_33757d\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph5150c2_V11i00_heldout_qwen3827b_58f0f49d26be_c548a0\",\"inputs\":[{\"id\":\"ph5150c2_V11i00_heldout_qwen3827b_58f0f49d26be_33757d\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph5150c2_V11i00_heldout_qwen3827b_58f0f49d26be_d48c47\",\"inputs\":[{\"id\":\"ph5150c2_V11i00_heldout_qwen3827b_58f0f49d26be_33757d\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph5150c2_V11i00_heldout_qwen3827b_58f0f49d26be_d48c47/1, ph5150c2_V11i00_heldout_qwen3827b_58f0f49d26be_c548a0/1 lookup_available=false (your one lookup was used; decide now)\"}",
+    "role": "user"
+   }
+  ],
+  "model": "qwen3.8-27b",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 8,
+  "model": "qwen3.8-27b",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 919,
+  "output_tokens": 1751,
+  "cost": 0.002225,
+  "unit": "credits",
+  "reasoning_tokens": 1406,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "qwen3.8-27b",
+  "provider_response_id": "resp_TNLkz6tcaVsfi0Q0joZaJI-0JvziKbR6hsPEGRrW0IWLSLqnER8WF8b0e8JfUQIeawW2qrd0NUlamLf-C400TS68BEJa9Jq7zc8o8MvI2juGqjlB3c1spgzlMi118ptr2KyaLO4WZPFX0PK6494MzgthuF6A9ngTtKFlOvXpMRh2iLcvF6W6fab-6UZf3N3VIEfwm6iw7XLe28ZfAAGayBaOPHo11oLe-BVvzc5syIVJyfXdp2yQWT1VDn-fM27OkQ8hMTKprzuGrKN_2PLoERqXva7yoWcIN-02caOoOx8dslaM4jWnqumGtagxF1pTkgEwHwsgldoBNH6m3e5PQHZPHDzy9uFYDFZoC62jurd98mxizKKeAt7eUmoucAQa26jNRreZX9Ib9kO5NCH7rB0TtIai68jaWf5kl5GZSLx6yJpgIxL-HOQyGiMT4mnDy6-lNbuC9WZoYw1Adwtpg5uYY9BCwIONZjGZL2Nw-hL9YAU1sk5lNHt0no53QhQHYQqFFhjf7gQGQcjulHGG1rbT_l4=",
+  "elapsed_s": 15.497,
+  "stop_reason": "end_turn",
+  "raw_text": "\n\n{\n  \"decision\": \"approve\",\n  \"artifact\": \"ph5150c2_V11i00_heldout_qwen3827b_58f0f49d26be_c548a0\",\n  \"result\": {\n    \"units\": 10\n  },\n  \"evidence\": [\n    {\n      \"id\": \"ph5150c2_V11i00_heldout_qwen3827b_58f0f49d26be_c548a0\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"ph5150c2_V11i00_heldout_qwen3827b_58f0f49d26be_33757d\",\n      \"ver\": 2\n    }\n  ],\n  \"consulted\": [\n    {\n      \"id\": \"ph5150c2_V11i00_heldout_qwen3827b_58f0f49d26be_d48c47\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"ph5150c2_V11i00_heldout_qwen3827b_58f0f49d26be_33757d\",\n      \"ver\": 1\n    }\n  ]\n}"
+ }
+}

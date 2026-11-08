@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 18, \\\"summary\\\": \\\"gaskets at site-1: 18 units\\\"}\",\"id\":\"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_8fe50b\",\"ver\":1},{\"body\":\"{\\\"units\\\": 18, \\\"summary\\\": \\\"gaskets at site-1: 18 units\\\"}\",\"id\":\"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_149e2c\",\"ver\":1},{\"body\":\"{\\\"units\\\": 18, \\\"note\\\": \\\"observed count of gaskets at site-1\\\"}\",\"id\":\"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_13bd11\",\"ver\":2},{\"body\":\"{\\\"units\\\": 18, \\\"note\\\": \\\"observed count of gaskets at site-1\\\"}\",\"id\":\"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_13bd11\",\"ver\":1}],\"corrections\":[{\"id\":\"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_13bd11\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_13bd11\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_13bd11\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_13bd11\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_149e2c\",\"inputs\":[{\"id\":\"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_13bd11\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_8fe50b\",\"inputs\":[{\"id\":\"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_13bd11\",\"ver\":2}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_8fe50b/1, phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_149e2c/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-26b-a4b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 379,
+  "model": "gemma-4-26b-a4b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 1056,
+  "output_tokens": 284,
+  "cost": 0.000153,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-26b-a4b-it",
+  "provider_response_id": "resp_iErgv7XD1_IB5GfqhWXm83fknaMR3OIcMXRPLMTyH8rp7m7vbdFCBZY8x4vfn8PBX_DnVCXHkVTfCtp-McXFnDC_MNpsDYemqJXxTnyNlymbRWQAF_EmhLIBHZLxwXYMRvR8wtAAVCRHcqBvTd00ofwcfPOzIwjlShAmKNIKihvGCJ8SBvrdLpJz-CmjYToJss8q8tyA1Rlzr15TXavPVdIg2vqRJ5qKJ7T2x7gYrnJkWhmMoK0e78TW9CyxqOlCOQ3ixffghXHXt9WKTVKRnIutpFIwMmJIRDSt4LXQk6D_5mHSPYoIXh0cIE1UVm5PAWlbAIVndrErIDJHR6VTYXRF8rVnxRPhXtvUg5dEEulVgYWgjLhdiIqxlgo1Zc8DM-jQZi9pZXqCvN7Qkb5BkGPG3dVyQ9w6Rc0a_BkWucOoGj2OiFPNO5GCKuB0B6M7Jn_FESM9bNzSc48ccwsSYxIr9wbWdxowgTViZ7D3qRDcwjK8idkE0V4K_FqWYj0PHEns_7QM4flSyfhXdwwheqJBfCs=",
+  "elapsed_s": 1.425,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_8fe50b\", \"result\": {\"units\": 18}, \"evidence\": [{\"id\": \"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_8fe50b\", \"ver\": 1}, {\"id\": \"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_13bd11\", \"ver\": 2}], \"consulted\": [{\"id\": \"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_149e2c\", \"ver\": 1}, {\"id\": \"phe9f804_V6i31_heldout_gemma426ba4b_747ab5c2de39_13bd11\", \"ver\": 1}]}\n```"
+ }
+}

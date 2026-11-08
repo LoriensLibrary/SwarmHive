@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 36, \\\"summary\\\": \\\"clamps at site-1: 36 units\\\"}\",\"id\":\"ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_5229e2\",\"ver\":1},{\"body\":\"{\\\"units\\\": 36, \\\"summary\\\": \\\"clamps at site-1: 36 units\\\"}\",\"id\":\"ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_820869\",\"ver\":1},{\"body\":\"{\\\"units\\\": 36, \\\"note\\\": \\\"observed count of clamps at site-1\\\"}\",\"id\":\"ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_5cdbe8\",\"ver\":2}],\"corrections\":[{\"id\":\"ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_5cdbe8\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_5cdbe8\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_5229e2\",\"inputs\":[{\"id\":\"ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_5cdbe8\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_5cdbe8\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_5cdbe8\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_820869\",\"inputs\":[{\"id\":\"ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_5cdbe8\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_5229e2/1, ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_820869/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-26b-a4b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 403,
+  "model": "gemma-4-26b-a4b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 991,
+  "output_tokens": 237,
+  "cost": 0.000136,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-26b-a4b-it",
+  "provider_response_id": "resp_HugKzqRPyOgJatApd4T2NUmx07k0Vx8FbnU_AC2Cu6X0sMraHLCYpdPcu2tnBGk6dxN3CsIAXYfwHCCqD-LBQXhJ9TvkYKkKjfSghmcxrG_3IoM2qC5TPl4Y3mPw3NT8V0AmgCXorUTRmnH24R_4GggsA8F5aZ0Q3OXu7O_cU7jluXxWcdmeb4f7lZIBCz8mQo7bXvA2zCYIF3B0FB2iA7-PYHGUAyiThRrPj0NowIHHVLZRjbBS_sm1i_ILlkczouz9QzvThv3VS1-f2162taCzEdXz7GLVW6gfba98RXdbt7sp4vo8IjpdmRgSckbNyBoRN4s4BC6Rlr16OyJa4aY8d6JI1hbWLqJH7d5nHbLw0qyMNO5j4pqZjdmIDNcjEbwCEd73qaIztlNIQ31W6h69ePP72tNJEMYxMbg20EubUdO1wgMqdfg4luhgRwUqXNleqbQiuzEWPcOPLHyhWjuIq5hJDG48Z2KKho9SZjW1XNjyWtgR7y_UrjMPKLjJlzm9-dxqBD5O7YAmu9BT36YSGbU=",
+  "elapsed_s": 1.275,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_820869\", \"result\": {\"units\": 36}, \"evidence\": [{\"id\": \"ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_820869\", \"ver\": 1}, {\"id\": \"ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_5cdbe8\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph136afa_V6i33_heldout_gemma426ba4b_4099199b892f_5229e2\", \"ver\": 1}]}\n```"
+ }
+}

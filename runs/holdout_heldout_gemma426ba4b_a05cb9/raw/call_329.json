@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 17, \\\"summary\\\": \\\"gaskets at site-4: 17 units\\\"}\",\"id\":\"phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_c8ca0d\",\"ver\":1},{\"body\":\"{\\\"units\\\": 17, \\\"summary\\\": \\\"gaskets at site-4: 17 units\\\"}\",\"id\":\"phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_8efe3f\",\"ver\":1},{\"body\":\"{\\\"units\\\": 17, \\\"note\\\": \\\"observed count of gaskets at site-4\\\"}\",\"id\":\"phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_e1d9dc\",\"ver\":2}],\"corrections\":[{\"id\":\"phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_e1d9dc\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_e1d9dc\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_8efe3f\",\"inputs\":[{\"id\":\"phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_e1d9dc\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_c8ca0d\",\"inputs\":[{\"id\":\"phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_e1d9dc\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_e1d9dc\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_e1d9dc\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_c8ca0d/1, phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_8efe3f/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-26b-a4b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 329,
+  "model": "gemma-4-26b-a4b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 965,
+  "output_tokens": 226,
+  "cost": 0.000131,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-26b-a4b-it",
+  "provider_response_id": "resp_SZfGSJGGF8iaO4A0ALLaWk_VikMNeg3VZDr4znIAJ7w12jdHI-Oba6qtDVUY5E0WOQDN80NFpON549vfZgxqWN7XN_GCKoj3aT8vHkofrJX99hZdHdwQsrOoPTqVSq-4Er7LgMGj-jIKrU8GMFDuQxm8SxMzWRz4Ze_dLd36mEz6-zisUOBRJo7XEBhvdG78jNToodZLykaaFJcd-xbuD2bgc4lfpz3QDENigXzNkuxWSNq3cDElDhzjxhrAfXARYBszfveoVNwOKDSUS5WDwfOYU-5gPcK1DUtbdiuisen9y8ZOwAjiiKXDVT5CVScQjhpdkmWMzk1FMNmbjYsfeHPXJz9gOGynGeS17g5u16QSSGyv2pCPJcAf7zDIoI3HW7BUuB9SE-1hjkrN8cAACqhJr75FkjT9Oo6c2qWV5EP8993Nt47ZaIkauVhmsKUw5B5jiMFt5KbJUS28yfhA70-6ekO-endvozEO7M5ltVXB9TIN3K633z3BnXMlU1ESqc_atUHwhr3KXxCC1_fmrktg9Q4=",
+  "elapsed_s": 1.19,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_c8ca0d\", \"result\": {\"units\": 17}, \"evidence\": [{\"id\": \"phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_c8ca0d\", \"ver\": 1}, {\"id\": \"phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_e1d9dc\", \"ver\": 2}], \"consulted\": [{\"id\": \"phfba3fe_V6i27_heldout_gemma426ba4b_eee4c3d320e6_8efe3f\", \"ver\": 1}]}\n```"
+ }
+}

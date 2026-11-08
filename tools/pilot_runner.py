@@ -118,31 +118,60 @@ class DB:
     authorship='authenticated' (default): an agent's output is INSERTed into exp.proposals over the agent's own
     login (proposer bound by trigger) and the operator seals FROM that row, so the author in exp.artifacts is the
     login, never a parameter. authorship='asserted' is the old path, kept only for comparison and labeled."""
+    CONN_KW = dict(sslmode="require", autocommit=True, connect_timeout=20, keepalives=1, keepalives_idle=30, keepalives_interval=10, keepalives_count=3,
+                   options="-c statement_timeout=120000")   # a dead socket (laptop sleep, Neon compute restart) surfaces within ~60 s instead of hanging for hours
+    DEAD = (psycopg.OperationalError, psycopg.InterfaceError)
     def __init__(self, dsn, authorship="authenticated", bot_passwords="secrets/bot_passwords.json"):
         self.dsn = dsn   # keep the full DSN; conn.info.dsn omits the password
-        self.c = psycopg.connect(dsn, sslmode="require", autocommit=True)
+        self.c = psycopg.connect(dsn, **self.CONN_KW)
         self.authorship = authorship
-        self.bots = {}
+        self.bot_dsn = {}; self.bots = {}
         if authorship == "authenticated":
             m = re.match(r"postgresql://[^:]+:[^@]+@([^/]+)/(\w+)", dsn)
             host, dbname = m.group(1), m.group(2)
             pw = json.load(open(bot_passwords))
             for role, secret in pw.items():
-                self.bots[role] = psycopg.connect(f"postgresql://{role}:{secret}@{host}/{dbname}", sslmode="require", autocommit=True)
+                self.bot_dsn[role] = f"postgresql://{role}:{secret}@{host}/{dbname}"
+                self.bots[role] = psycopg.connect(self.bot_dsn[role], **self.CONN_KW)
+        self.reconnects = 0
+    def _reconnect(self, role=None):
+        self.reconnects += 1
+        if role is None:
+            try: self.c.close()
+            except Exception: pass
+            self.c = psycopg.connect(self.dsn, **self.CONN_KW)
+        else:
+            try: self.bots[role].close()
+            except Exception: pass
+            self.bots[role] = psycopg.connect(self.bot_dsn[role], **self.CONN_KW)
+    def _read(self, sql, p, fetchall):
+        """Idempotent read with ONE reconnect on a dead connection (AdminShutdown is an OperationalError)."""
+        for attempt in (1, 2):
+            try:
+                cur = self.c.execute(sql, p); return cur.fetchall() if fetchall else cur.fetchone()
+            except self.DEAD:
+                if attempt == 2: raise
+                self._reconnect()
     def propose(self, actor, aid, ver, body):
         """The agent itself submits its output over ITS OWN login; the trigger binds proposer to session_user.
         The runtime generates a receipt token that travels INSIDE the payload; the operator later seals only the row
         carrying that exact token, so a same-role session cannot substitute a body by racing on artifact/version."""
         if actor not in self.bots:
             raise PermissionError(f"no authenticated connection for role {actor!r}")
-        receipt = uuid.uuid4().hex + uuid.uuid4().hex[:16]
-        self.bots[actor].execute("INSERT INTO exp.proposals(payload) VALUES (%s::jsonb)",
-                                 (json.dumps({"artifact_id": aid, "version": ver, "body": body, "receipt": receipt}),))
+        for attempt in (1, 2):
+            receipt = uuid.uuid4().hex + uuid.uuid4().hex[:16]     # a fresh token per attempt: a possibly-committed first insert is simply never sealed
+            try:
+                self.bots[actor].execute("INSERT INTO exp.proposals(payload) VALUES (%s::jsonb)",
+                                         (json.dumps({"artifact_id": aid, "version": ver, "body": body, "receipt": receipt}),))
+                break
+            except self.DEAD:
+                if attempt == 2: raise
+                self._reconnect(actor)
         return {"receipt": receipt, "body_sha256": hashlib.sha256(body.encode("utf-8")).hexdigest()}
     def one(self, sql, p=()):
-        r = self.c.execute(sql, p).fetchone(); return r[0] if r else None
+        r = self._read(sql, p, False); return r[0] if r else None
     def rows(self, sql, p=()):
-        return self.c.execute(sql, p).fetchall()
+        return self._read(sql, p, True)
     def seal(self, author, aid, ver, body, deps):
         if self.authorship == "authenticated":
             pr = self.propose(author, aid, ver, body)
@@ -161,7 +190,7 @@ class DB:
         """Fenced single transaction (READ COMMITTED). Returns (gate_reply, attempt) where attempt is the primary key
         of the approvals row THIS transaction wrote: approvals.at defaults to now(), the transaction timestamp, so
         rows with at = now() inside this transaction are ours and nobody else's (the fence serializes publishes)."""
-        with psycopg.connect(self.dsn, sslmode="require", autocommit=False) as t:
+        with psycopg.connect(self.dsn, **dict(self.CONN_KW, autocommit=False)) as t:
             t.execute("BEGIN ISOLATION LEVEL READ COMMITTED")
             r = t.execute("SELECT exp.publish_decision(%s,%s,%s::jsonb)", (aid, ver, json.dumps(ack))).fetchone()[0]
             row = t.execute("SELECT reviewer, at FROM exp.approvals WHERE artifact_id=%s AND version=%s AND at = now()", (aid, ver)).fetchone()
@@ -828,6 +857,7 @@ def main():
     ap.add_argument("--temperature", type=float, default=TEMPERATURE, help="sampling temperature sent on every request; part of the freeze")
     ap.add_argument("--max-tokens", type=int, default=MAX_TOKENS, help="uniform per-call output budget (reasoning + answer) for every model and arm; part of the freeze")
     ap.add_argument("--timeout", type=int, default=TRANSPORT_TIMEOUT_S, help="per-attempt transport timeout in seconds; part of the freeze")
+    ap.add_argument("--resume-out", default=None, help="continue a frozen execution in this existing run directory: instances with a trace for every arm are kept, partial instances are re-run (their partial traces moved aside), nothing is re-claimed")
     ap.add_argument("--authorship", choices=("authenticated", "asserted"), default="authenticated", help="authenticated = agents submit through their own login and the operator seals from the intake row; asserted = legacy parameter path, labeled")
     ap.add_argument("--cohort", default=None, help="cohort tag for artifact prefixes and the output dir; defaults to the model id, sanitized")
     ap.add_argument("--retries", type=int, default=0, help="automatic retries per call on retryable statuses; each attempt is reserved and counted separately (default 0)")
@@ -842,7 +872,13 @@ def main():
         sys.exit("A paid run requires a finite positive --ceiling (USD for anthropic, credits for adaption).")
     nonce = uuid.uuid4().hex[:6]
     cohort = a.cohort or re.sub(r"[^a-z0-9]+", "", a.model.lower())[:12]
-    out = f"runs/{'holdout' if a.spec_file else 'pilot'}_{cohort}_{nonce}{'_dry' if a.dry_run else ''}"; os.makedirs(os.path.join(out, "raw"), exist_ok=True)
+    if a.resume_out:
+        if not a.spec_file or not os.path.exists(os.path.join(a.resume_out, "EXECUTION.json")):
+            sys.exit("--resume-out needs a frozen spec and an existing run directory with EXECUTION.json")
+        out = a.resume_out.rstrip("/\\")
+    else:
+        out = f"runs/{'holdout' if a.spec_file else 'pilot'}_{cohort}_{nonce}{'_dry' if a.dry_run else ''}"
+    os.makedirs(os.path.join(out, "raw"), exist_ok=True)
     dsn = declared_dsn or open("secrets/operator.env").read().split("=", 1)[1].strip()
     db = DB(dsn, authorship=a.authorship)
     keys, manifest, traces, allsteps = [], [], [], {}
@@ -883,6 +919,11 @@ def main():
             "context_tokens": MODEL_SPEC[a.model]["context"] if a.model in MODEL_SPEC else None,
         }
         bad = {k: (frz.get(k), v) for k, v in checks.items() if frz.get(k) != v}
+        if a.resume_out and set(bad) <= {"runner_sha256"}:
+            # a resume may run a newer runner ONLY for the resume/keepalive change; the old and new hashes are both recorded
+            resumed_runner_change = bad.pop("runner_sha256", None)
+        else:
+            resumed_runner_change = None
         if bad: sys.exit(f"FREEZE MISMATCH before any paid call: {bad}")
         if "freeze_id" not in frz: sys.exit("FREEZE.json has no freeze_id")
         if frz["freeze_id"] != freeze_digest(frz): sys.exit("FREEZE.json content does not match its freeze_id digest (edited after freezing)")
@@ -902,7 +943,51 @@ def main():
         if frz.get("cohort") and a.cohort and a.cohort != frz["cohort"]: sys.exit(f"cohort {a.cohort!r} is not the frozen cohort {frz['cohort']!r}")
         if frz.get("cohort"): cohort = frz["cohort"]
         execution_id = uuid.uuid4().hex
-        if not a.dry_run:
+        skip_tids = set()
+        if a.resume_out:
+            prev = json.load(open(f"{out}/EXECUTION.json"))
+            if prev["freeze_id"] != frz["freeze_id"] or prev["cohort"] != cohort:
+                sys.exit("REFUSED: the run directory belongs to a different freeze or cohort")
+            if not a.dry_run:
+                claim = f"runs/registry/{frz['freeze_id'][:24]}_{cohort}.claim"
+                if not os.path.exists(claim) or json.load(open(claim))["out"].replace("\\", "/") != out.replace("\\", "/"):
+                    sys.exit("REFUSED: resume requires the namespace claim that points at this run directory")
+            # keep every instance that already has a trace for every arm; set partial instances aside and re-run them
+            done_traces = [json.loads(l) for l in open(f"{out}/traces.jsonl")] if os.path.exists(f"{out}/traces.jsonl") else []
+            have = {}
+            for t in done_traces: have.setdefault(t["task_id"], set()).add(t["condition"])
+            complete_tids = {f"{i['tid']}_{i['nonce']}" for i in instances if have.get(f"{i['tid']}_{i['nonce']}", set()) >= set(i["arm_order"])}
+            partial_tids = {tid for tid in have if tid not in complete_tids}
+            kept = [t for t in done_traces if t["task_id"] in complete_tids]
+            if partial_tids:
+                with open(f"{out}/traces.partial_superseded.jsonl", "a") as f:
+                    for t in done_traces:
+                        if t["task_id"] in partial_tids: f.write(json.dumps(t) + "\n")
+            with open(f"{out}/traces.jsonl", "w") as f:
+                for t in kept: f.write(json.dumps(t) + "\n")
+            old_keys = json.load(open(f"{out}/task_keys.json")) if os.path.exists(f"{out}/task_keys.json") else []
+            keys[:] = [k for k in old_keys if k["task_id"] in complete_tids]
+            traces[:] = kept
+            skip_tids = complete_tids
+            rec = {"freeze_id": frz["freeze_id"], "cohort": cohort, "execution_id": prev["execution_id"], "resume_execution_id": execution_id, "out": out,
+                   "resumed": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "kept_instances": len(complete_tids), "rerun_partial_instances": sorted(partial_tids),
+                   "runner_sha256_change": resumed_runner_change}
+            prev.setdefault("resumes", []).append(rec)
+            with open(f"{out}/EXECUTION.json", "w") as f: json.dump(prev, f, indent=1)
+            if not a.dry_run:
+                with open("runs/REGISTRY.jsonl", "a", encoding="utf-8") as f: f.write(json.dumps({"event": "resume", **rec}) + "\n")
+            # the freeze's ceiling and attempt cap are per EXECUTION of the namespace: inherit the prior ledger's settled spend,
+            # retained (unresolved) reserves and attempt count so the resumed process cannot spend or send twice the budget
+            lp = f"{out}/ledger.jsonl"
+            if os.path.exists(lp):
+                led = [json.loads(l) for l in open(lp)]
+                settled = max([r.get("spend_after", 0.0) for r in led if r.get("event") == "actual"] or [0.0])
+                retained = sum(r.get("reserve_kept", 0.0) for r in led if r.get("event") in ("unresolved", "missing_usage", "usage_exceeds_reserve", "unrecognized_billing_model"))
+                model.spend = settled + retained; model.attempts = sum(1 for r in led if r.get("event") == "debit")
+                model._ledger({"event": "resume", "inherited_spend": round(model.spend, 6), "inherited_attempts": model.attempts, "resume_execution_id": execution_id})
+            print(json.dumps({"resume": out, "kept_instances": len(complete_tids), "rerun_partial": sorted(partial_tids), "remaining": len(instances) - len(complete_tids),
+                              "inherited_spend": round(model.spend, 6), "inherited_attempts": model.attempts}), flush=True)
+        elif not a.dry_run:
             # A frozen (freeze_id, cohort) namespace is executed at most once; a rerun would be a new ledger on shared
             # database rows and prefixes. Register BEFORE the first call; refuse if the namespace is already registered.
             os.makedirs("runs/registry", exist_ok=True)
@@ -914,15 +999,16 @@ def main():
             rec = {"freeze_id": frz["freeze_id"], "cohort": cohort, "execution_id": execution_id, "out": out, "started": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}
             os.write(fd, json.dumps(rec).encode()); os.close(fd)
             with open("runs/REGISTRY.jsonl", "a", encoding="utf-8") as f: f.write(json.dumps(rec) + "\n")   # human-readable log
-        with open(f"{out}/EXECUTION.json", "w") as f:
-            json.dump({"execution_id": execution_id, "freeze_id": frz["freeze_id"], "cohort": cohort, "dry_run": a.dry_run, "checks": checks}, f, indent=1)
-        # the registered denominator is written BEFORE any review dispatch: every frozen slot is scoreable (as missing) from the start
-        with open(f"{out}/manifest.json", "w") as f: json.dump(expected, f, indent=1)
+        if not a.resume_out:
+            with open(f"{out}/EXECUTION.json", "w") as f:
+                json.dump({"execution_id": execution_id, "freeze_id": frz["freeze_id"], "cohort": cohort, "dry_run": a.dry_run, "checks": checks}, f, indent=1)
+            # the registered denominator is written BEFORE any review dispatch: every frozen slot is scoreable (as missing) from the start
+            with open(f"{out}/manifest.json", "w") as f: json.dump(expected, f, indent=1)
+            with open(f"{out}/task_keys.json", "w") as f:
+                json.dump([], f)
+            with open(f"{out}/traces.jsonl", "x"):
+                pass
         task_keys_path = f"{out}/task_keys.json"
-        with open(task_keys_path, "w") as f:
-            json.dump([], f)
-        with open(f"{out}/traces.jsonl", "x"):
-            pass
 
         def persist_task_key(key):
             keys.append(key)
@@ -936,11 +1022,16 @@ def main():
                 f.write(json.dumps(trace) + "\n")
 
         for inst in instances:
+            if f"{inst['tid']}_{inst['nonce']}" in skip_tids:
+                continue
             _, m, t, s = run_task(inst["tid"], inst["spec"], db, model, a.split, inst["nonce"], out,
                                   arms=inst["arm_order"], cohort=cohort, upstream_mode=a.upstream,
                                   on_task_key=persist_task_key, on_trace=persist_trace)
             manifest += m; traces += t; allsteps[inst["tid"]] = s
-        if [e["run_id"] for e in manifest] != [e["run_id"] for e in expected]:
+        produced = [t["run_id"] for t in traces]
+        if sorted(produced) != sorted(e["run_id"] for e in expected) or len(set(produced)) != len(produced):
+            sys.exit("MANIFEST MISMATCH after run: the traces do not cover the frozen slots exactly once")
+        if not a.resume_out and [e["run_id"] for e in manifest] != [e["run_id"] for e in expected]:
             sys.exit("MANIFEST MISMATCH after run: produced order differs from the freeze")
     else:
         arms = tuple(a.arms.split(","))

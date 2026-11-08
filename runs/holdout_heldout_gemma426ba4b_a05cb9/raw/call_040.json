@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 33, \\\"summary\\\": \\\"bolts at site-4: 33 units\\\"}\",\"id\":\"ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_2d3331\",\"ver\":1},{\"body\":\"{\\\"units\\\": 33, \\\"summary\\\": \\\"bolts at site-4: 33 units\\\"}\",\"id\":\"ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_7633d1\",\"ver\":1},{\"body\":\"{\\\"units\\\": 33, \\\"note\\\": \\\"observed count of bolts at site-4\\\"}\",\"id\":\"ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_fa0415\",\"ver\":2}],\"corrections\":[{\"id\":\"ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_fa0415\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_fa0415\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_2d3331\",\"inputs\":[{\"id\":\"ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_fa0415\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_7633d1\",\"inputs\":[{\"id\":\"ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_fa0415\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_fa0415\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_fa0415\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_2d3331/1, ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_7633d1/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-26b-a4b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 40,
+  "model": "gemma-4-26b-a4b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 1011,
+  "output_tokens": 242,
+  "cost": 0.000139,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-26b-a4b-it",
+  "provider_response_id": "resp_08rx1Lsm7OcVc1icDp2gZanz3DO-D9ZsN05yAoSOe2z62SD1W2SUBW7WZ5K8T0Kg9cb6hSlrgEw7fFelqMfR3_ma5pX5uoATWQY3Y0H1ZwrEdZsuS-H7nFGfnlHaejZvEDNtISctmByPbf7e699jPj-RpDLXjvjiz1g_BuC7EHitVK5nX7PRuN6mUe5p1iuB_-C9vdecdR_Fj6q3DdYmKgieCtXZ6BIWsfr1ymQ4DiYAsZWrZjyr9L2VKbcT2r5dHz86VHyeo6q9cuufvGNEMA_TWhuiJ2SwGwuTXyF238Xv7808CTle3RhBSYKTWqOw4kyg_qlglVAKIcsTSUyteLpM8ARW1dKQmBrAn_l5c4YvXn2cJfTL3-fN0l0zyj54tXruNqJoR94-ICX_Z_C6vzE9Mvj1LKbH3baOqwFTvss5-jWmAPD_mBUhFV4vnC2-Gk89Lzhxxp4JlmATuFcSGA6T00sO_7X_cCTPqt24ww8a05Qxsh1kZ7TJh85mMJLM7kRcgUfVPCZ_vMvbt5ri61rrUvw=",
+  "elapsed_s": 1.272,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_2d3331\", \"result\": {\"units\": 33}, \"evidence\": [{\"id\": \"ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_2d3331\", \"ver\": 1}, {\"id\": \"ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_fa0415\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph6628e0_V6i03_heldout_gemma426ba4b_15695fb40d63_7633d1\", \"ver\": 1}]}\n```"
+ }
+}

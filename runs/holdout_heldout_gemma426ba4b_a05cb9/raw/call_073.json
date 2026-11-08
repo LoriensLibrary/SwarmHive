@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 30, \\\"summary\\\": \\\"bolts at site-9: 30 units\\\"}\",\"id\":\"ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_1baca4\",\"ver\":1},{\"body\":\"{\\\"units\\\": 30, \\\"summary\\\": \\\"bolts at site-9: 30 units\\\"}\",\"id\":\"ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_45e9bc\",\"ver\":1},{\"body\":\"{\\\"units\\\": 30, \\\"note\\\": \\\"observed count of bolts at site-9\\\"}\",\"id\":\"ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_cf3311\",\"ver\":2}],\"corrections\":[{\"id\":\"ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_cf3311\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_cf3311\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_1baca4\",\"inputs\":[{\"id\":\"ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_cf3311\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_45e9bc\",\"inputs\":[{\"id\":\"ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_cf3311\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_cf3311\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_cf3311\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_1baca4/1, ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_45e9bc/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-26b-a4b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 73,
+  "model": "gemma-4-26b-a4b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 1015,
+  "output_tokens": 242,
+  "cost": 0.000139,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-26b-a4b-it",
+  "provider_response_id": "resp_uBlBURsUyTdPTtG539C63UL4Rz9svRNPlGd5DRiwTgTHJXr5AwdVbvlZvT0uI0DN8jrQQlzPPLCGPFYcf9D4CI8StVKOv5SymTBhwyoaBPj9cO4a62FmrYpU9AuNH9e2RwYY_5OFAF6shwZkJcbmff_x23DDa6KtWbUaMbZ4qtEzv2DZWYbmliBvUW145PHgTQYmYOS6aktMGgvPWIvB0GuiEpZfeMzlkpNaGBujc6mbcQGOhEmozD_bArHFqbRbyWYWzjjmCHQtNKrzgl_kqMjHR3g2j5rqu25nMl2JDLDkXKM2dMXYHNmbPEkNYwYfCosrFPumdn7PBohoPwKgIlRl_JQ0i9Yy5ZmoMy2K2BJzhrwftNdj2-sUsvI_TEzJQ-zLqHPXkjasi5D75GF__NZYLA9NJAxsG1tr4ksibc9koGoXz9JjZmQkLRCGV-foBu-_nkBbMpuec3BeNNc3ksPl8ULHFWpeqnmPkJsRKQ1Q2otnHGLo7K7Z3fEOjvfPNW2u9dTJPQnubKLQa-H_smpwaGE=",
+  "elapsed_s": 1.264,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_45e9bc\", \"result\": {\"units\": 30}, \"evidence\": [{\"id\": \"ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_45e9bc\", \"ver\": 1}, {\"id\": \"ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_cf3311\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph05f1a0_V6i06_heldout_gemma426ba4b_1c280031018c_1baca4\", \"ver\": 1}]}\n```"
+ }
+}

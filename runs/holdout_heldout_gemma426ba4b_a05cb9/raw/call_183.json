@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 11, \\\"summary\\\": \\\"filters at site-1: 11 units\\\"}\",\"id\":\"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_29dde8\",\"ver\":1},{\"body\":\"{\\\"units\\\": 11, \\\"summary\\\": \\\"filters at site-1: 11 units\\\"}\",\"id\":\"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_59adec\",\"ver\":1},{\"body\":\"{\\\"units\\\": 11, \\\"note\\\": \\\"observed count of filters at site-1\\\"}\",\"id\":\"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_57015a\",\"ver\":2}],\"corrections\":[{\"id\":\"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_57015a\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_57015a\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_29dde8\",\"inputs\":[{\"id\":\"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_57015a\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_57015a\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_57015a\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_59adec\",\"inputs\":[{\"id\":\"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_57015a\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_29dde8/1, ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_59adec/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-26b-a4b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 183,
+  "model": "gemma-4-26b-a4b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 1003,
+  "output_tokens": 708,
+  "cost": 0.000257,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-26b-a4b-it",
+  "provider_response_id": "resp_MDPirgsL6ugLhteAXuQf8JRNLnizRsHPKF1HGy2J4_-Q2hMVU2oa0EfExWQWC-QDRotdo_P0k9TEri-Bm1bOQY2ixnpjDqwXBZMX4o20hSaqcb50bVY66qgNYzLvSG-1y3hnLcl4_NZXUr0UqAh36OHL3n3W_7jalv6pv9TDD229M-JDOLypsAjBTnaUJXXQUKQjJO2aZngsYRchTlFkSzETXbXa3q4ymIBwx_3l73cUrMofvyN4QTszADFqKGGqrU1ObNFFu-nbkYUKP_y8aGfQM2x5KRjIA7kJQz8WXJ5WiaB1vwvcI6G1N5X3VqMJxzKyfurGwTYVGooawYID3Aoq5QzjfLQI63MEHYL8BBDtJkDrJK64ObwBkO4dEfZd_NE6neswZoMvSRZyEQusBuDVm-trtH7U6LtiZYh9_8QNA37nTAdOpE7SyODvqe8fHv2YdqSa3SO7H4KiubWLraN87XL683QFbES33otkJv5z9HH5c2ZwnbjBPfUNBTfUQi5T-cX2B0_umqEfS054ZcSAHGM=",
+  "elapsed_s": 3.147,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_57015a/2\", \"result\": {\"units\": 11}, \"evidence\": [{\"id\": \"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_57015a\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_29dde8\", \"ver\": 1}, {\"id\": \"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_59adec\", \"ver\": 1}]}\n```\n\nWait, I must correct my decision based on the provided queue. The task asks to choose between `ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_29dde8/1` and `ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_59adec/1`. \n\nLooking at the history:\n- `57015a/2` is the most recent valid artifact (ver 2).\n- `29dde8/1` uses `57015a/2` as input.\n- `59adec/1` uses `57015a/1` (which was invalidated) as input.\n\nSince `29dde8/1` is in the queue and is based on the latest valid version (`57015a/2`), it is the correct choice.\n\n```json\n{\"decision\": \"approve\", \"artifact\": \"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_29dde8\", \"result\": {\"units\": 11}, \"evidence\": [{\"id\": \"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_29dde8\", \"ver\": 1}, {\"id\": \"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_57015a\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph48b327_V6i15_heldout_gemma426ba4b_19531aa51240_59adec\", \"ver\": 1}]}\n```"
+ }
+}

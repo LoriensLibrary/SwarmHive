@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 28, \\\"summary\\\": \\\"bolts at site-5: 28 units\\\"}\",\"id\":\"phc28e24_V1i00_heldout_qwen3827b_52cc6f8f2ebb_86517c\",\"ver\":1},{\"body\":\"{\\\"units\\\": 28, \\\"note\\\": \\\"observed count of bolts at site-5\\\"}\",\"id\":\"phc28e24_V1i00_heldout_qwen3827b_52cc6f8f2ebb_355f98\",\"ver\":1},{\"body\":\"{\\\"units\\\": 3, \\\"note\\\": \\\"observed count of bolts at site-5\\\"}\",\"id\":\"phc28e24_V1i00_heldout_qwen3827b_52cc6f8f2ebb_5edc17\",\"ver\":2}],\"corrections\":[{\"id\":\"phc28e24_V1i00_heldout_qwen3827b_52cc6f8f2ebb_5edc17\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"phc28e24_V1i00_heldout_qwen3827b_52cc6f8f2ebb_5edc17\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"phc28e24_V1i00_heldout_qwen3827b_52cc6f8f2ebb_355f98\",\"inputs\":[],\"status\":\"valid\",\"ver\":1},{\"id\":\"phc28e24_V1i00_heldout_qwen3827b_52cc6f8f2ebb_5edc17\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"phc28e24_V1i00_heldout_qwen3827b_52cc6f8f2ebb_86517c\",\"inputs\":[{\"id\":\"phc28e24_V1i00_heldout_qwen3827b_52cc6f8f2ebb_355f98\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phc28e24_V1i00_heldout_qwen3827b_52cc6f8f2ebb_86517c/1 lookup_available=false (your one lookup was used; decide now)\"}",
+    "role": "user"
+   }
+  ],
+  "model": "qwen3.8-27b",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 13,
+  "model": "qwen3.8-27b",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 860,
+  "output_tokens": 1891,
+  "cost": 0.002397,
+  "unit": "credits",
+  "reasoning_tokens": 1730,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "qwen3.8-27b",
+  "provider_response_id": "resp_WXpRzFwqtFUBRR_bAaWTFVEkRYUXTaivqTKZhFG6DUNYGH2eJgpe8Z4gI4IowvhejbyPTm9VZUd5trtYpjfBo_itH7V7QMixxqzcM14laKZuNSf7wLztGhCfismemU3Y1e_gzUoJuJd3MZJmrafk2Cat3nGznAScnri4MnGfzkV1GAogreDUr5Y66NY_d1_kCxSwrx-MZHI-sJuebjjNBroCnPJU8T_vqN5GifnH2Zo5-J6BeLjlX8uogRQuSrr5N70i2AQkz2CwtDS5_Ti-TAusnNBHAQ0J7bmsKCVO9jYHSVNzzroUBFe57YhkKw4yWPp4jV-Q6WdVbqTWN9QSi1-t0lBl-BG4LG_jJIP28ScwftBhg4UMPZIMFvJ8fEW4H-WllSyBOvcjupQv2McfwVMeAgK-BcN0Tp1HRLP0ckDF8ssGmC6sbM-dLMbEP1XvWMuCYqS70V0fPUiW1xHKIM3MESRlvG2giXgdgrIVD7cxADOfMvlGPO2oMaLRRPJ9Yxth2Nz_0CqQhDSWClAmJS-P76o=",
+  "elapsed_s": 19.074,
+  "stop_reason": "end_turn",
+  "raw_text": "\n\n{\"decision\":\"reject\",\"artifact\":null,\"result\":null,\"evidence\":[],\"consulted\":[{\"id\":\"phc28e24_V1i00_heldout_qwen3827b_52cc6f8f2ebb_86517c\",\"ver\":1},{\"id\":\"phc28e24_V1i00_heldout_qwen3827b_52cc6f8f2ebb_355f98\",\"ver\":1},{\"id\":\"phc28e24_V1i00_heldout_qwen3827b_52cc6f8f2ebb_5edc17\",\"ver\":2}]}"
+ }
+}
