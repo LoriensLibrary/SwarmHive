@@ -27,7 +27,7 @@ def main():
     src = re.sub(r"\n&#91;embedded content:[^\n]*\n", "\n", src)
     src = src.replace("\n## Code and Data\n", "\n<div class=\"appendix-break\"></div>\n\n## Code and Data\n")
     html = markdown.markdown(src, extensions=["tables", "fenced_code", "sane_lists"])
-    html = html.replace("<p>Nov 8, 2026", "<p class=\"byline\">Nov 8, 2026", 1)
+    html = html.replace("<p>Angela Faye Reinhold", "<p class=\"byline\">Angela Faye Reinhold", 1)
     doc = f"<!doctype html><html><head><meta charset='utf-8'><title>Sealed Provenance for Agent Swarms</title><style>{CSS}</style></head><body>{html}</body></html>"
     open("report/REPORT.html", "w", encoding="utf-8").write(doc)
     out = os.path.abspath("report/REPORT.pdf"); inp = "file:///" + os.path.abspath("report/REPORT.html").replace("\\", "/")
