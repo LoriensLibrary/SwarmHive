@@ -32,6 +32,7 @@ def main():
     ap.add_argument("--gate-deployment", help="reviewed credential-free gate_preflight.py receipt, required for a paid freeze")
     ap.add_argument("--max-tokens", type=int, default=pilot_runner.MAX_TOKENS, help="uniform per-call output budget frozen for every model and arm")
     ap.add_argument("--timeout", type=int, default=pilot_runner.TRANSPORT_TIMEOUT_S, help="per-attempt transport timeout in seconds, frozen")
+    ap.add_argument("--interleave", action="store_true", help="order instances round-robin across variants so a cumulative budget stop cannot wipe one late family")
     a = ap.parse_args()
     pilot_runner.set_max_tokens(a.max_tokens); MAX_TOKENS = pilot_runner.MAX_TOKENS
     arms = a.arms.split(",")
@@ -66,6 +67,16 @@ def main():
                 manifest.append({"run_id": f"{tid}_{nonce}_{arm}_{a.split}", "task_id": task_id,
                                  "condition": arm, "split": a.split,
                                  "correct_abstention_expected": bool(spec.get("bad_draft"))})
+    if a.interleave:
+        by_v = {}
+        for inst in instances: by_v.setdefault(inst["variant"], []).append(inst)
+        order = a.variants.split(","); inter = []
+        for i in range(max(len(v) for v in by_v.values())):
+            for v in order:
+                if i < len(by_v[v]): inter.append(by_v[v][i])
+        instances = inter
+        manifest = [{"run_id": f"{i['tid']}_{i['nonce']}_{arm}_{a.split}", "task_id": f"{i['tid']}_{i['nonce']}", "condition": arm, "split": a.split,
+                     "correct_abstention_expected": bool(i["spec"].get("bad_draft"))} for i in instances for arm in i["arm_order"]]
     os.makedirs(a.out, exist_ok=True)
     mbytes = json.dumps(manifest, indent=1, sort_keys=True).encode()
     with open(f"{a.out}/manifest.json", "wb") as f: f.write(mbytes)
