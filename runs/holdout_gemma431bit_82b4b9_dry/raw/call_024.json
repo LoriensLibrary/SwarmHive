@@ -1,0 +1,26 @@
+{
+ "request": {
+  "max_tokens": 1200,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 25, \\\"summary\\\": \\\"clamps at site-2: 25 units\\\"}\",\"id\":\"phd0745c_V1i00_gemma431bit_b964d6\",\"ver\":1},{\"body\":\"{\\\"units\\\": 25, \\\"note\\\": \\\"observed count of clamps at site-2\\\"}\",\"id\":\"phd0745c_V1i00_gemma431bit_993767\",\"ver\":1}],\"corrections\":[{\"id\":\"phd0745c_V1i00_gemma431bit_2bb1ef\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"phd0745c_V1i00_gemma431bit_2bb1ef\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"phd0745c_V1i00_gemma431bit_993767\",\"inputs\":[],\"status\":\"valid\",\"ver\":1},{\"id\":\"phd0745c_V1i00_gemma431bit_b964d6\",\"inputs\":[{\"id\":\"phd0745c_V1i00_gemma431bit_993767\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phd0745c_V1i00_gemma431bit_b964d6/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 24,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cost": 0.0,
+  "unit": "credits",
+  "elapsed_s": 0.0,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"phd0745c_V1i00_gemma431bit_b964d6\", \"result\": {\"units\": 25}, \"evidence\": [{\"id\": \"phd0745c_V1i00_gemma431bit_b964d6\", \"ver\": 1}]}"
+ }
+}

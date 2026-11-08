@@ -11,6 +11,7 @@ Field mapping (recorder request -> Adaption):
   system       -> instructions
   messages[0].content (single user turn) -> input
   max_tokens   -> max_output_tokens
+  temperature  -> temperature        (frozen sampling config, sent on every request)
   tools        -> tools=[]           (explicitly none)
 
 Auth: ADAPTION_API_KEY env var, else secrets/adaption.key (gitignored). Never printed.
@@ -68,6 +69,8 @@ def send(**request):
         "tools": [],            # explicitly no tools, no memory
         "store": False,
     }
+    if request.get("temperature") is not None:
+        body["temperature"] = float(request["temperature"])
     req = urllib.request.Request(
         f"{BASE}/api/v1/responses", data=json.dumps(body).encode("utf-8"), method="POST",
         headers={"Content-Type": "application/json", "Authorization": f"Bearer {_key()}"})

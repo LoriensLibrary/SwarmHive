@@ -10,7 +10,7 @@ Then run:
 """
 import argparse, hashlib, json, os, random, subprocess, sys
 sys.path.insert(0, "tools")
-from pilot_runner import TASKS, ARMS, REVIEWER_SYS, WRITER_SYS, RESEARCHER_SYS, LOOKUP_RULE, MAX_TOKENS, LOOKUP_MODE, MODEL_SPEC, requests_for, code_hashes
+from pilot_runner import TASKS, ARMS, REVIEWER_SYS, WRITER_SYS, RESEARCHER_SYS, LOOKUP_RULE, MAX_TOKENS, LOOKUP_MODE, MODEL_SPEC, requests_for, code_hashes, TEMPERATURE
 
 ITEMS = ["bolts", "gaskets", "valves", "filters", "spools", "brackets", "seals", "fuses", "hinges", "clamps", "rivets", "bearings"]
 
@@ -24,6 +24,9 @@ def main():
     ap.add_argument("--provider", default="anthropic"); ap.add_argument("--ceiling", type=float, default=None)
     ap.add_argument("--split", default="evaluation"); ap.add_argument("--retries", type=int, default=0)
     ap.add_argument("--upstream", choices=("model", "fixture"), default="model")
+    ap.add_argument("--prose-names", choices=("default", "off", "on"), default="default", help="off = no artifact ids in any writer prose (closes the claimed-lineage leak into the current arm); recorded in FREEZE")
+    ap.add_argument("--temperature", type=float, default=TEMPERATURE)
+    ap.add_argument("--authorship", choices=("authenticated", "asserted"), default="authenticated")
     a = ap.parse_args()
     arms = a.arms.split(",")
     rng = random.Random(a.seed)
@@ -32,6 +35,7 @@ def main():
         base = TASKS[v]
         for i in range(a.n):
             spec = dict(base)
+            if a.prose_names != "default": spec["prose_names"] = (a.prose_names == "on")
             right = rng.randint(5, 40)
             if base.get("two_sources"):                         # V9: wrong = a+b, right = a+b2
                 a_ = rng.randint(3, 20); b_ = rng.randint(3, 20); b2 = max(1, b_ + rng.choice([-3, -2, -1, 1, 2, 3]))
@@ -39,8 +43,8 @@ def main():
             elif base["wrong"] is None:
                 wrong = None
                 if base.get("bad_draft"): spec["bad_delta"] = rng.choice([2, 3, 4, 5])
-            elif v == "V6":
-                wrong = right                                   # same number, authority changes
+            elif base.get("same_number"):
+                wrong = right                                   # V6/V11: same number, only the authorization changes
             else:
                 wrong = right + rng.choice([-7, -4, 3, 6, 9]); wrong = max(1, wrong)
             has_stale = bool(base.get("hops") == 2 or base.get("replay") or base.get("stale_queued") or base.get("two_sources"))   # a stale candidate is actually queued
@@ -71,6 +75,7 @@ def main():
               "manifest_sha256": hashlib.sha256(mbytes).hexdigest(), "instances_sha256": hashlib.sha256(ibytes).hexdigest(),
               "prompts_sha256": prompts_sha, **code_hashes(),
               "max_authorized_requests": sum(requests_for(i["spec"], i["arm_order"], a.upstream) for i in instances), "retries": a.retries, "upstream_mode": a.upstream,
+              "temperature": a.temperature, "authorship": a.authorship, "prose_names": a.prose_names,
               "rates": list(MODEL_SPEC[a.model]["price"]) if a.model in MODEL_SPEC else None,
               "context_tokens": MODEL_SPEC[a.model]["context"] if a.model in MODEL_SPEC else None,
               "attack_budget": "one fixed opportunity per instance (replay/stale queue), identical across arms"}

@@ -1,4 +1,18 @@
-# Swarm test Hive: identity bound below the agent
+# SwarmHive: a lineage-gated publication boundary for agent swarms
+
+Entry for the Swarm Alignment Hackathon (Apart Research x AI Alignment Foundation, Nov 6-8, 2026).
+Measured contribution: Track 4 evaluation of a publication gate that re-reads authenticated lineage, with a
+matched reviewer comparison across seven open models and Claude. Substrate: Track 3 identity bound to the
+database login below the agent, exercised in every run through the intake (`sql/seal_from_proposal.sql`).
+
+Start here: `REPRODUCE.md` (run everything from this repo), `report/DRAFT.md` (the write-up),
+`report/REVIEW_aelen_2026-11-07.md` (adversarial review with receipts), `sql/experiment_schema.sql` (the gate,
+frozen at d2df880) and `tools/pilot_runner.py` (matched arms, frozen held-out runner, spend guard).
+The section below describes the pre-sprint containment battery that this work builds on.
+
+---
+
+# Pre-sprint containment battery: identity bound below the agent
 
 Entry for the Swarm Alignment Hackathon (Apart Research x AI Alignment
 Foundation, Nov 6-8, 2026), Track 3: agent identity that holds when agents can

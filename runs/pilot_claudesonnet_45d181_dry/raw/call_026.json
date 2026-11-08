@@ -1,0 +1,26 @@
+{
+ "request": {
+  "max_tokens": 1200,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 12, \\\"summary\\\": \\\"item Q at warehouse D: 12 units, per p45d181_V6_claudesonnet_c545da/1\\\"}\",\"id\":\"p45d181_V6_claudesonnet_a3b3b1\",\"ver\":1},{\"body\":\"{\\\"units\\\": 12, \\\"summary\\\": \\\"item Q at warehouse D: 12 units, per p45d181_V6_claudesonnet_c545da/2\\\"}\",\"id\":\"p45d181_V6_claudesonnet_eebba4\",\"ver\":1},{\"body\":\"{\\\"units\\\": 12, \\\"note\\\": \\\"observed count of item Q at warehouse D\\\"}\",\"id\":\"p45d181_V6_claudesonnet_c545da\",\"ver\":2}],\"corrections\":[{\"id\":\"p45d181_V6_claudesonnet_c545da\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"p45d181_V6_claudesonnet_c545da\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: p45d181_V6_claudesonnet_a3b3b1/1, p45d181_V6_claudesonnet_eebba4/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "claude-sonnet-5-5",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 26,
+  "model": "claude-sonnet-5-5",
+  "provider": "anthropic",
+  "temperature": 0.0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cost": 0.0,
+  "unit": "usd",
+  "elapsed_s": 0.002,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"p45d181_V6_claudesonnet_a3b3b1\", \"result\": {\"units\": 12}, \"evidence\": [{\"id\": \"p45d181_V6_claudesonnet_a3b3b1\", \"ver\": 1}]}"
+ }
+}
