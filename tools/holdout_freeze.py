@@ -31,6 +31,7 @@ def main():
     ap.add_argument("--cohort", default=None, help="execution namespace bound into the freeze; default = sanitized model id")
     ap.add_argument("--gate-deployment", help="reviewed credential-free gate_preflight.py receipt, required for a paid freeze")
     ap.add_argument("--max-tokens", type=int, default=pilot_runner.MAX_TOKENS, help="uniform per-call output budget frozen for every model and arm")
+    ap.add_argument("--timeout", type=int, default=pilot_runner.TRANSPORT_TIMEOUT_S, help="per-attempt transport timeout in seconds, frozen")
     a = ap.parse_args()
     pilot_runner.set_max_tokens(a.max_tokens); MAX_TOKENS = pilot_runner.MAX_TOKENS
     arms = a.arms.split(",")
@@ -82,7 +83,7 @@ def main():
               "manifest_sha256": hashlib.sha256(mbytes).hexdigest(), "instances_sha256": hashlib.sha256(ibytes).hexdigest(),
               "prompts_sha256": prompts_sha, **code_hashes(),
               "max_authorized_requests": sum(requests_for(i["spec"], i["arm_order"], a.upstream) for i in instances), "retries": a.retries, "upstream_mode": a.upstream,
-              "temperature": a.temperature, "authorship": a.authorship, "prose_names": a.prose_names,
+              "temperature": a.temperature, "authorship": a.authorship, "prose_names": a.prose_names, "transport_timeout_s": a.timeout,
               "rates": list(MODEL_SPEC[a.model]["price"]) if a.model in MODEL_SPEC else None,
               "context_tokens": MODEL_SPEC[a.model]["context"] if a.model in MODEL_SPEC else None,
               "attack_budget": "one fixed opportunity per instance (replay/stale queue), identical across arms"}

@@ -1,0 +1,33 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 12, \\\"summary\\\": \\\"item Q at warehouse D: 12 units, per pa5b714_V6_claudesonnet_81038145f018_59f993/1\\\"}\",\"id\":\"pa5b714_V6_claudesonnet_81038145f018_228956\",\"ver\":1},{\"body\":\"{\\\"units\\\": 12, \\\"summary\\\": \\\"item Q at warehouse D: 12 units, per pa5b714_V6_claudesonnet_81038145f018_59f993/2\\\"}\",\"id\":\"pa5b714_V6_claudesonnet_81038145f018_07bc65\",\"ver\":1},{\"body\":\"{\\\"units\\\": 12, \\\"note\\\": \\\"observed count of item Q at warehouse D\\\"}\",\"id\":\"pa5b714_V6_claudesonnet_81038145f018_59f993\",\"ver\":2}],\"corrections\":[{\"id\":\"pa5b714_V6_claudesonnet_81038145f018_59f993\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"pa5b714_V6_claudesonnet_81038145f018_59f993\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"pa5b714_V6_claudesonnet_81038145f018_07bc65\",\"inputs\":[{\"id\":\"pa5b714_V6_claudesonnet_81038145f018_59f993\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"pa5b714_V6_claudesonnet_81038145f018_228956\",\"inputs\":[{\"id\":\"pa5b714_V6_claudesonnet_81038145f018_59f993\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"pa5b714_V6_claudesonnet_81038145f018_59f993\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"pa5b714_V6_claudesonnet_81038145f018_59f993\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: pa5b714_V6_claudesonnet_81038145f018_228956/1, pa5b714_V6_claudesonnet_81038145f018_07bc65/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "claude-sonnet-5-5",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 1,
+  "model": "claude-sonnet-5-5",
+  "provider": "anthropic",
+  "temperature": 0.0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cost": 0.0,
+  "unit": "usd",
+  "reasoning_tokens": null,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": null,
+  "incomplete_reason": null,
+  "returned_model": null,
+  "provider_response_id": null,
+  "elapsed_s": 0.002,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"pa5b714_V6_claudesonnet_81038145f018_07bc65\", \"result\": {\"units\": 12}, \"evidence\": [{\"id\": \"pa5b714_V6_claudesonnet_81038145f018_07bc65\", \"ver\": 1}, {\"id\": \"pa5b714_V6_claudesonnet_81038145f018_59f993\", \"ver\": 2}], \"consulted\": [{\"id\": \"pa5b714_V6_claudesonnet_81038145f018_228956\", \"ver\": 1}]}"
+ }
+}

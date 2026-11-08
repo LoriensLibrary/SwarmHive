@@ -52,6 +52,7 @@ def set_max_tokens(n):
         raise SystemExit(f"--max-tokens must be a positive integer (got {n!r}); a zero budget would reserve nothing and send a provider default")
     MAX_TOKENS = n
 TEMPERATURE = 0.0                                    # frozen sampling temperature, sent on every request and recorded in FREEZE; --temperature overrides
+TRANSPORT_TIMEOUT_S = 240                            # frozen per-attempt transport timeout in seconds; a provider gateway timeout before this is an unresolved attempt
 
 
 class BudgetStop(Exception):
@@ -242,9 +243,10 @@ class Model:
     ledger first; a returned usage block reconciles it to the verified rate; a lost, errored or usage-less response
     keeps the full reserve as spent, because the provider may have charged it. No automatic retries by default.
     Attempts are bounded by max_attempts (the freeze's max_authorized_requests). The ceiling is finite and positive."""
-    def __init__(self, model, dry_run, rawdir, provider="anthropic", ceiling=None, ledger=None, max_attempts=None, retries=0, temperature=TEMPERATURE):
+    def __init__(self, model, dry_run, rawdir, provider="anthropic", ceiling=None, ledger=None, max_attempts=None, retries=0, temperature=TEMPERATURE, transport_timeout_s=TRANSPORT_TIMEOUT_S):
         self.model, self.dry, self.rawdir, self.n, self.spend, self.provider = model, dry_run, rawdir, 0, 0.0, provider
         self.temperature = temperature
+        self.transport_timeout_s = transport_timeout_s
         self.ceiling, self.ledger, self.max_attempts, self.retries = ceiling, ledger, max_attempts, retries
         self.attempts = 0                                 # provider attempts actually sent (dry: 0)
         self.integrity_stop = None                        # sticky for this cohort
@@ -295,7 +297,10 @@ class Model:
         self._ledger({"call": self.n, "event": "debit", "attempt": self.attempts, "reserve": round(res, 6), "spend_after_debit": round(self.spend, 6), "unit": self.unit})
         try:
             outgoing = dict(request, temperature=self.temperature)   # sampling is frozen runtime config, sent on every attempt
-            resp = self.client.send(**outgoing) if self.provider == "adaption" else self.client.messages.create(**outgoing)
+            if self.provider == "adaption":
+                resp = self.client.send(**dict(outgoing, transport_timeout_s=self.transport_timeout_s))
+            else:
+                resp = self.client.with_options(timeout=self.transport_timeout_s).messages.create(**outgoing)
         except Exception as e:
             code = getattr(e, "code", None) or getattr(e, "status_code", None) or getattr(getattr(e, "response", None), "status_code", None)
             self._ledger({"call": self.n, "event": "unresolved", "attempt": self.attempts, "status": code, "error": type(e).__name__, "reserve_kept": round(res, 6)})
@@ -822,6 +827,7 @@ def main():
     ap.add_argument("--upstream", choices=("model", "fixture"), default="model", help="model = each cohort model writes the upstream artifacts (full-model pipeline); fixture = presealed deterministic upstream shared across providers (reviewer-only study)")
     ap.add_argument("--temperature", type=float, default=TEMPERATURE, help="sampling temperature sent on every request; part of the freeze")
     ap.add_argument("--max-tokens", type=int, default=MAX_TOKENS, help="uniform per-call output budget (reasoning + answer) for every model and arm; part of the freeze")
+    ap.add_argument("--timeout", type=int, default=TRANSPORT_TIMEOUT_S, help="per-attempt transport timeout in seconds; part of the freeze")
     ap.add_argument("--authorship", choices=("authenticated", "asserted"), default="authenticated", help="authenticated = agents submit through their own login and the operator seals from the intake row; asserted = legacy parameter path, labeled")
     ap.add_argument("--cohort", default=None, help="cohort tag for artifact prefixes and the output dir; defaults to the model id, sanitized")
     ap.add_argument("--retries", type=int, default=0, help="automatic retries per call on retryable statuses; each attempt is reserved and counted separately (default 0)")
@@ -847,7 +853,7 @@ def main():
     else:
         max_req = sum(requests_for(TASKS[t], tuple(a.arms.split(",")), a.upstream) for t in a.tasks.split(","))
     model = Model(a.model, a.dry_run, os.path.join(out, "raw"), provider=a.provider, ceiling=a.ceiling,
-                  ledger=os.path.join(out, "ledger.jsonl"), max_attempts=max_req, retries=a.retries, temperature=a.temperature)
+                  ledger=os.path.join(out, "ledger.jsonl"), max_attempts=max_req, retries=a.retries, temperature=a.temperature, transport_timeout_s=a.timeout)
     if a.spec_file:
         fdir = os.path.dirname(os.path.abspath(a.spec_file)); fpath = os.path.join(fdir, "FREEZE.json")
         if not os.path.exists(fpath): sys.exit("frozen run requires FREEZE.json beside the spec file")
@@ -872,7 +878,7 @@ def main():
             "model": a.model, "provider": a.provider, "max_tokens": MAX_TOKENS, "lookup_mode": LOOKUP_MODE, "split": a.split,
             "ceiling": a.ceiling,                       # the authorized ceiling is part of the freeze
             "max_authorized_requests": max_req, "retries": a.retries, "upstream_mode": a.upstream,
-            "temperature": a.temperature, "authorship": a.authorship,
+            "temperature": a.temperature, "authorship": a.authorship, "transport_timeout_s": a.timeout,
             "rates": list(MODEL_SPEC[a.model]["price"]) if a.model in MODEL_SPEC else None,
             "context_tokens": MODEL_SPEC[a.model]["context"] if a.model in MODEL_SPEC else None,
         }
@@ -951,7 +957,7 @@ def main():
     with open(f"{out}/run_summary.json", "w") as f:
         json.dump({"model": a.model, "provider": a.provider, "dry_run": a.dry_run, "harness_test": a.dry_run, "model_calls": model.n, "spend": round(model.spend, 4), "unit": model.unit,
                    "ceiling": a.ceiling, "lookup_mode": LOOKUP_MODE, "max_tokens": MAX_TOKENS, "steps": allsteps, "out": out,
-                   "cohort": cohort, "upstream_mode": a.upstream, "temperature": a.temperature, "authorship": a.authorship, "provider_attempts": model.attempts, "max_authorized_requests": max_req, "retries": a.retries, "rates": list(model.price), "context_tokens": model.context,
+                   "cohort": cohort, "upstream_mode": a.upstream, "temperature": a.temperature, "authorship": a.authorship, "transport_timeout_s": a.timeout, "provider_attempts": model.attempts, "max_authorized_requests": max_req, "retries": a.retries, "rates": list(model.price), "context_tokens": model.context,
                    "budget_stopped_runs": sum(1 for t in traces if "budget_stopped" in str(t.get("error", "")))}, f, indent=1)
     print(json.dumps({"out": out, "runs": len(traces), "model_calls": model.n, "spend": round(model.spend, 4), "unit": model.unit}))
 

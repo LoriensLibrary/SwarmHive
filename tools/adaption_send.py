@@ -23,6 +23,7 @@ Credits (not USD) are the unit of cost; recorded as usage tokens for the manifes
 import json, os, urllib.request
 
 HOSTED_BASE_URL = "https://api.prod.adaptionlabs.ai"
+TRANSPORT_TIMEOUT_S = 240   # frozen per run (Lorien's b8630c0 extension); long reasoning replies exceeded 120 s
 BASE = os.environ.get("ADAPTION_BASE_URL", HOSTED_BASE_URL)
 
 
@@ -101,7 +102,7 @@ def send(**request):
     req = urllib.request.Request(
         f"{BASE}/api/v1/responses", data=json.dumps(body).encode("utf-8"), method="POST",
         headers={"Content-Type": "application/json", "Authorization": f"Bearer {_key()}"})
-    with urllib.request.urlopen(req, timeout=120) as r:
+    with urllib.request.urlopen(req, timeout=_positive_int(request.get("transport_timeout_s") or TRANSPORT_TIMEOUT_S, "transport_timeout_s")) as r:
         raw = json.loads(r.read().decode("utf-8"))
     if raw.get("error"):
         raise RuntimeError(f"adaption error: {raw['error']}")

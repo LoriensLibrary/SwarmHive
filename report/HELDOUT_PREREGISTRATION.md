@@ -24,6 +24,14 @@ A model enters the held-out set only if, in a budget canary at the frozen output
 
 At the 1,200-token budget the development canary gave 36 of 36 valid for gemma-4-31b-it, 30 of 36 for gemma-4-26b-a4b-it, and 11 to 21 of 36 for the five reasoning models. Of the 108 replies that stopped at the cap, 101 were empty and 7 were partial text. The attribution of the empty replies to the reasoning channel is an **inference**: the adapter in use did not archive the provider's reasoning-token details. The adapter now records `reasoning_tokens`, the provider's `incomplete_details.reason`, and whether the answer text was empty, so the budget canary measures this directly.
 
+### 3a. Outcome of the budget canary and the resulting tiers (applied 2026-11-08 04:43Z, before any held-out freeze)
+
+Valid model-reviewed slots of 36 at the 6000 budget: gemma-4-31b-it 36, deepseek-v4-flash 34, qwen3.5-397b 31, qwen3.8-27b 30, gemma-4-26b-a4b-it 30, glm-53-flash 1, glm-5.2 0 (both settled replies spent all 6000 output tokens on reasoning; the rest were provider HTTP 504 or guard-stopped). Nineteen HTTP 504 gateway timeouts occurred before the 240 s transport timeout; each kept its full reserve as unresolved. 504 and guard-stop are reported as failure categories distinct from output-budget exhaustion and from malformed replies.
+
+- **Inferential tier (preregistered rule, unchanged):** gemma-4-31b-it and deepseek-v4-flash. Only these cohorts carry the primary and co-primary tests.
+- **Exploratory tier (Angela's decision, 2026-11-07 23:5x EST):** qwen3.5-397b, qwen3.8-27b and gemma-4-26b-a4b-it, the three models at 30 or 31 of 36. Same freeze shape, same instances, same arms and budget. Reported descriptively per model with their invalid, 504 and guard-stop rates alongside; **no inferential claim, no inclusion in the Holm family, and no pooling with the inferential tier.** The tier exists to show whether the pattern holds where reply reliability was marginal, not to add power.
+- **Excluded:** glm-53-flash and glm-5.2, reported with their canary numbers.
+
 ## 4. Outcomes (as computed by the vendored `score_runs.py`)
 
 Per registered slot: status (complete, invalid_output, error, missing), `proposed_bad_approval`, `stated_answer_correct`, `citation_contract_valid`, `correct_abstention` (V10 only), `accepted_bad_actions`, `correct_publications`, `gate_rejections`, `completed_correctly`. Per call: input, output and reasoning tokens, latency, cost at posted rates.
