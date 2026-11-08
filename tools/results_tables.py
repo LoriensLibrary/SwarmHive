@@ -130,6 +130,28 @@ def audit(dsn_file, prefixes):
     return out
 
 
+def diag_table(diag):
+    """diagnostics cohorts: completed correctly per family and arm, plus failure counts, descriptive only."""
+    rows = []
+    for k, c in diag.items():
+        sc = {r["run_id"]: r for r in c["scored"] if r.get("run_id")}
+        fams = sorted({fam_of(t["task_id"]) for t in c["traces"]}, key=lambda f: int(f[1:]))
+        by_run = {t["run_id"]: t for t in c["traces"]}
+        for fam in fams:
+            cells = []
+            for arm in ARMS:
+                slots = [e for e in c["manifest"] if fam_of(e["task_id"]) == fam and e["condition"] == arm]
+                done = sum(1 for e in slots if sc.get(e["run_id"], {}).get("completed_correctly") or (sc.get(e["run_id"], {}).get("correct_abstention") is True))
+                missing = sum(1 for e in slots if e["run_id"] not in by_run)
+                cells.append(f"{done}/{len(slots)}" + (f" ({missing} missing)" if missing else ""))
+            errs = sum(1 for e in c["manifest"] if fam_of(e["task_id"]) == fam and by_run.get(e["run_id"], {}).get("status") == "error")
+            inv = sum(1 for e in c["manifest"] if fam_of(e["task_id"]) == fam and by_run.get(e["run_id"], {}).get("status") == "invalid_output")
+            unsafe = sum(1 for e in c["manifest"] if fam_of(e["task_id"]) == fam and sc.get(e["run_id"], {}).get("proposed_bad_approval"))
+            bad = sum(int(sc.get(e["run_id"], {}).get("accepted_bad_actions") or 0) for e in c["manifest"] if fam_of(e["task_id"]) == fam)
+            rows.append([c["model"], fam] + cells + [errs, inv, unsafe, bad])
+    return md_table(["model", "family"] + ARMS + ["errors", "invalid", "unsafe proposals", "unsafe commits"], rows)
+
+
 def md_table(headers, rows):
     s = "| " + " | ".join(headers) + " |\n|" + "|".join([" --- "] * len(headers)) + "|\n"
     for r in rows: s += "| " + " | ".join("" if v is None else str(v) for v in r) + " |\n"
@@ -146,6 +168,7 @@ def main():
     ap.add_argument("--results", required=True); ap.add_argument("--index", required=True)
     ap.add_argument("--cohort", action="append", default=[], help="cohort_name=run_dir")
     ap.add_argument("--audit-dsn-file", default=None); ap.add_argument("--out", default="report/heldout_results")
+    ap.add_argument("--diag", action="append", default=[], help="diagnostics cohort_name=run_dir (descriptive table only)")
     a = ap.parse_args()
     os.makedirs(a.out, exist_ok=True)
     R = json.load(open(a.results)); idx = {r["cohort"]: r for r in json.load(open(a.index))}
@@ -182,8 +205,10 @@ def main():
     rows = []
     for cl in R["claims"]:
         if cl["type"] != "tokens_lookup_minus_compact": continue
-        rows.append([cl["model"], cl["n"], f"{cl['hodges_lehmann']:+.1f}", f"{cl['mean']:+.1f}", fmt_p(cl["sign_p"]), fmt_p(cl["holm_adjusted_p"]), "yes" if cl["reject_at_0.05"] else "no"])
-    md.append("### Co-primary: tokens per registered case, lookup-offered minus compact (V6 and V11 pooled within model, settled pairs only)\n\n" + md_table(["model", "settled pairs", "Hodges-Lehmann", "mean", "sign-test p", "Holm p", "reject at 0.05"], rows))
+        direction = "compact cheaper" if cl["hodges_lehmann"] > 0 else ("compact costlier" if cl["hodges_lehmann"] < 0 else "tie")
+        verdict = "supported" if (cl["reject_at_0.05"] and cl["hodges_lehmann"] > 0) else ("not supported: opposite direction" if cl["reject_at_0.05"] else "not shown")
+        rows.append([cl["model"], cl["n"], f"{cl['hodges_lehmann']:+.1f}", f"{cl['mean']:+.1f}", direction, fmt_p(cl["sign_p"]), fmt_p(cl["holm_adjusted_p"]), verdict])
+    md.append("### Co-primary: tokens per registered case, lookup-offered minus compact (V6 and V11 pooled within model, settled pairs only; the preregistered claim is that compact uses fewer)\n\n" + md_table(["model", "settled pairs", "Hodges-Lehmann", "mean", "direction", "sign-test p", "Holm p", "preregistered claim"], rows))
 
     rates = {k: arm_rates(c) for k, c in cohorts.items()}
     rows = []
@@ -215,16 +240,22 @@ def main():
     rows = []; tot = collections.Counter()
     for k, c in cohorts.items():
         g = gate_integrity(c); tot.update(g); T["cohorts"][k]["gate"] = dict(g)
-        rows.append([idx[k]["model"], g["slots"], g["gate_calls"], g["unsafe_proposals"], g["pre_gate_stops"], g["gate_rejections"], g["correct_publications"], g["unsafe_commits"], g["unknown_commit_outcome"], g["db_verified_approved_events"]])
-    rows.append(["all", tot["slots"], tot["gate_calls"], tot["unsafe_proposals"], tot["pre_gate_stops"], tot["gate_rejections"], tot["correct_publications"], tot["unsafe_commits"], tot["unknown_commit_outcome"], tot["db_verified_approved_events"]])
+        rows.append([idx[k]["model"]] + [g.get(x, 0) for x in ("slots", "gate_calls", "unsafe_proposals", "pre_gate_stops", "gate_rejections", "correct_publications", "unsafe_commits", "unknown_commit_outcome", "db_verified_approved_events")])
+    rows.append(["all"] + [tot.get(x, 0) for x in ("slots", "gate_calls", "unsafe_proposals", "pre_gate_stops", "gate_rejections", "correct_publications", "unsafe_commits", "unknown_commit_outcome", "db_verified_approved_events")])
     T["gate_total"] = dict(tot)
     md.append("### Gate integrity across registered slots\n\n" + md_table(["model", "slots", "gate calls", "unsafe proposals", "pre-gate stops", "gate rejections", "correct publications", "unsafe commits", "unknown commit outcome", "db-verified approvals"], rows))
 
     if a.audit_dsn_file:
         try:
             au = audit(a.audit_dsn_file, {k: k for k in cohorts}); T["branch_audit"] = au
-            rows = [[idx[k]["model"], T["cohorts"][k]["gate"]["db_verified_approved_events"], au.get(k)] for k in cohorts]
-            md.append("### Read-only audit of the evaluation branch: committed approvals carrying each cohort's id vs db-verified approved events in the traces\n\n" + md_table(["model", "approved events in traces", "approval rows on branch"], rows))
+            rows = []
+            for k, run_dir in (x.split("=", 1) for x in a.cohort):
+                sup_path = run_dir + "/traces.partial_superseded.jsonl"
+                sup = sum(1 for l in open(sup_path) for e in (json.loads(l).get("gate_events") or []) if e.get("db_verified") is True and e.get("decision") == "approved") if os.path.exists(sup_path) else 0
+                ev = T["cohorts"][k]["gate"].get("db_verified_approved_events", 0); unk = T["cohorts"][k]["gate"].get("unknown_commit_outcome", 0)
+                rows.append([idx[k]["model"], ev, sup, unk, au.get(k), au.get(k) - ev - sup - unk])
+                T["cohorts"][k]["audit"] = dict(approved_events=ev, superseded_partial_approvals=sup, unknown_outcome_slots=unk, branch_rows=au.get(k))
+            md.append("### Read-only audit of the evaluation branch: committed approvals carrying each cohort id\n\n" + md_table(["model", "db-verified approved events in traces", "approvals from superseded partial traces (instance re-run after resume)", "slots with unknown commit outcome", "approval rows on branch", "rows unexplained"], rows))
         except Exception as e:
             md.append(f"### Branch audit\n\nnot run: {type(e).__name__}\n"); T["branch_audit_error"] = type(e).__name__
 
@@ -237,6 +268,17 @@ def main():
     T["cost_total"] = dict(settled=round(ts, 4), retained=round(tr, 4))
     md.append("### Cost per cohort (platform credits)\n\n" + md_table(["model", "attempts", "request cap", "settled", "retained reserves (504)", "ceiling", "modeled charge", "all-at-cap", "resumes"], rows))
 
+    if a.diag:
+        diag = {}
+        for x in a.diag:
+            k, v = x.split("=", 1); c = load_cohort(v); c["model"] = idx[k]["model"]; diag[k] = c
+            T["cohorts"][k] = {"slots": dict(slot_table(c)[0]), "gate": dict(gate_integrity(c)), "cost": cost_row(c, idx[k]), "done": c["done"]}
+        md.append("### Diagnostics families (descriptive; V10 counts a correct abstention as completed)\n\n" + diag_table(diag))
+        rows = []
+        for k, c in diag.items():
+            s_, _ = slot_table(c); g = gate_integrity(c); cr = T["cohorts"][k]["cost"]
+            rows.append([c["model"], s_.get("registered", 0), s_.get("complete", 0), s_.get("error_504", 0), s_.get("missing", 0), g.get("unsafe_proposals", 0), g.get("gate_rejections", 0), g.get("pre_gate_stops", 0), g.get("unsafe_commits", 0), g.get("unknown_commit_outcome", 0), cr["settled"], cr["retained"], cr["ceiling"], "yes" if c["done"] else "RUNNING"])
+        md.append("### Diagnostics cohorts: slots, gate and cost\n\n" + md_table(["model", "registered", "complete", "error 504", "missing", "unsafe proposals", "gate rejections", "pre-gate stops", "unsafe commits", "unknown outcome", "settled", "retained", "ceiling", "complete run"], rows))
     open(os.path.join(a.out, "TABLES.md"), "w", encoding="utf-8").write("\n".join(md))
     json.dump(T, open(os.path.join(a.out, "tables.json"), "w"), indent=1)
     print("\n".join(md))

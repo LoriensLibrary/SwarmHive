@@ -25,12 +25,12 @@
 | deepseek-v4-flash | V6 | 60 | 58 | 0 | 2 | 0 | 0.967 | 1.000 | -0.033 | [-0.114, +0.029] | 0.043 | 0.043 | holds |
 | deepseek-v4-flash | V11 | 60 | 60 | 0 | 0 | 0 | 1.000 | 1.000 | +0.000 | [-0.060, +0.060] | 0.005 | 0.010 | holds |
 
-### Co-primary: tokens per registered case, lookup-offered minus compact (V6 and V11 pooled within model, settled pairs only)
+### Co-primary: tokens per registered case, lookup-offered minus compact (V6 and V11 pooled within model, settled pairs only; the preregistered claim is that compact uses fewer)
 
-| model | settled pairs | Hodges-Lehmann | mean | sign-test p | Holm p | reject at 0.05 |
-| --- | --- | --- | --- | --- | --- | --- |
-| gemma-4-31b-it | 119 | -263.0 | -173.0 | 2.67e-19 | 1.34e-18 | yes |
-| deepseek-v4-flash | 118 | +1280.5 | +1401.8 | 6.02e-36 | 3.61e-35 | yes |
+| model | settled pairs | Hodges-Lehmann | mean | direction | sign-test p | Holm p | preregistered claim |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| gemma-4-31b-it | 119 | -263.0 | -173.0 | compact costlier | 2.67e-19 | 1.34e-18 | not supported: opposite direction |
+| deepseek-v4-flash | 118 | +1280.5 | +1401.8 | compact cheaper | 6.02e-36 | 3.61e-35 | supported |
 
 ### Calls, tokens and lookup use per settled slot (descriptive)
 
@@ -117,14 +117,14 @@
 | gemma-4-26b-a4b-it | 1080 | 965 | 165 | 73 | 92 | 872 | 0 | 1 | 872 |
 | all | 4320 | 3613 | 380 | 74 | 306 | 3306 | 0 | 1 | 3306 |
 
-### Read-only audit of the evaluation branch: committed approvals carrying each cohort's id vs db-verified approved events in the traces
+### Read-only audit of the evaluation branch: committed approvals carrying each cohort id
 
-| model | approved events in traces | approval rows on branch |
-| --- | --- | --- |
-| gemma-4-31b-it | 910 | 910 |
-| deepseek-v4-flash | 755 | 755 |
-| qwen3.8-27b | 769 | 772 |
-| gemma-4-26b-a4b-it | 872 | 873 |
+| model | db-verified approved events in traces | approvals from superseded partial traces (instance re-run after resume) | slots with unknown commit outcome | approval rows on branch | rows unexplained |
+| --- | --- | --- | --- | --- | --- |
+| gemma-4-31b-it | 910 | 0 | 0 | 910 | 0 |
+| deepseek-v4-flash | 755 | 0 | 0 | 755 | 0 |
+| qwen3.8-27b | 769 | 3 | 0 | 772 | 0 |
+| gemma-4-26b-a4b-it | 872 | 0 | 1 | 873 | 0 |
 
 ### Cost per cohort (platform credits)
 
