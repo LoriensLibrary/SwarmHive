@@ -352,8 +352,11 @@ class _Canned:
             if pick is None:
                 text = json.dumps({"decision": "reject", "artifact": None, "result": None, "evidence": []})
             else:
+                # canned citation follows the reviewer contract: the approved draft itself plus the delivered current source(s)
+                srcs = [{"id": a["id"], "ver": a["ver"]} for a in arts if (a["id"], a["ver"]) not in q]
                 text = json.dumps({"decision": "approve", "artifact": pick["id"], "result": {"units": json.loads(pick["body"])["units"]},
-                                   "evidence": [{"id": pick["id"], "ver": pick["ver"]}]})
+                                   "evidence": [{"id": pick["id"], "ver": pick["ver"]}] + srcs,
+                                   "consulted": [{"id": a["id"], "ver": a["ver"]} for a in drafts if a is not pick]})
         self.content = [type("T", (), {"text": text})()]
         self.usage = type("U", (), {"input_tokens": 0, "output_tokens": 0})()
         self.stop_reason = "end_turn"
