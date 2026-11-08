@@ -1,6 +1,6 @@
 # Sealed Provenance for Agent Swarms: Preloaded Lineage vs On-Demand Retrieval Under a Trusted Publication Gate
 
-Nov 8, 2026 · @Angela Faye Reinhold · Lorien's Library · Swarm Alignment Hackathon, Apart Research x AI Alignment Foundation, Track 3 with Track 4 evaluation
+Angela Faye Reinhold, Lorien's Library LLC. With Apart Research. Research conducted at the Swarm Alignment Hackathon, November 2026. Tracks 3 and 4.
 
 ## Abstract
 

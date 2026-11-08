@@ -39,7 +39,7 @@ def main():
     gate = T["gate_total"]; n_models = len([k for k in T["cohorts"] if k.startswith("heldout_")])
     title = d.split("\n", 1)[0].lstrip("# ").strip()
     head = d[:d.index("## Abstract")]
-    byline = next((l for l in head.split("\n") if "Reinhold" in l), "")
+    byline = "Angela Faye Reinhold, Lorien's Library LLC. With Apart Research. Research conducted at the Swarm Alignment Hackathon, November 2026. Tracks 3 and 4."
 
     intro = pick(S, "1. The failure") + """
 
