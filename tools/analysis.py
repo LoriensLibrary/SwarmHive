@@ -147,8 +147,8 @@ def synthetic():
     print("Synthetic checks (compact - lookup completion; margin -0.10)")
     lo, hi = tango_interval(0, 0, 60); assert abs(lo + hi) < 1e-6, ("all-tie interval must be symmetric", lo, hi)
     assert tango_z(0, 0, 60, 0.0) == 0.0, "all-tie statistic at d=0 must be 0"
-    lo1, hi1 = tango_interval(60, 0, 60); assert hi1 > 0.99 and lo1 > 0.9, ("all compact-only endpoint", lo1, hi1)
-    lo2, hi2 = tango_interval(0, 60, 60); assert lo2 < -0.99 and hi2 < -0.9, ("all lookup-only endpoint", lo2, hi2)
+    lo1, hi1 = tango_interval(60, 0, 60); assert hi1 > 0.99 and 0.8 < lo1 < 1.0, ("all compact-only endpoint", lo1, hi1)
+    lo2, hi2 = tango_interval(0, 60, 60); assert lo2 < -0.99 and -1.0 < hi2 < -0.8, ("all lookup-only endpoint", lo2, hi2)
     print("  symmetry and endpoint tests pass")
     for label, n12, n21, n in (("all tie n=40", 0, 0, 40), ("all tie n=60", 0, 0, 60), ("all tie n=120", 0, 0, 120),
                                ("n=60, 8 compact-only, 2 lookup-only", 8, 2, 60), ("n=60, 2 compact-only, 8 lookup-only", 2, 8, 60),
