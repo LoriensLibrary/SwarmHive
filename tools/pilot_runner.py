@@ -120,14 +120,14 @@ class DB:
                 self.bots[role] = psycopg.connect(f"postgresql://{role}:{secret}@{host}/{dbname}", sslmode="require", autocommit=True)
     def propose(self, actor, aid, ver, body):
         """The agent itself submits its output over ITS OWN login; the trigger binds proposer to session_user.
-        Bots hold INSERT only (no SELECT, so no RETURNING); the operator then reads the row it will seal from."""
+        The runtime generates a receipt token that travels INSIDE the payload; the operator later seals only the row
+        carrying that exact token, so a same-role session cannot substitute a body by racing on artifact/version."""
         if actor not in self.bots:
             raise PermissionError(f"no authenticated connection for role {actor!r}")
+        receipt = uuid.uuid4().hex + uuid.uuid4().hex[:16]
         self.bots[actor].execute("INSERT INTO exp.proposals(payload) VALUES (%s::jsonb)",
-                                 (json.dumps({"artifact_id": aid, "version": ver, "body": body}),))
-        row = self.c.execute("SELECT id, proposer FROM exp.proposals WHERE payload->>'artifact_id'=%s AND (payload->>'version')::int=%s"
-                             " AND sealed_as IS NULL ORDER BY id DESC LIMIT 1", (aid, ver)).fetchone()
-        return {"proposal_id": row[0], "proposer": row[1]}
+                                 (json.dumps({"artifact_id": aid, "version": ver, "body": body, "receipt": receipt}),))
+        return {"receipt": receipt, "body_sha256": hashlib.sha256(body.encode("utf-8")).hexdigest()}
     def one(self, sql, p=()):
         r = self.c.execute(sql, p).fetchone(); return r[0] if r else None
     def rows(self, sql, p=()):
@@ -135,8 +135,10 @@ class DB:
     def seal(self, author, aid, ver, body, deps):
         if self.authorship == "authenticated":
             pr = self.propose(author, aid, ver, body)
-            kind = self.one("SELECT exp.seal_from_proposal(%s,%s,%s::jsonb)", (pr["proposal_id"], author, json.dumps(deps)))
-            self.last_seal = {"authorship": "authenticated", **pr, "author_in_store": self.one("SELECT author_role FROM exp.artifacts WHERE artifact_id=%s AND version=%s", (aid, ver))}
+            kind = self.one("SELECT exp.seal_from_receipt(%s,%s,%s,%s::jsonb)", (pr["receipt"], author, pr["body_sha256"], json.dumps(deps)))
+            row = self.rows("SELECT id, proposer FROM exp.proposals WHERE payload->>'receipt' = %s", (pr["receipt"],))[0]
+            self.last_seal = {"authorship": "authenticated", "proposal_id": row[0], "proposer": row[1], "receipt_sha256": hashlib.sha256(pr["receipt"].encode()).hexdigest(),
+                              "body_sha256": pr["body_sha256"], "author_in_store": self.one("SELECT author_role FROM exp.artifacts WHERE artifact_id=%s AND version=%s", (aid, ver))}
             return kind
         kind = self.one("SELECT exp.seal_artifact(%s,%s,%s,%s,%s::jsonb)", (author, aid, ver, body, json.dumps(deps)))
         self.last_seal = {"authorship": "asserted", "author_in_store": author}
@@ -416,7 +418,7 @@ def code_hashes():
     here = os.path.dirname(os.path.abspath(__file__))
     files = {"runner_sha256": os.path.join(here, "pilot_runner.py"), "adapter_sha256": os.path.join(here, "adaption_send.py"),
              "recorder_sha256": os.path.join(VENDOR, "delivery_recorder.py"), "scorer_sha256": os.path.join(VENDOR, "score_runs.py"),
-             "gate_sha256": os.path.join(here, "..", "sql", "experiment_schema.sql"), "gate_addendum_sha256": os.path.join(here, "..", "sql", "seal_from_proposal.sql"), "gate_hardening_sha256": os.path.join(here, "..", "sql", "gate_hardening.sql")}
+             "gate_sha256": os.path.join(here, "..", "sql", "experiment_schema.sql"), "gate_addendum_sha256": os.path.join(here, "..", "sql", "seal_from_proposal.sql"), "gate_hardening_sha256": os.path.join(here, "..", "sql", "gate_hardening.sql"), "gate_hardening_2_sha256": os.path.join(here, "..", "sql", "gate_hardening_2.sql")}
     return {k: hashlib.sha256(open(v, "rb").read()).hexdigest() for k, v in files.items()}
 
 
@@ -620,6 +622,7 @@ def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS, cohort="", upst
     task_key = {"task_id": f"{tid}_{nonce}", "expected_result": expected, "blocked_evidence": blocked,
                 "correction_step": correction_step, "artifact_dependencies": [{"id": a["id"], "ver": a["ver"], "inputs": a["inputs"]} for a in db.meta(P)],
                 "queued_candidates": [{"id": a, "ver": v} for a, v in queued], "queue_order": order,
+                "queued_candidate_results": [{"id": a, "ver": v, "result": {"units": _units(db.body(a, v))}} for a, v in queued],   # from SEALED bodies, never model text
                 "current_sources": [{"id": a, "ver": v} for a, v in current_sources],
                 "attack_attempt": {"replay": spec["replay"], "stale_queued": [list(q) for q in stale], "bad_draft": bool(spec.get("bad_draft"))},
                 "names": names, "compact_records_sha256": reach_sha, "upstream_mode": upstream_mode,
@@ -673,7 +676,8 @@ def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS, cohort="", upst
                 task1 = qtask + (" lookup_available=true" if arm == "current_lookup" else "")
                 resp, receipt = dispatch_stage(model.send, actor="bot_reviewer", model=model.model, instructions=sysm,
                                                task=task1, inputs=inputs, corrections=review_notices, max_tokens=MAX_TOKENS, history_metadata=hist)
-                trace["reviewer_receipt"] = receipt.trace_metadata(); trace["raw_reviewer"] = resp._rec
+                trace["reviewer_receipt"] = {**receipt.trace_metadata(), "lineage_artifacts": [{"id": r["id"], "ver": r["ver"]} for r in (hist or {}).get("artifacts", [])]}
+                trace["raw_reviewer"] = resp._rec
                 p = parse_json(resp._rec["raw_text"]); validate_proposal(p)
                 if arm == "current_lookup" and p.get("decision") == "lookup":
                     # ONE authenticated lookup (trusted DB read), then a second stateless recorder-backed request.
@@ -694,7 +698,8 @@ def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS, cohort="", upst
                                                    task=qtask + " lookup_available=false (your one lookup was used; decide now)",
                                                    inputs=inputs2, corrections=review_notices, max_tokens=MAX_TOKENS, history_metadata={"artifacts": records})
                     trace["reviewer_receipt_initial"] = trace["reviewer_receipt"]; trace["raw_reviewer_initial"] = trace["raw_reviewer"]
-                    trace["reviewer_receipt"] = receipt.trace_metadata(); trace["raw_reviewer"] = resp._rec
+                    trace["reviewer_receipt"] = {**receipt.trace_metadata(), "lineage_artifacts": [{"id": r["id"], "ver": r["ver"]} for r in records]}
+                    trace["raw_reviewer"] = resp._rec
                     p = parse_json(resp._rec["raw_text"])
                 if p.get("decision") == "lookup":
                     raise ValueError("lookup returned as a final decision")

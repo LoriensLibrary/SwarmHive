@@ -1,0 +1,28 @@
+{
+ "request": {
+  "max_tokens": 1200,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 9, \\\"summary\\\": \\\"item S at warehouse G: 9 units, per pe3a19e_V7_claudesonnet_c58511/1\\\"}\",\"id\":\"pe3a19e_V7_claudesonnet_db5da6\",\"ver\":1},{\"body\":\"{\\\"units\\\": 9, \\\"note\\\": \\\"observed count of item S at warehouse G\\\"}\",\"id\":\"pe3a19e_V7_claudesonnet_c80a78\",\"ver\":2}],\"corrections\":[{\"id\":\"pe3a19e_V7_claudesonnet_c80a78\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"pe3a19e_V7_claudesonnet_c80a78\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"pe3a19e_V7_claudesonnet_c58511\",\"inputs\":[{\"id\":\"pe3a19e_V7_claudesonnet_c80a78\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"pe3a19e_V7_claudesonnet_c80a78\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"pe3a19e_V7_claudesonnet_db5da6\",\"inputs\":[{\"id\":\"pe3a19e_V7_claudesonnet_c58511\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: pe3a19e_V7_claudesonnet_db5da6/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "claude-sonnet-5-5",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 34,
+  "model": "claude-sonnet-5-5",
+  "provider": "anthropic",
+  "temperature": 0.0,
+  "input_tokens": 0,
+  "output_tokens": 0,
+  "cost": 0.0,
+  "unit": "usd",
+  "returned_model": null,
+  "provider_response_id": null,
+  "elapsed_s": 0.0,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"pe3a19e_V7_claudesonnet_db5da6\", \"result\": {\"units\": 9}, \"evidence\": [{\"id\": \"pe3a19e_V7_claudesonnet_db5da6\", \"ver\": 1}]}"
+ }
+}
