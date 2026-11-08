@@ -15,7 +15,7 @@ Outputs (under runs/pilot_<nonce>/): traces.jsonl, manifest.json, task_keys.json
   python -I tools/pilot_runner.py --dry-run          # zero-cost pipeline + scorer check
   python -I tools/pilot_runner.py --model claude-sonnet-5-5
 """
-import argparse, hashlib, json, os, sys, time, uuid
+import argparse, hashlib, json, os, re, sys, time, uuid
 import psycopg
 LOOKUP_MODE = os.environ.get("LOOKUP_MODE", "direct")   # 'direct' (normalized, primary) | 'roots_bodies' (Lorien's original control)
 sys.path.insert(0, "tools")
@@ -32,7 +32,12 @@ MODEL_SPEC = {
     "claude-opus-5-5":   dict(provider="anthropic", unit="usd", price=(4.0, 20.0), context=200000),
     # Adaption posted rates, https://docs.adaptionlabs.ai/inference-stacks/models/ (read by Lorien 2026-11-08 00:03Z)
     "gemma-4-31b-it":    dict(provider="adaption", unit="credits", price=(0.09, 0.34), context=256000),
-    "glm-5.2":           dict(provider="adaption", unit="credits", price=(1.40, 4.40), context=200000),
+    "glm-5.2":           dict(provider="adaption", unit="credits", price=(1.40, 4.40), context=786432),
+    "qwen3.5-397b":      dict(provider="adaption", unit="credits", price=(0.55, 3.50), context=131072),
+    "gemma-4-26b-a4b-it": dict(provider="adaption", unit="credits", price=(0.0765, 0.255), context=256000),
+    "qwen3.8-27b":       dict(provider="adaption", unit="credits", price=(0.039, 1.25), context=262144),
+    "deepseek-v4-flash": dict(provider="adaption", unit="credits", price=(0.04444, 0.13332), context=1048576),
+    "glm-53-flash":      dict(provider="adaption", unit="credits", price=(0.15, 0.50), context=1048576),
 }
 MAX_TOKENS = 1200                                    # frozen per-call output cap (thinking + answer)
 
@@ -303,8 +308,8 @@ def requests_for(spec, arms):
     return up + len(arms) + (1 if "current_lookup" in arms else 0)
 
 
-def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS):
-    P = f"p{nonce}_{tid}_"
+def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS, cohort=""):
+    P = f"p{nonce}_{tid}_{cohort}_" if cohort else f"p{nonce}_{tid}_"   # cohort tag: no prefix collisions across model cohorts on one DB
     oid = lambda: P + uuid.uuid4().hex[:6]            # opaque ids: no role or recency leaks to the model
     S, W, R, W2, W3, U = oid(), oid(), oid(), oid(), oid(), oid()
     names = {S: "source", W: "draft_from_v1", R: "report_from_draft", W2: "draft_from_v2", W3: "replay_of_draft_v1", U: "unrelated_source"}  # evaluator-only
@@ -504,6 +509,7 @@ def main():
     ap.add_argument("--spec-file", help="frozen held-out instances from holdout_freeze.py (ids, nonces, arm order)")
     ap.add_argument("--manifest", help="frozen manifest.json; the produced run_ids must match it IN ORDER, checked before any paid call")
     ap.add_argument("--ceiling", type=float, default=None, help="hard spend ceiling: USD for anthropic, credits for adaption; enforced BEFORE each call")
+    ap.add_argument("--cohort", default=None, help="cohort tag for artifact prefixes and the output dir; defaults to the model id, sanitized")
     ap.add_argument("--retries", type=int, default=0, help="automatic retries per call on retryable statuses; each attempt is reserved and counted separately (default 0)")
     a = ap.parse_args()
     if not a.dry_run and a.provider == "anthropic" and not _load_key.load():
@@ -511,7 +517,8 @@ def main():
     if not a.dry_run and (a.ceiling is None or not a.ceiling > 0):
         sys.exit("A paid run requires a finite positive --ceiling (USD for anthropic, credits for adaption).")
     nonce = uuid.uuid4().hex[:6]
-    out = f"runs/{'holdout' if a.spec_file else 'pilot'}_{nonce}{'_dry' if a.dry_run else ''}"; os.makedirs(os.path.join(out, "raw"), exist_ok=True)
+    cohort = a.cohort or re.sub(r"[^a-z0-9]+", "", a.model.lower())[:12]
+    out = f"runs/{'holdout' if a.spec_file else 'pilot'}_{cohort}_{nonce}{'_dry' if a.dry_run else ''}"; os.makedirs(os.path.join(out, "raw"), exist_ok=True)
     dsn = os.environ.get("HIVE_OPERATOR_DSN") or open("secrets/operator.env").read().split("=", 1)[1].strip()
     db = DB(dsn)
     keys, manifest, traces, allsteps = [], [], [], {}
@@ -549,7 +556,7 @@ def main():
         bad = {k: (frz.get(k), v) for k, v in checks.items() if frz.get(k) != v}
         if bad: sys.exit(f"FREEZE MISMATCH before any paid call: {bad}")
         for inst in instances:
-            k, m, t, s = run_task(inst["tid"], inst["spec"], db, model, a.split, inst["nonce"], out, arms=inst["arm_order"])
+            k, m, t, s = run_task(inst["tid"], inst["spec"], db, model, a.split, inst["nonce"], out, arms=inst["arm_order"], cohort=cohort)
             keys.append(k); manifest += m; traces += t; allsteps[inst["tid"]] = s
             with open(f"{out}/traces.jsonl", "a") as f:                 # persist incrementally: a crash or budget stop keeps what ran
                 for tr in t: f.write(json.dumps(tr) + "\n")
@@ -560,7 +567,7 @@ def main():
         bad = [x for x in arms if x not in ARMS_ALL]
         if bad: sys.exit(f"unknown arm(s) {bad}; choose from {ARMS_ALL}")
         for tid in a.tasks.split(","):
-            k, m, t, s = run_task(tid, TASKS[tid], db, model, a.split, nonce, out, arms=arms)
+            k, m, t, s = run_task(tid, TASKS[tid], db, model, a.split, nonce, out, arms=arms, cohort=cohort)
             keys.append(k); manifest += m; traces += t; allsteps[tid] = s
     with open(f"{out}/task_keys.json", "w") as f: json.dump(keys, f, indent=1)          # evaluator-only
     with open(f"{out}/manifest.json", "w") as f: json.dump(manifest, f, indent=1)
@@ -570,7 +577,7 @@ def main():
     with open(f"{out}/run_summary.json", "w") as f:
         json.dump({"model": a.model, "provider": a.provider, "dry_run": a.dry_run, "model_calls": model.n, "spend": round(model.spend, 4), "unit": model.unit,
                    "ceiling": a.ceiling, "lookup_mode": LOOKUP_MODE, "max_tokens": MAX_TOKENS, "steps": allsteps, "out": out,
-                   "provider_attempts": model.attempts, "max_authorized_requests": max_req, "retries": a.retries, "rates": list(model.price), "context_tokens": model.context,
+                   "cohort": cohort, "provider_attempts": model.attempts, "max_authorized_requests": max_req, "retries": a.retries, "rates": list(model.price), "context_tokens": model.context,
                    "budget_stopped_runs": sum(1 for t in traces if "budget_stopped" in str(t.get("error", "")))}, f, indent=1)
     print(json.dumps({"out": out, "runs": len(traces), "model_calls": model.n, "spend": round(model.spend, 4), "unit": model.unit}))
 

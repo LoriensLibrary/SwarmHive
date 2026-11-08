@@ -76,7 +76,19 @@ def send(**request):
     return AdaptionResponse(raw)
 
 
+def list_models():
+    """GET the hosted models this key can access (availability varies by key). Read-only, no credits."""
+    req = urllib.request.Request(f"{BASE}/api/v1/models?type=hosted", headers={"Authorization": f"Bearer {_key()}"})
+    with urllib.request.urlopen(req, timeout=60) as r:
+        raw = json.loads(r.read().decode("utf-8"))
+    data = raw.get("data", raw if isinstance(raw, list) else [])
+    return sorted(m.get("id") or m.get("name") for m in data)
+
+
 if __name__ == "__main__":
+    import sys
+    if "--list" in sys.argv:
+        print("hosted models for this key:", list_models()); sys.exit(0)
     # smoke test: one tiny call, prints only token counts and the reply, never the key
     r = send(model=os.environ.get("ADAPTION_MODEL", "gemma-4-31b-it"), system="Reply with the single word: ok",
              max_tokens=16, messages=[{"role": "user", "content": "ping"}])
