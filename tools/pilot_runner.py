@@ -597,13 +597,13 @@ def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS, cohort="", upst
             # V1/V8: an authenticated correction lands on an UNRELATED source before review (V8: with the SAME number as
             # the queued draft, so a number-matching heuristic false-quarantines). The queued draft's lineage is untouched.
             ucount = spec["right"] if spec.get("unrelated_count") == "right" else 3
-            stage("U1", "bot_researcher", RESEARCHER_SYS, f"Report the count of a different item at {spec['site']}. count={ucount}", [], [], U, 1, units=ucount)
+            _, upstream["U1"], _ = stage("U1", "bot_researcher", RESEARCHER_SYS, f"Report the count of a different item at {spec['site']}. count={ucount}", [], [], U, 1, units=ucount)
             try:
                 db.adjudicate(U, 1); step += 1; correction_step = step; steps["unrelated_correction"] = step
                 notices = [{"type": "withdrawal", "id": U, "ver": 1, "reason": "superseded by a re-authorized recount", "superseded_by": {"id": U, "ver": 2}, "step": step}]
             except Exception as e:
                 failures.append({"stage": "unrelated_correction", "error": type(e).__name__ + ": " + str(e)[:200]})
-            stage("U2", "bot_researcher", RESEARCHER_SYS, f"Recount the different item at {spec['site']}. count={ucount}", [], notices, U, 2, units=ucount)
+            _, upstream["U2"], _ = stage("U2", "bot_researcher", RESEARCHER_SYS, f"Recount the different item at {spec['site']}. count={ucount}", [], notices, U, 2, units=ucount)
             blocked = [{"id": U, "ver": 1}]   # blocked, but not in the queued draft's lineage
         fresh = (W, 1); current_sources = [(S, 1)] + ([(U, 2)] if spec.get("unrelated_correction") and not failures else [])   # V1/V8: the decoy's current version is visible
 
