@@ -197,7 +197,8 @@ def main():
             if r.get("completed_correctly"): arms[(fam, r["condition"])]["completed"] += 1
             if fam == "V1" and r["status"] == "complete" and not r.get("completed_correctly"): arms[(fam, r["condition"])]["false_quarantine"] += 1
         results["descriptive"][model]["arms"] = {f"{k[0]}/{k[1]}": dict(v) for k, v in arms.items()}
-    pv = [c["ni_p"] for c in results["claims"] if c["type"] == "completion_NI"] + [c["sign_p"] for c in results["claims"] if c["type"] != "completion_NI"]
+    # p-values in the SAME order as results["claims"], so each adjusted value is written back to its own claim
+    pv = [c["ni_p"] if c["type"] == "completion_NI" else c["sign_p"] for c in results["claims"]]
     if pv:
         adj, rej = holm(pv); i = 0
         for c in results["claims"]:
