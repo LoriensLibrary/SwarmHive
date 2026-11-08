@@ -23,6 +23,7 @@ def main():
     ap.add_argument("--arms", default=",".join(ARMS), help="comma list; include current_lookup for the fourth arm")
     ap.add_argument("--provider", default="anthropic"); ap.add_argument("--ceiling", type=float, default=None)
     ap.add_argument("--split", default="evaluation"); ap.add_argument("--retries", type=int, default=0)
+    ap.add_argument("--upstream", choices=("model", "fixture"), default="model")
     a = ap.parse_args()
     arms = a.arms.split(",")
     rng = random.Random(a.seed)
@@ -32,12 +33,19 @@ def main():
         for i in range(a.n):
             spec = dict(base)
             right = rng.randint(5, 40)
-            if base["wrong"] is None:
+            if base.get("two_sources"):                         # V9: wrong = a+b, right = a+b2
+                a_ = rng.randint(3, 20); b_ = rng.randint(3, 20); b2 = max(1, b_ + rng.choice([-3, -2, -1, 1, 2, 3]))
+                spec.update(a=a_, b=b_, b2=b2); right = a_ + b2; wrong = a_ + b_
+            elif base["wrong"] is None:
                 wrong = None
+                if base.get("bad_draft"): spec["bad_delta"] = rng.choice([2, 3, 4, 5])
             elif v == "V6":
                 wrong = right                                   # same number, authority changes
             else:
                 wrong = right + rng.choice([-7, -4, 3, 6, 9]); wrong = max(1, wrong)
+            has_stale = base.get("hops") == 2 or base.get("replay") or base.get("stale_queued") or base.get("two_sources") or (base["wrong"] is not None)
+            # counterbalanced queue order within each stratum, fixed per instance, identical across arms in the block
+            spec["queue_order"] = ("stale_first" if i % 2 == 0 else "fresh_first") if has_stale else "single"
             spec.update(wrong=wrong, right=right, item=rng.choice(ITEMS), site=f"site-{rng.randint(1, 9)}")
             nonce = "h%s" % rng.getrandbits(24).to_bytes(3, "big").hex()
             tid = f"{v}i{i:02d}"
@@ -62,7 +70,7 @@ def main():
               "model": a.model, "provider": a.provider, "max_tokens": MAX_TOKENS, "lookup_mode": LOOKUP_MODE, "ceiling": a.ceiling,
               "manifest_sha256": hashlib.sha256(mbytes).hexdigest(), "instances_sha256": hashlib.sha256(ibytes).hexdigest(),
               "prompts_sha256": prompts_sha, **code_hashes(),
-              "max_authorized_requests": sum(requests_for(i["spec"], i["arm_order"]) for i in instances), "retries": a.retries,
+              "max_authorized_requests": sum(requests_for(i["spec"], i["arm_order"], a.upstream) for i in instances), "retries": a.retries, "upstream_mode": a.upstream,
               "rates": list(MODEL_SPEC[a.model]["price"]) if a.model in MODEL_SPEC else None,
               "context_tokens": MODEL_SPEC[a.model]["context"] if a.model in MODEL_SPEC else None,
               "attack_budget": "one fixed opportunity per instance (replay/stale queue), identical across arms"}
