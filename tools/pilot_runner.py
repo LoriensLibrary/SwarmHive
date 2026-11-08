@@ -15,7 +15,7 @@ Outputs (under runs/pilot_<nonce>/): traces.jsonl, manifest.json, task_keys.json
   python -I tools/pilot_runner.py --dry-run          # zero-cost pipeline + scorer check
   python -I tools/pilot_runner.py --model claude-sonnet-5-5
 """
-import argparse, hashlib, json, os, re, sys, time, uuid
+import argparse, hashlib, json, math, os, re, sys, time, uuid
 import psycopg
 LOOKUP_MODE = os.environ.get("LOOKUP_MODE", "direct")   # 'direct' (normalized, primary) | 'roots_bodies' (Lorien's original control)
 sys.path.insert(0, "tools")
@@ -178,7 +178,7 @@ class Model:
         if not dry_run:
             if spec is None or spec["provider"] != provider:
                 raise SystemExit(f"no explicit rate/context for model {model!r} on provider {provider!r}; add it to MODEL_SPEC from the provider's posted pricing")
-            if ceiling is None or not (ceiling > 0):
+            if ceiling is None or not (isinstance(ceiling, (int, float)) and math.isfinite(ceiling) and ceiling > 0):
                 raise SystemExit("a paid run requires a finite positive --ceiling")
         self.unit = spec["unit"] if spec else ("credits" if provider == "adaption" else "usd")
         self.price = spec["price"] if spec else (0.0, 0.0)
@@ -218,7 +218,7 @@ class Model:
             e.retryable = code in self.RETRY_STATUS; raise                       # reserve stays spent: it may have been charged
         usage = getattr(resp, "usage", None)
         it, ot = getattr(usage, "input_tokens", None), getattr(usage, "output_tokens", None)
-        if usage is None or not isinstance(it, int) or not isinstance(ot, int):
+        if usage is None or type(it) is not int or type(ot) is not int or it < 0 or ot < 0:   # bool is not int here; negatives fail
             self._ledger({"call": self.n, "event": "missing_usage", "attempt": self.attempts, "reserve_kept": round(res, 6)})
             raise RuntimeError("usage counters missing from the provider response; reserve kept, call failed closed")
         if it > self.context or ot > int(request.get("max_tokens") or MAX_TOKENS):
@@ -300,6 +300,15 @@ def parse_json(text):
     if t.startswith("```"):
         t = t.strip("`"); t = t[t.find("{"):]
     return json.loads(t[t.find("{"): t.rfind("}") + 1])
+
+
+def code_hashes():
+    """Byte hashes of the code that produces or scores a run; frozen and re-checked before the first paid call."""
+    ref = os.environ.get("LORIEN_REF", r"C:/Users/Angela/Documents/Codex/2026-11-06/che/outputs/swarm_reference")
+    here = os.path.dirname(os.path.abspath(__file__))
+    files = {"runner_sha256": os.path.join(here, "pilot_runner.py"), "adapter_sha256": os.path.join(here, "adaption_send.py"),
+             "recorder_sha256": os.path.join(ref, "delivery_recorder.py"), "scorer_sha256": os.path.join(ref, "score_runs.py")}
+    return {k: hashlib.sha256(open(v, "rb").read()).hexdigest() for k, v in files.items()}
 
 
 def requests_for(spec, arms):
@@ -514,7 +523,7 @@ def main():
     a = ap.parse_args()
     if not a.dry_run and a.provider == "anthropic" and not _load_key.load():
         sys.exit("NO KEY: secrets/anthropic.key")
-    if not a.dry_run and (a.ceiling is None or not a.ceiling > 0):
+    if not a.dry_run and (a.ceiling is None or not (math.isfinite(a.ceiling) and a.ceiling > 0)):
         sys.exit("A paid run requires a finite positive --ceiling (USD for anthropic, credits for adaption).")
     nonce = uuid.uuid4().hex[:6]
     cohort = a.cohort or re.sub(r"[^a-z0-9]+", "", a.model.lower())[:12]
@@ -546,7 +555,7 @@ def main():
             "manifest_sha256": hashlib.sha256(open(mpath, "rb").read()).hexdigest(),
             "instances_sha256": hashlib.sha256(open(a.spec_file, "rb").read()).hexdigest(),
             "prompts_sha256": hashlib.sha256((REVIEWER_SYS + "\n" + WRITER_SYS + "\n" + RESEARCHER_SYS + "\n" + LOOKUP_RULE).encode()).hexdigest(),
-            "recorder_sha256": hashlib.sha256(open(os.path.join(os.environ.get("LORIEN_REF", r"C:/Users/Angela/Documents/Codex/2026-11-06/che/outputs/swarm_reference"), "delivery_recorder.py"), "rb").read()).hexdigest(),
+            **code_hashes(),
             "model": a.model, "provider": a.provider, "max_tokens": MAX_TOKENS, "lookup_mode": LOOKUP_MODE, "split": a.split,
             "ceiling": a.ceiling,                       # the authorized ceiling is part of the freeze
             "max_authorized_requests": max_req, "retries": a.retries,
@@ -555,6 +564,21 @@ def main():
         }
         bad = {k: (frz.get(k), v) for k, v in checks.items() if frz.get(k) != v}
         if bad: sys.exit(f"FREEZE MISMATCH before any paid call: {bad}")
+        if "freeze_id" not in frz: sys.exit("FREEZE.json has no freeze_id")
+        execution_id = uuid.uuid4().hex
+        if not a.dry_run:
+            # A frozen (freeze_id, cohort) namespace is executed at most once; a rerun would be a new ledger on shared
+            # database rows and prefixes. Register BEFORE the first call; refuse if the namespace is already registered.
+            os.makedirs("runs", exist_ok=True); regp = "runs/REGISTRY.jsonl"
+            if os.path.exists(regp):
+                for line in open(regp, encoding="utf-8"):
+                    row = json.loads(line)
+                    if row["freeze_id"] == frz["freeze_id"] and row["cohort"] == cohort:
+                        sys.exit(f"REFUSED: freeze {frz['freeze_id'][:12]} cohort {cohort} already executed as {row['execution_id'][:12]} ({row['out']}); a rerun needs a new freeze")
+            with open(regp, "a", encoding="utf-8") as f:
+                f.write(json.dumps({"freeze_id": frz["freeze_id"], "cohort": cohort, "execution_id": execution_id, "out": out, "started": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())}) + "\n")
+        with open(f"{out}/EXECUTION.json", "w") as f:
+            json.dump({"execution_id": execution_id, "freeze_id": frz["freeze_id"], "cohort": cohort, "dry_run": a.dry_run, "checks": checks}, f, indent=1)
         for inst in instances:
             k, m, t, s = run_task(inst["tid"], inst["spec"], db, model, a.split, inst["nonce"], out, arms=inst["arm_order"], cohort=cohort)
             keys.append(k); manifest += m; traces += t; allsteps[inst["tid"]] = s

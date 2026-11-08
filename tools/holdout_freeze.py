@@ -10,7 +10,7 @@ Then run:
 """
 import argparse, hashlib, json, os, random, subprocess, sys
 sys.path.insert(0, "tools")
-from pilot_runner import TASKS, ARMS, REVIEWER_SYS, WRITER_SYS, RESEARCHER_SYS, LOOKUP_RULE, MAX_TOKENS, LOOKUP_MODE, MODEL_SPEC, requests_for
+from pilot_runner import TASKS, ARMS, REVIEWER_SYS, WRITER_SYS, RESEARCHER_SYS, LOOKUP_RULE, MAX_TOKENS, LOOKUP_MODE, MODEL_SPEC, requests_for, code_hashes
 
 ITEMS = ["bolts", "gaskets", "valves", "filters", "spools", "brackets", "seals", "fuses", "hinges", "clamps", "rivets", "bearings"]
 
@@ -55,19 +55,20 @@ def main():
         commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True).stdout.strip()
     except Exception:
         commit = "unknown"
-    ref = os.environ.get("LORIEN_REF", r"C:/Users/Angela/Documents/Codex/2026-11-06/che/outputs/swarm_reference")
-    recorder_sha = hashlib.sha256(open(os.path.join(ref, "delivery_recorder.py"), "rb").read()).hexdigest()
     prompts_sha = hashlib.sha256((REVIEWER_SYS + "\n" + WRITER_SYS + "\n" + RESEARCHER_SYS + "\n" + LOOKUP_RULE).encode()).hexdigest()
     # Everything the runner re-checks BEFORE its first paid call must be here, under these exact keys.
     freeze = {"runner_commit": commit, "seed": a.seed, "variants": a.variants.split(","), "n_per_variant": a.n,
               "arms": arms, "instances": len(instances), "runs": len(manifest), "split": a.split,
               "model": a.model, "provider": a.provider, "max_tokens": MAX_TOKENS, "lookup_mode": LOOKUP_MODE, "ceiling": a.ceiling,
               "manifest_sha256": hashlib.sha256(mbytes).hexdigest(), "instances_sha256": hashlib.sha256(ibytes).hexdigest(),
-              "prompts_sha256": prompts_sha, "recorder_sha256": recorder_sha,
+              "prompts_sha256": prompts_sha, **code_hashes(),
               "max_authorized_requests": sum(requests_for(i["spec"], i["arm_order"]) for i in instances), "retries": a.retries,
               "rates": list(MODEL_SPEC[a.model]["price"]) if a.model in MODEL_SPEC else None,
               "context_tokens": MODEL_SPEC[a.model]["context"] if a.model in MODEL_SPEC else None,
               "attack_budget": "one fixed opportunity per instance (replay/stale queue), identical across arms"}
+    import uuid
+    freeze["freeze_id"] = hashlib.sha256((json.dumps(freeze, sort_keys=True) + uuid.uuid4().hex).encode()).hexdigest()
+    freeze["frozen_at"] = __import__("time").strftime("%Y-%m-%dT%H:%M:%SZ", __import__("time").gmtime())
     with open(f"{a.out}/FREEZE.json", "w") as f: json.dump(freeze, f, indent=1)
     print(json.dumps(freeze, indent=1))
 

@@ -38,9 +38,11 @@ class _Block:
 
 
 class _Usage:
+    """Absent or malformed counters stay None so the runner's guard fails closed instead of refunding a reserve."""
     def __init__(self, u):
-        self.input_tokens = int((u or {}).get("input_tokens") or 0)
-        self.output_tokens = int((u or {}).get("output_tokens") or 0)
+        counts = u if isinstance(u, dict) else {}
+        self.input_tokens = counts.get("input_tokens")
+        self.output_tokens = counts.get("output_tokens")
 
 
 class AdaptionResponse:
