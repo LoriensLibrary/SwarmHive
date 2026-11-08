@@ -10,7 +10,7 @@ Then run:
 """
 import argparse, hashlib, json, os, random, subprocess, sys
 sys.path.insert(0, "tools")
-from pilot_runner import TASKS, ARMS, REVIEWER_SYS, WRITER_SYS, RESEARCHER_SYS, LOOKUP_RULE, MAX_TOKENS, LOOKUP_MODE, MODEL_SPEC, requests_for, code_hashes, TEMPERATURE
+from pilot_runner import TASKS, ARMS, REVIEWER_SYS, WRITER_SYS, RESEARCHER_SYS, LOOKUP_RULE, MAX_TOKENS, LOOKUP_MODE, MODEL_SPEC, requests_for, code_hashes, TEMPERATURE, freeze_digest
 
 ITEMS = ["bolts", "gaskets", "valves", "filters", "spools", "brackets", "seals", "fuses", "hinges", "clamps", "rivets", "bearings"]
 
@@ -27,6 +27,7 @@ def main():
     ap.add_argument("--prose-names", choices=("default", "off", "on"), default="default", help="off = no artifact ids in any writer prose (closes the claimed-lineage leak into the current arm); recorded in FREEZE")
     ap.add_argument("--temperature", type=float, default=TEMPERATURE)
     ap.add_argument("--authorship", choices=("authenticated", "asserted"), default="authenticated")
+    ap.add_argument("--cohort", default=None, help="execution namespace bound into the freeze; default = sanitized model id")
     a = ap.parse_args()
     arms = a.arms.split(",")
     rng = random.Random(a.seed)
@@ -79,9 +80,10 @@ def main():
               "rates": list(MODEL_SPEC[a.model]["price"]) if a.model in MODEL_SPEC else None,
               "context_tokens": MODEL_SPEC[a.model]["context"] if a.model in MODEL_SPEC else None,
               "attack_budget": "one fixed opportunity per instance (replay/stale queue), identical across arms"}
-    import uuid
-    freeze["freeze_id"] = hashlib.sha256((json.dumps(freeze, sort_keys=True) + uuid.uuid4().hex).encode()).hexdigest()
-    freeze["frozen_at"] = __import__("time").strftime("%Y-%m-%dT%H:%M:%SZ", __import__("time").gmtime())
+    import re, time
+    freeze["cohort"] = a.cohort or re.sub(r"[^a-z0-9]+", "", a.model.lower())[:12]
+    freeze["frozen_at"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
+    freeze["freeze_id"] = freeze_digest(freeze)      # canonical content digest; the runner recomputes and compares it
     with open(f"{a.out}/FREEZE.json", "w") as f: json.dump(freeze, f, indent=1)
     print(json.dumps(freeze, indent=1))
 
