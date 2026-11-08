@@ -10,7 +10,8 @@ Then run:
 """
 import argparse, hashlib, json, os, random, subprocess, sys
 sys.path.insert(0, "tools")
-from pilot_runner import TASKS, ARMS, REVIEWER_SYS, WRITER_SYS, RESEARCHER_SYS, LOOKUP_RULE, MAX_TOKENS, LOOKUP_MODE, MODEL_SPEC, requests_for, code_hashes, TEMPERATURE, freeze_digest
+import pilot_runner
+from pilot_runner import TASKS, ARMS, REVIEWER_SYS, WRITER_SYS, RESEARCHER_SYS, LOOKUP_RULE, LOOKUP_MODE, MODEL_SPEC, requests_for, code_hashes, TEMPERATURE, freeze_digest
 
 ITEMS = ["bolts", "gaskets", "valves", "filters", "spools", "brackets", "seals", "fuses", "hinges", "clamps", "rivets", "bearings"]
 
@@ -29,7 +30,9 @@ def main():
     ap.add_argument("--authorship", choices=("authenticated", "asserted"), default="authenticated")
     ap.add_argument("--cohort", default=None, help="execution namespace bound into the freeze; default = sanitized model id")
     ap.add_argument("--gate-deployment", help="reviewed credential-free gate_preflight.py receipt, required for a paid freeze")
+    ap.add_argument("--max-tokens", type=int, default=pilot_runner.MAX_TOKENS, help="uniform per-call output budget frozen for every model and arm")
     a = ap.parse_args()
+    pilot_runner.set_max_tokens(a.max_tokens); MAX_TOKENS = pilot_runner.MAX_TOKENS
     arms = a.arms.split(",")
     rng = random.Random(a.seed)
     instances, manifest = [], []

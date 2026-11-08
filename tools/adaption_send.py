@@ -40,18 +40,30 @@ class _Block:
 
 
 class _Usage:
-    """Absent or malformed counters stay None so the runner's guard fails closed instead of refunding a reserve."""
+    """Absent or malformed counters stay None so the runner's guard fails closed instead of refunding a reserve.
+    reasoning_tokens (from output_tokens_details) is recorded for the output-budget protocol; it is part of output_tokens."""
     def __init__(self, u):
         counts = u if isinstance(u, dict) else {}
         self.input_tokens = counts.get("input_tokens")
         self.output_tokens = counts.get("output_tokens")
+        details = counts.get("output_tokens_details") if isinstance(counts.get("output_tokens_details"), dict) else {}
+        self.reasoning_tokens = details.get("reasoning_tokens")
 
 
 class AdaptionResponse:
     def __init__(self, raw):
         self.raw = raw
-        self.content = [_Block(raw.get("output_text") or "")]
+        text = raw.get("output_text")
+        if not text:   # some providers omit output_text; assemble from message items so a real answer is never read as empty
+            parts = []
+            for item in raw.get("output") or []:
+                if isinstance(item, dict) and item.get("type") == "message":
+                    for c in item.get("content") or []:
+                        if isinstance(c, dict) and c.get("type") in ("output_text", "text") and c.get("text"): parts.append(c["text"])
+            text = "".join(parts)
+        self.content = [_Block(text or "")]
         self.usage = _Usage(raw.get("usage"))
+        self.output_item_types = [i.get("type") for i in (raw.get("output") or []) if isinstance(i, dict)]
         st = raw.get("status")
         self.stop_reason = {"completed": "end_turn", "incomplete": "max_tokens"}.get(st, st)
         self.model = raw.get("model")

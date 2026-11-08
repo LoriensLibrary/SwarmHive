@@ -41,7 +41,14 @@ MODEL_SPEC = {
     "deepseek-v4-flash": dict(provider="adaption", unit="credits", price=(0.04444, 0.13332), context=1048576),
     "glm-53-flash":      dict(provider="adaption", unit="credits", price=(0.15, 0.50), context=1048576),
 }
-MAX_TOKENS = 1200                                    # frozen per-call output cap (thinking + answer)
+MAX_TOKENS = 1200                                    # per-call output cap (reasoning + answer); frozen per run via --max-tokens and FREEZE.json
+# Output-budget protocol (wider canary, 2026-11-08 03:22Z): on reasoning models the whole 1,200-token budget went to the
+# reasoning channel and the answer never arrived (108 of 115 invalid replies). The provider exposes no reasoning cap, so
+# the protocol is one uniform, frozen, generous output budget for every model and arm, reasoning tokens recorded
+# separately, and a provider stop at the cap scored as invalid output in its registered slot. Proposed held-out value: 6000.
+def set_max_tokens(n):
+    global MAX_TOKENS
+    MAX_TOKENS = int(n)
 TEMPERATURE = 0.0                                    # frozen sampling temperature, sent on every request and recorded in FREEZE; --temperature overrides
 
 
@@ -326,7 +333,9 @@ class Model:
                         raise                               # the run records an error trace; the denominator keeps it
                     wait = 2 ** tries; self._ledger({"call": self.n, "event": "retry_wait", "wait_s": wait}); time.sleep(wait)
         text = "".join(getattr(b, "text", "") for b in resp.content)
+        rt = getattr(getattr(resp, "usage", None), "reasoning_tokens", None)
         rec = {"call": self.n, "model": self.model, "provider": self.provider, "temperature": self.temperature, "input_tokens": it, "output_tokens": ot, "cost": round(cost, 6), "unit": self.unit,
+               "reasoning_tokens": rt, "max_tokens": MAX_TOKENS, "empty_text": not text.strip(), "output_item_types": getattr(resp, "output_item_types", None),
                "returned_model": getattr(resp, "model", None), "provider_response_id": getattr(resp, "id", None),
                "elapsed_s": round(time.time() - t0, 3), "stop_reason": getattr(resp, "stop_reason", None), "raw_text": text}
         with open(os.path.join(self.rawdir, f"call_{self.n:03d}.json"), "w", encoding="utf-8") as f:
@@ -777,7 +786,10 @@ def run_task(tid, spec, db, model, split, nonce, out, arms=ARMS, cohort="", upst
                     trace["status"] = "error"; trace["error"] = "gate reply without a committed row for this attempt"
         except (json.JSONDecodeError, KeyError, ValueError) as e:   # InvalidOutput is a ValueError
             trace["status"] = "invalid_output"; trace["error"] = str(e)[:200]
-            trace["stop_reason"] = (trace.get("raw_reviewer") or {}).get("stop_reason")
+            rr = trace.get("raw_reviewer") or {}
+            trace["stop_reason"] = rr.get("stop_reason")
+            trace["invalid_reason"] = ("output_budget_exhausted" if rr.get("stop_reason") == "max_tokens" and rr.get("empty_text")
+                                       else "truncated_answer" if rr.get("stop_reason") == "max_tokens" else "malformed_or_nonqueued")
         except Exception as e:
             trace["status"] = "error"; trace["error"] = type(e).__name__ + ": " + str(e)[:200]
         traces.append(trace)
@@ -804,10 +816,12 @@ def main():
     ap.add_argument("--ceiling", type=float, default=None, help="hard spend ceiling: USD for anthropic, credits for adaption; enforced BEFORE each call")
     ap.add_argument("--upstream", choices=("model", "fixture"), default="model", help="model = each cohort model writes the upstream artifacts (full-model pipeline); fixture = presealed deterministic upstream shared across providers (reviewer-only study)")
     ap.add_argument("--temperature", type=float, default=TEMPERATURE, help="sampling temperature sent on every request; part of the freeze")
+    ap.add_argument("--max-tokens", type=int, default=MAX_TOKENS, help="uniform per-call output budget (reasoning + answer) for every model and arm; part of the freeze")
     ap.add_argument("--authorship", choices=("authenticated", "asserted"), default="authenticated", help="authenticated = agents submit through their own login and the operator seals from the intake row; asserted = legacy parameter path, labeled")
     ap.add_argument("--cohort", default=None, help="cohort tag for artifact prefixes and the output dir; defaults to the model id, sanitized")
     ap.add_argument("--retries", type=int, default=0, help="automatic retries per call on retryable statuses; each attempt is reserved and counted separately (default 0)")
     a = ap.parse_args()
+    set_max_tokens(a.max_tokens)
     declared_dsn = os.environ.get("HIVE_OPERATOR_DSN")
     if not a.dry_run and (not a.spec_file or not declared_dsn):
         sys.exit("paid runs require a frozen spec and an explicit HIVE_OPERATOR_DSN")
