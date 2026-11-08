@@ -4,9 +4,9 @@ Nov 8, 2026 · @Angela Faye Reinhold · Lorien's Library · Swarm Alignment Hack
 
 ## Abstract
 
-In a swarm, a corrected source does not un-write the summaries already built on it. A reviewer that sees only current records can approve a draft whose number is right but whose lineage is dead. We built a PostgreSQL publication gate where agents cannot write authoritative state: a trusted runtime seals each artifact with the inputs it delivered, invalidation is authority-checked, and publication re-reads the full dependency closure inside one fenced transaction. An AI collaborator's independently written acceptance suite checked the gate in 19 live checks, and the gate was rebuilt from the committed migration on a fresh database branch.
+In a swarm, a corrected source does not un-write the summaries already built on it. A reviewer that sees only current records can approve a draft whose number is right but whose lineage is dead. We built a PostgreSQL publication gate where agents cannot write authoritative state: a trusted runtime seals each artifact with the inputs it delivered, invalidation is authority-checked, and publication re-reads the full dependency closure inside one fenced transaction. An independently written acceptance suite checked the gate in 19 live checks, and the gate was rebuilt from the committed migration on a fresh database branch.
 
-On that gate we ran a preregistered, matched reviewer comparison on 7 open models hosted by Adaption: 5,400 registered slots, three task families, six arms, only the reviewer's context varying. The models made 428 unsafe proposals and the gate committed none. Whether preloaded lineage beats an authenticated lookup turns on whether the model takes the lookup: gemma-4-31b-it took it in 13 of 120 offers and completed 119 of 120 same-number cases with preloaded lineage against 68 with the lookup offered; deepseek-v4-flash took it in 119 of 120, the arms tied, and preloading saved a median 1,280 tokens per case. On a clean-draft control three models quarantined all or nearly all clean drafts under an unrelated correction notice in every arm: false quarantine is model behavior, not a property of lineage. Failed claims are reported as failed. The gate assumes a trusted operator and cannot observe what a model relied on.
+On that gate we ran a preregistered, matched reviewer comparison on 5 open models hosted by Adaption: 5,400 registered slots, three task families, six arms, only the reviewer's context varying. The models made 428 unsafe proposals and the gate committed none. Whether preloaded lineage beats an authenticated lookup turns on whether the model takes the lookup: gemma-4-31b-it took it in 13 of 120 offers and completed 119 of 120 same-number cases with preloaded lineage against 68 with the lookup offered; deepseek-v4-flash took it in 119 of 120, the arms tied, and preloading saved a median 1,280 tokens per case. On a clean-draft control three models quarantined all or nearly all clean drafts under an unrelated correction notice in every arm: false quarantine is model behavior, not a property of lineage. Failed claims are reported as failed. The gate assumes a trusted operator and cannot observe what a model relied on.
 
 ## 1. The failure we test
 
@@ -83,7 +83,7 @@ Preregistered before any freeze (`report/HELDOUT_PREREGISTRATION.md`); analysis 
 
 On gemma-4-31b-it the lookup arm took its lookup in 13 of 120 offers, so it mostly behaved as the no-lineage arm and picked the stale draft half the time; compact completed 119 of 120. On deepseek-v4-flash the lookup was taken in 119 of 120 offers and the arms tie near the ceiling. Non-inferiority holds for all four claims under Holm; the deepseek V6 claim is marginal (one-sided p 0.043, two-sided interval reaching -0.114). When a model takes the authenticated lookup, preloading changes nothing about correctness; when it does not, preloading is what saves the case. The gemma gap is a fact about that model's lookup behavior under this prompt, not evidence that preloaded lineage beats retrieval.
 
-**Co-primary: tokens per registered case.** Supported on deepseek-v4-flash, where the lookup arm made two calls and compact saved a median +1280 tokens per case. Not supported on gemma-4-31b-it, where compact cost a median 263 more tokens because the lookup arm mostly made one call with no lineage in context. We report that as a failed claim, not as a cheaper arm by another name.
+**Co-primary: tokens per registered case.** Supported on deepseek-v4-flash, where the lookup arm made two calls and compact saved a median 1280 tokens per case. Not supported on gemma-4-31b-it, where compact cost a median 263 more tokens because the lookup arm mostly made one call with no lineage in context. We report that as a failed claim, not as a cheaper arm by another name.
 
 | model | settled pairs | Hodges-Lehmann, lookup minus compact | Holm p | claim: compact uses fewer |
 | --- | --- | --- | --- | --- |
@@ -104,7 +104,7 @@ Both rule arms approve every clean draft on every model. deepseek-v4-flash and q
 
 **Exploratory tier.** qwen3.8-27b follows the gemma-31 pattern with a lookup arm that mostly takes its lookup: compact 60/60 and 60/60, lookup-offered 56/60 and 53/60 (lookup taken 56 and 48 of 60), current 30 of 60 on both. gemma-4-26b-a4b-it is the weakest reviewer: compact 52/60 and 56/60, lookup-offered 11/60 and 7/60, most of its lookup-arm slots ending as non-queued selections stopped before the gate. qwen3.5-397b behaves like deepseek: compact 59/60 and 60/60, lookup-offered 60/60 and 60/60 (lookup taken 60 and 60 of 60), and it quarantined the clean draft in nearly every V1 model-arm slot. The full arm tracks compact on every model, so the historical bodies add nothing the lineage metadata did not carry. The diagnostics families (V0, V3, V4, V5, V7, V8, V9, V10 at n = 10 on the two inferential models) are in Appendix B.7; the one to know about is V10, where the lineage is valid and the figure is wrong: the gate commits whatever the reviewer approves there by design, the lineage-only rule approves every one, and only the rule that also reads the figure catches all ten. On gemma-4-31b-it the model arms caught between 5 and 9 of 10. A lineage gate cannot see content, and these rows measure what that costs.
 
-**Cost and incidents.** Settled usage 16.8263 credits plus 7.9202 held as reserves against provider timeouts whose billing the platform does not report; every cohort stayed under its credit ceiling. qwen3.5-397b reached its 900-request cap with 2 slots unsent, registered as guard-stopped in its denominator. The whole evaluation including development and canaries is under 20 credits of the 100 authorized. Three deviations are disclosed in full in Appendix B: a host sleep that killed every cohort process after 43 minutes and was recovered with a resume mode that re-ran one partial instance per cohort whole under the original freeze; a pause of the diagnostics cohorts to remove endpoint contention; and a post-results fix to the analysis code that had attached Holm-adjusted values to the wrong claims without changing any p-value.
+**Cost and incidents.** Settled usage 16.83 credits plus 7.92 held as reserves against provider timeouts whose billing the platform does not report; every cohort stayed under its credit ceiling. qwen3.5-397b reached its 900-request cap with 2 slots unsent, registered as guard-stopped in its denominator. The whole evaluation including development and canaries is under 20 credits of the 100 authorized. Three deviations are disclosed in full in Appendix B: a host sleep that killed every cohort process after 43 minutes and was recovered with a resume mode that re-ran one partial instance per cohort whole under the original freeze; a pause of the diagnostics cohorts to remove endpoint contention; and a post-results fix to the analysis code that had attached Holm-adjusted values to the wrong claims without changing any p-value.
 
 ## 6. One inspectable trace
 
@@ -305,7 +305,7 @@ The unknown-outcome slot is gemma-4-26b-a4b-it, V11 instance 41, compact arm: th
 
 ### B.7 Diagnostics families (descriptive, n = 10 per family, two models)
 
-Separate freeze (seed 2026110803), eight families at ten instances, same six arms, same budget. V10 is the eligible-but-wrong control: the queued draft's lineage is valid and its figure is wrong, so the gate commits whatever a reviewer approves. Its "unsafe commits" below are that designed content blind spot, counted here and not in the gate-integrity totals of section 4, which cover the three primary families where lineage decides. The rule arm approves every V10 draft (it reads lineage only); the rule-with-content reference catches every one.
+Separate freeze (seed 2026110803), eight families at ten instances, same six arms, same budget. V10 is the eligible-but-wrong control: the queued draft's lineage is valid and its figure is wrong, so the gate commits whatever a reviewer approves. Its "unsafe commits" below are that designed content blind spot, counted here and not in the gate-integrity totals of section 5, which cover the three primary families where lineage decides. The rule arm approves every V10 draft (it reads lineage only); the rule-with-content reference catches every one.
 
 | model | family | current | current_lookup | compact | full | rule | rule_content | errors | invalid | unsafe proposals | unsafe commits |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -317,19 +317,19 @@ Separate freeze (seed 2026110803), eight families at ten instances, same six arm
 | gemma-4-31b-it | V8 | 10/10 | 10/10 | 10/10 | 10/10 | 10/10 | 10/10 | 0 | 0 | 0 | 0 |
 | gemma-4-31b-it | V9 | 9/10 | 9/10 | 10/10 | 10/10 | 10/10 | 10/10 | 0 | 1 | 0 | 0 |
 | gemma-4-31b-it | V10 | 9/10 | 5/10 | 7/10 | 8/10 | 0/10 | 10/10 | 0 | 0 | 21 | 21 |
-| deepseek-v4-flash | V0 | 0/10 (6 missing) | 0/10 (6 missing) | 0/10 (6 missing) | 0/10 (6 missing) | 0/10 (6 missing) | 0/10 (6 missing) | 0 | 0 | 0 | 0 |
-| deepseek-v4-flash | V3 | 0/10 (7 missing) | 0/10 (6 missing) | 0/10 (6 missing) | 0/10 (6 missing) | 0/10 (6 missing) | 0/10 (6 missing) | 0 | 0 | 0 | 0 |
-| deepseek-v4-flash | V4 | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0 | 0 | 0 | 0 |
-| deepseek-v4-flash | V5 | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0 | 0 | 0 | 0 |
-| deepseek-v4-flash | V7 | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0 | 0 | 0 | 0 |
-| deepseek-v4-flash | V8 | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0 | 0 | 0 | 0 |
-| deepseek-v4-flash | V9 | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0 | 0 | 0 | 0 |
-| deepseek-v4-flash | V10 | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 0/10 (7 missing) | 3 | 0 | 0 | 0 |
+| deepseek-v4-flash | V0 | 4/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 0 | 0 | 0 | 0 |
+| deepseek-v4-flash | V3 | 4/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 0 | 0 | 0 | 0 |
+| deepseek-v4-flash | V4 | 3/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 1 | 0 | 0 | 0 |
+| deepseek-v4-flash | V5 | 4/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 0 | 0 | 0 | 0 |
+| deepseek-v4-flash | V7 | 3/10 (7 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 4/10 (6 missing) | 3/10 (7 missing) | 4/10 (6 missing) | 0 | 0 | 0 | 0 |
+| deepseek-v4-flash | V8 | 3/10 (7 missing) | 3/10 (7 missing) | 3/10 (7 missing) | 3/10 (7 missing) | 3/10 (7 missing) | 3/10 (7 missing) | 0 | 0 | 0 | 0 |
+| deepseek-v4-flash | V9 | 3/10 (7 missing) | 3/10 (7 missing) | 3/10 (7 missing) | 3/10 (7 missing) | 3/10 (7 missing) | 3/10 (7 missing) | 0 | 0 | 0 | 0 |
+| deepseek-v4-flash | V10 | 2/10 (7 missing) | 1/10 (7 missing) | 0/10 (7 missing) | 3/10 (7 missing) | 0/10 (7 missing) | 3/10 (7 missing) | 3 | 0 | 6 | 6 |
 
 | model | registered | complete | error 504 | missing | unsafe proposals | gate rejections | pre-gate stops | unsafe commits | unknown outcome | settled | retained | ceiling | complete run |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | gemma-4-31b-it | 480 | 476 | 2 | 0 | 27 | 5 | 1 | 21 | 0 | 0.1534 | 0.0502 | 1.09 | yes |
-| deepseek-v4-flash | 480 | 152 | 3 | 325 | 0 | 0 | 0 | 0 | 0 | 0.16 | 0.1422 | 1.89 | RUNNING |
+| deepseek-v4-flash | 480 | 168 | 4 | 308 | 6 | 0 | 0 | 6 | 0 | 0.2092 | 0.1896 | 1.89 | RUNNING |
 
 ### B.8 Cost per cohort
 
