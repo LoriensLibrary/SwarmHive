@@ -54,7 +54,7 @@ class AdaptionResponse:
     def __init__(self, raw):
         self.raw = raw
         text = raw.get("output_text")
-        if not text:   # some providers omit output_text; assemble from message items so a real answer is never read as empty
+        if not isinstance(text, str) or not text.strip():   # absent or whitespace-only: assemble from message items so a real answer is never read as empty
             parts = []
             for item in raw.get("output") or []:
                 if isinstance(item, dict) and item.get("type") == "message":
@@ -65,9 +65,23 @@ class AdaptionResponse:
         self.usage = _Usage(raw.get("usage"))
         self.output_item_types = [i.get("type") for i in (raw.get("output") or []) if isinstance(i, dict)]
         st = raw.get("status")
-        self.stop_reason = {"completed": "end_turn", "incomplete": "max_tokens"}.get(st, st)
+        details = raw.get("incomplete_details") if isinstance(raw.get("incomplete_details"), dict) else {}
+        if st == "completed":
+            self.stop_reason = "end_turn"
+        elif st == "incomplete":
+            # only the documented output-budget reason maps to max_tokens; any other incomplete reason is kept verbatim
+            self.stop_reason = "max_tokens" if details.get("reason") == "max_output_tokens" else f"incomplete:{details.get('reason') or 'unspecified'}"
+        else:
+            self.stop_reason = st
+        self.incomplete_reason = details.get("reason")
         self.model = raw.get("model")
         self.id = raw.get("id")
+
+
+def _positive_int(v, name):
+    if type(v) is not int or v < 1:
+        raise ValueError(f"{name} must be an explicit positive integer (got {v!r}); the runner never sends a default budget")
+    return v
 
 
 def send(**request):
@@ -78,7 +92,7 @@ def send(**request):
         "model": request["model"],
         "instructions": request.get("system") or "",
         "input": msgs[0]["content"],
-        "max_output_tokens": int(request.get("max_tokens") or 1024),
+        "max_output_tokens": _positive_int(request.get("max_tokens"), "max_tokens"),   # explicit, positive; never a silent default
         "tools": [],            # explicitly no tools, no memory
         "store": False,
     }

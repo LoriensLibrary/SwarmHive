@@ -48,7 +48,9 @@ MAX_TOKENS = 1200                                    # per-call output cap (reas
 # separately, and a provider stop at the cap scored as invalid output in its registered slot. Proposed held-out value: 6000.
 def set_max_tokens(n):
     global MAX_TOKENS
-    MAX_TOKENS = int(n)
+    if type(n) is not int or n < 1:
+        raise SystemExit(f"--max-tokens must be a positive integer (got {n!r}); a zero budget would reserve nothing and send a provider default")
+    MAX_TOKENS = n
 TEMPERATURE = 0.0                                    # frozen sampling temperature, sent on every request and recorded in FREEZE; --temperature overrides
 
 
@@ -268,7 +270,9 @@ class Model:
     def reserve(self, request):
         """Worst case for ONE attempt: documented context as input, the full output cap as output."""
         pi, po = self.price
-        return (self.context * pi + int(request.get("max_tokens") or MAX_TOKENS) * po) / 1e6
+        mt = request.get("max_tokens")
+        if type(mt) is not int or mt < 1: raise BudgetStop(f"budget_stopped: request carries no positive max_tokens ({mt!r})")
+        return (self.context * pi + mt * po) / 1e6
     def _ledger(self, row):
         if self.ledger:
             with open(self.ledger, "a", encoding="utf-8") as f: f.write(json.dumps(row) + "\n")
@@ -336,6 +340,7 @@ class Model:
         rt = getattr(getattr(resp, "usage", None), "reasoning_tokens", None)
         rec = {"call": self.n, "model": self.model, "provider": self.provider, "temperature": self.temperature, "input_tokens": it, "output_tokens": ot, "cost": round(cost, 6), "unit": self.unit,
                "reasoning_tokens": rt, "max_tokens": MAX_TOKENS, "empty_text": not text.strip(), "output_item_types": getattr(resp, "output_item_types", None),
+               "incomplete_reason": getattr(resp, "incomplete_reason", None),
                "returned_model": getattr(resp, "model", None), "provider_response_id": getattr(resp, "id", None),
                "elapsed_s": round(time.time() - t0, 3), "stop_reason": getattr(resp, "stop_reason", None), "raw_text": text}
         with open(os.path.join(self.rawdir, f"call_{self.n:03d}.json"), "w", encoding="utf-8") as f:
