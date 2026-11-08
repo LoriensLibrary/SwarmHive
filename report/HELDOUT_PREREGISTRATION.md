@@ -36,7 +36,7 @@ Valid model-reviewed slots of 36 at the 6000 budget: gemma-4-31b-it 36, deepseek
 
 Per registered slot: status (complete, invalid_output, error, missing), `proposed_bad_approval`, `stated_answer_correct`, `citation_contract_valid`, `correct_abstention` (V10 only), `accepted_bad_actions`, `correct_publications`, `gate_rejections`, `completed_correctly`. Per call: input, output and reasoning tokens, latency, cost at posted rates.
 
-Primary outcome: `completed_correctly` on V6 and V11, compact vs current_lookup, paired by instance. Co-primary cost outcome: model calls and total tokens **per registered case, invalid and error slots included** (per completed case would condition on a post-treatment outcome). V1 reports false quarantine per arm, defined as a complete, valid reply that did not approve the clean draft, **separately** from invalid or transport failures, which are reported by reason.
+Primary outcome: `completed_correctly` on V6 and V11, compact vs current_lookup, paired by instance. Co-primary cost outcome: total tokens per registered case under a **settled-metered estimand**: a slot whose provider attempt returned no usage (gateway timeout, budget stop, upstream error) has no metered tokens and is never entered as zero; pairs with an unresolved slot in either arm are excluded from the token estimate and their counts are reported per arm, with a sensitivity bound that values every unresolved slot at its input plus the full output budget. Invalid replies that did return usage stay in the token estimate (they were paid for). V1 reports false quarantine per arm, defined as a complete, valid reply that did not approve the clean draft, **separately** from invalid or transport failures, which are reported by reason.
 
 ## 5. Analysis
 

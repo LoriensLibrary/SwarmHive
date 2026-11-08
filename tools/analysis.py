@@ -45,8 +45,11 @@ def tango_z(n12, n21, n, d):
     B = (n12 + n21) - d * (2 * n - n12 + n21)
     q = (B + math.sqrt(B * B + 8 * n * n21 * d * (1 - d))) / (4 * n)        # restricted MLE of p21 under H0
     var = n * (2 * q + d * (1 - d))
-    if var <= 0: return float("inf") if (n12 - n21 - n * d) > 0 else float("-inf")
-    return (n12 - n21 - n * d) / math.sqrt(var)
+    num = n12 - n21 - n * d
+    if var <= 1e-15:
+        if abs(num) < 1e-12: return 0.0            # all-tie boundary at d = 0: no evidence either way, not -inf
+        return float("inf") if num > 0 else float("-inf")
+    return num / math.sqrt(var)
 
 
 def tango_bound(n12, n21, n, alpha_one_sided, lower=True):
@@ -118,10 +121,20 @@ def paired_table(scored, keys, traces, family, arm_a="compact", arm_b="current_l
     n12 = sum(1 for k in tasks if by_task[k][arm_a] and not by_task[k][arm_b])
     n21 = sum(1 for k in tasks if by_task[k][arm_b] and not by_task[k][arm_a])
     n11 = sum(1 for k in tasks if by_task[k][arm_a] and by_task[k][arm_b])
-    diffs = [tok[k][arm_b] - tok[k][arm_a] for k in tasks]    # lookup minus compact tokens: positive = compact cheaper
+    # Settled-metered token estimand: a slot whose provider attempt never returned usage (gateway timeout, budget stop,
+    # upstream error) has NO metered tokens, so it must not enter the comparison as zero. Pairs with an unresolved slot
+    # in either arm are excluded from the token estimate and counted; a sensitivity bound values each unresolved slot at
+    # the full output budget plus its input.
+    def unresolved(run):
+        t = tr.get(run) or {}
+        return t.get("status") in ("error",) or (t.get("raw_reviewer") is None and t.get("status") != "complete")
+    runs_by = {(r["task_id"], r["condition"]): r["run_id"] for r in scored if r.get("run_id")}
+    settled = [k for k in tasks if not unresolved(runs_by.get((k, arm_a))) and not unresolved(runs_by.get((k, arm_b)))]
+    diffs = [tok[k][arm_b] - tok[k][arm_a] for k in settled]    # lookup minus compact tokens: positive = compact cheaper
+    unres_a = sum(1 for k in tasks if unresolved(runs_by.get((k, arm_a)))); unres_b = sum(1 for k in tasks if unresolved(runs_by.get((k, arm_b))))
     return {"n": len(tasks), "both": n11, "compact_only": n12, "lookup_only": n21, "neither": len(tasks) - n11 - n12 - n21,
             "compact_rate": (n11 + n12) / len(tasks) if tasks else None, "lookup_rate": (n11 + n21) / len(tasks) if tasks else None,
-            "token_diffs": diffs}
+            "token_diffs": diffs, "token_pairs_settled": len(settled), "unresolved_compact": unres_a, "unresolved_lookup": unres_b}
 
 
 def analyze_binary(n12, n21, n, margin=MARGIN):
@@ -132,6 +145,11 @@ def analyze_binary(n12, n21, n, margin=MARGIN):
 
 def synthetic():
     print("Synthetic checks (compact - lookup completion; margin -0.10)")
+    lo, hi = tango_interval(0, 0, 60); assert abs(lo + hi) < 1e-6, ("all-tie interval must be symmetric", lo, hi)
+    assert tango_z(0, 0, 60, 0.0) == 0.0, "all-tie statistic at d=0 must be 0"
+    lo1, hi1 = tango_interval(60, 0, 60); assert hi1 > 0.99 and lo1 > 0.9, ("all compact-only endpoint", lo1, hi1)
+    lo2, hi2 = tango_interval(0, 60, 60); assert lo2 < -0.99 and hi2 < -0.9, ("all lookup-only endpoint", lo2, hi2)
+    print("  symmetry and endpoint tests pass")
     for label, n12, n21, n in (("all tie n=40", 0, 0, 40), ("all tie n=60", 0, 0, 60), ("all tie n=120", 0, 0, 120),
                                ("n=60, 8 compact-only, 2 lookup-only", 8, 2, 60), ("n=60, 2 compact-only, 8 lookup-only", 2, 8, 60),
                                ("n=60, 30 compact-only, 0", 30, 0, 60)):
