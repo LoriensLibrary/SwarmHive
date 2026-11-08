@@ -11,7 +11,6 @@ import json, sys, os
 sys.path.insert(0, "tools")
 from hive_http import query
 
-HOST = OP.split("@")[1].split("/")[0]   # bots connect to the SAME database as the operator (scratch branch), never to main
 pw = json.load(open("secrets/bot_passwords.json"))
 OP = open("secrets/operator.env").read().split("=", 1)[1].strip()
 # DESTRUCTIVE: these tests TRUNCATE exp.* . They run ONLY against the scratch branch (secrets/branch_operator.env),
@@ -21,6 +20,7 @@ _dsn = _os.environ.get("DET_DSN") or open("secrets/branch_operator.env").read().
 if "ep-summer-paper" in _dsn:
     _sys.exit("REFUSED: det_tests truncates exp.*; point it at the scratch branch (secrets/branch_operator.env), not the shared main Hive")
 OP = _dsn
+HOST = OP.split("@")[1].split("/")[0]   # bots connect to the SAME database as the operator (scratch branch), never to main
 
 conn = lambda b: OP if b == "hive_operator" else f"postgresql://{b}:{pw[b]}@{HOST}/hive?sslmode=require"
 
