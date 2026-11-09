@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 32, \\\"summary\\\": \\\"valves at site-4: 32 units\\\"}\",\"id\":\"ph879b39_V6i26_heldout_qwen3827b_f73149831295_d392b4\",\"ver\":1},{\"body\":\"{\\\"units\\\": 32, \\\"summary\\\": \\\"valves at site-4: 32 units\\\"}\",\"id\":\"ph879b39_V6i26_heldout_qwen3827b_f73149831295_77194c\",\"ver\":1},{\"body\":\"{\\\"units\\\": 32, \\\"note\\\": \\\"observed count of valves at site-4\\\"}\",\"id\":\"ph879b39_V6i26_heldout_qwen3827b_f73149831295_0a3e06\",\"ver\":2}],\"corrections\":[{\"id\":\"ph879b39_V6i26_heldout_qwen3827b_f73149831295_0a3e06\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph879b39_V6i26_heldout_qwen3827b_f73149831295_0a3e06\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph879b39_V6i26_heldout_qwen3827b_f73149831295_0a3e06\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph879b39_V6i26_heldout_qwen3827b_f73149831295_0a3e06\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph879b39_V6i26_heldout_qwen3827b_f73149831295_77194c\",\"inputs\":[{\"id\":\"ph879b39_V6i26_heldout_qwen3827b_f73149831295_0a3e06\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph879b39_V6i26_heldout_qwen3827b_f73149831295_d392b4\",\"inputs\":[{\"id\":\"ph879b39_V6i26_heldout_qwen3827b_f73149831295_0a3e06\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph879b39_V6i26_heldout_qwen3827b_f73149831295_d392b4/1, ph879b39_V6i26_heldout_qwen3827b_f73149831295_77194c/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "qwen3.8-27b",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 308,
+  "model": "qwen3.8-27b",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 1019,
+  "output_tokens": 990,
+  "cost": 0.001277,
+  "unit": "credits",
+  "reasoning_tokens": 732,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "qwen3.8-27b",
+  "provider_response_id": "resp_VLRjtkSjnTJ-eGIqsNr7jWM3EVVIDTGZUz7he9mPpDrCAyBNsGwWnU9okqCaEWQjCnZJO8nGsuh-qLRP4CIrBiEImySOJElE4xRm2dzOPlv4qO1T5dI-zYbPlrWrWczeA3kuOLiRAdtvS7sSnuT3pDLBJeBYEXyfD49XfAepuqglM67emrT7mlVsTEgQQxdPDjUeOBpjV9lELp-JI_aVJkMkCjPx6UwDHVYGzYgn4jq0dAZ9gOzQI03QPh0jQ4hKlHeOeaFNl_Sb759XU5IyrFUaOgpz0oscdWs70n9HtXCgmG3zdc8RIf_ucGMnqR58Wb8tjVx5MJ_PZRINOonbRSAoIBrTKHV06m3g-bI7GTnVq9BeLfdIL1j1m8_fI9tGAA57LVju5VKlOa0IcpX3P3l9Q7ih7HB_9j-ydhYlVSQhaIb5s7m25AcGKnlP2Ccv77tyrmylNSUBql55esIa2OpmEKOw87OAn-J2ot5-Wgr8JAoF3lv5W4YFCoUR4omsZmtHC2Aj_D958vNRGHheK2uw2y0=",
+  "elapsed_s": 6.186,
+  "stop_reason": "end_turn",
+  "raw_text": "\n\n{\"decision\":\"approve\",\"artifact\":\"ph879b39_V6i26_heldout_qwen3827b_f73149831295_77194c\",\"result\":{\"units\":32},\"evidence\":[{\"id\":\"ph879b39_V6i26_heldout_qwen3827b_f73149831295_77194c\",\"ver\":1},{\"id\":\"ph879b39_V6i26_heldout_qwen3827b_f73149831295_0a3e06\",\"ver\":2}],\"consulted\":[{\"id\":\"ph879b39_V6i26_heldout_qwen3827b_f73149831295_d392b4\",\"ver\":1},{\"id\":\"ph879b39_V6i26_heldout_qwen3827b_f73149831295_0a3e06\",\"ver\":1}]}"
+ }
+}

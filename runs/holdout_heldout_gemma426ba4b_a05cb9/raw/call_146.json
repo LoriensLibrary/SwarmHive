@@ -3,21 +3,21 @@
   "max_tokens": 6000,
   "messages": [
    {
-    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 33, \\\"summary\\\": \\\"gaskets at site-9: 33 units\\\"}\",\"id\":\"ph65bd5a_V6i12_heldout_gemma426ba4b_474e9ea0e972_5e0a91\",\"ver\":1},{\"body\":\"{\\\"units\\\": 33, \\\"summary\\\": \\\"gaskets at site-9: 33 units\\\"}\",\"id\":\"ph65bd5a_V6i12_heldout_gemma426ba4b_474e9ea0e972_5a68b9\",\"ver\":1},{\"body\":\"{\\\"units\\\": 33, \\\"note\\\": \\\"observed count of gaskets at site-9\\\"}\",\"id\":\"ph65bd5a_V6i12_heldout_gemma426ba4b_474e9ea0e972_170195\",\"ver\":2}],\"corrections\":[{\"id\":\"ph65bd5a_V6i12_heldout_gemma426ba4b_474e9ea0e972_170195\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph65bd5a_V6i12_heldout_gemma426ba4b_474e9ea0e972_170195\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph65bd5a_V6i12_heldout_gemma426ba4b_474e9ea0e972_5e0a91/1, ph65bd5a_V6i12_heldout_gemma426ba4b_474e9ea0e972_5a68b9/1\"}",
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 28, \\\"summary\\\": \\\"gaskets at site-2: 28 units\\\"}\",\"id\":\"ph58991f_V11i53_heldout_gemma426ba4b_2f2821b7f1ea_c9d81d\",\"ver\":1},{\"body\":\"{\\\"units\\\": 28, \\\"summary\\\": \\\"gaskets at site-2: 28 units\\\"}\",\"id\":\"ph58991f_V11i53_heldout_gemma426ba4b_2f2821b7f1ea_5705ef\",\"ver\":1},{\"body\":\"{\\\"units\\\": 28, \\\"note\\\": \\\"observed count of gaskets at site-2\\\"}\",\"id\":\"ph58991f_V11i53_heldout_gemma426ba4b_2f2821b7f1ea_4b956d\",\"ver\":2}],\"corrections\":[],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph58991f_V11i53_heldout_gemma426ba4b_2f2821b7f1ea_c9d81d/1, ph58991f_V11i53_heldout_gemma426ba4b_2f2821b7f1ea_5705ef/1 lookup_available=true\"}",
     "role": "user"
    }
   ],
   "model": "gemma-4-26b-a4b-it",
-  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
  },
  "response": {
   "call": 146,
   "model": "gemma-4-26b-a4b-it",
   "provider": "adaption",
   "temperature": 0.0,
-  "input_tokens": 671,
-  "output_tokens": 239,
-  "cost": 0.000112,
+  "input_tokens": 644,
+  "output_tokens": 27,
+  "cost": 5.6e-05,
   "unit": "credits",
   "reasoning_tokens": 0,
   "max_tokens": 6000,
@@ -27,9 +27,9 @@
   ],
   "incomplete_reason": null,
   "returned_model": "gemma-4-26b-a4b-it",
-  "provider_response_id": "resp_EBglg5OwGG9hh5xiI_52qHVPxkCz9bXeW6xIu5t8MW6BdRQlq1O9MCEEcVZvglb7AJiAs8U-w_gsO49pskbsFskYV86qb63z-8UUGuAYJzDN4XE0MzMnDR8WkI8zc2tfTtJa4ioPeai_IQMU3IdzmT08-vv_gLeawTaILEHYKLOTssaGo_hOcL2oZic1djMvle-vDcXKvG9Ws41EALlA_rVQqzFDGDfYnlh8Wr155QHS12Wo0AIhKPOZs2DcnkyZ7AfWx3QGhpAJ3UHKHXwL-PKcceUg2xr1mOj0L6ZLdo8zqgLxzRNqs7UYYan8nTSj0EzUDuCJQ_RnjvTW0OSW26XKjpsa-Qdnb_wDhedI7ruNezeSXU9nUhYTDMnwI3k1q5VRjpC6hmdmq3LpoogZnO2ufpUqqNpo4wmAt9r5cpdIc7UrYYMRSuPrp3pMlT-rOPGVmoguybFrzFr5FCs5NsSSXZ17-M1UlNdkMeJL0B8v8UzMp7guMeVtb8IIjXA_hlRIVwiQzPFWgYjpRiaKtz9SKVA=",
-  "elapsed_s": 1.259,
+  "provider_response_id": "resp_VGl9uUQGEfBlJURN6LeP0bULkMiYLq5eCckV3fknODeBSn2aNwC99XvfWCjKEnqpc-axJzgMF3p-PSbGRK0C0G7l3F2-KFZ9yJoVsUqI7ygBfHY53GB0qz7qx3C8sOcGTfqVVU0JGaOVhLHqGOypPIjFCkDMmHXee7RqPY9eRPJwagXgmWQlT6S2qEP6HwAkmBNLggGd-3FMnDe1wxqpfuLJVvZlbi85c4xvGKe4T7KoIDA3zKCPuzjLTkFJa-DfWFu93W6H4OH2RVxghKN3hSO2djRJzmUpqLk7altpekYix9VV3BQ0OLIkXmhHYN2Gp4vDeRYy54BYk9_mJU6r9zaU5wUwbT2fogxz6XKUutyp6KoTez_9L840SnuRbYNxNWizcuNdtOi-yQeXHTAJDsEBlChmaWAlvSVQZLmJQRD_nbVApY_04y1WMmcNxk2KuNmuzK8R3mWNr-Mvq3JLs4K0JeAYKCUFEDYGnLdGLVtx6559gj-5lQ9XOmjijKXT1LTKVI1xiApV6toHPe0Cwg25TQ0=",
+  "elapsed_s": 1.357,
   "stop_reason": "end_turn",
-  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"ph65bd5a_V6i12_heldout_gemma426ba4b_474e9ea0e972_5e0a91\", \"result\": {\"units\": 33}, \"evidence\": [{\"id\": \"ph65bd5a_V6i12_heldout_gemma426ba4b_474e9ea0e972_5e0a91\", \"ver\": 1}], \"consulted\": [{\"id\": \"ph65bd5a_V6i12_heldout_gemma426ba4b_474e9ea0e972_5a68b9\", \"ver\": 1}, {\"id\": \"ph65bd5a_V6i12_heldout_gemma426ba4b_474e9ea0e972_170195\", \"ver\": 2}]}\n```"
+  "raw_text": "{\"decision\": \"lookup\", \"artifact\": null, \"result\": null, \"evidence\": [], \"consulted\": []}"
  }
 }

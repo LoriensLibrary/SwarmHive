@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 35, \\\"summary\\\": \\\"clamps at site-7: 35 units\\\"}\",\"id\":\"phabd034_V1i31_heldout_qwen35397b_9cf185ce3a3b_6937d8\",\"ver\":1},{\"body\":\"{\\\"units\\\": 35, \\\"note\\\": \\\"observed count of clamps at site-7\\\"}\",\"id\":\"phabd034_V1i31_heldout_qwen35397b_9cf185ce3a3b_675fcd\",\"ver\":1},{\"body\":\"{\\\"units\\\": 3, \\\"note\\\": \\\"observed count of clamps at site-7\\\"}\",\"id\":\"phabd034_V1i31_heldout_qwen35397b_9cf185ce3a3b_9cb6db\",\"ver\":2}],\"corrections\":[{\"id\":\"phabd034_V1i31_heldout_qwen35397b_9cf185ce3a3b_9cb6db\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"phabd034_V1i31_heldout_qwen35397b_9cf185ce3a3b_9cb6db\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phabd034_V1i31_heldout_qwen35397b_9cf185ce3a3b_6937d8/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "qwen3.5-397b",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 417,
+  "model": "qwen3.5-397b",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 595,
+  "output_tokens": 6000,
+  "cost": 0.021327,
+  "unit": "credits",
+  "reasoning_tokens": 6000,
+  "max_tokens": 6000,
+  "empty_text": true,
+  "output_item_types": [
+   "reasoning"
+  ],
+  "incomplete_reason": "max_output_tokens",
+  "returned_model": "qwen3.5-397b",
+  "provider_response_id": "resp_6wSp0PPeEQAHcVGTuMItB6HPJ1V5OYlLVNmijjhWkrxZBBynedAaT7nu2KYTobmTjx1B5GXxVWTekyS3m4QGjElk2j0o1cTOV5o92lEPZvJPnqms9CClCc6Smy0OeRbOL2IPxeddsl-5VQ-LhNjCDUAzAJ5L34pIywaFBtod9PqVR0BunjzoXcdNES7kqkSXTnHYbb_Su2fYHqNQ0kR72hH56G4Fldr6Px13TUAzXDpuiIInrgWtOrYMUikGJibux7hK0izOyXXO6C70JRxEY5J97-hPBzyuz0TJST1sxXtdZOKkPoiDkeNDXAtMsmaSKeqErNEh1ZhAgOgnJDdXWdEnaYvhl1KdSs1jmN4JgYusugDQmO2jTe44fMGD1OPFRxVp0XmG9mxADnqC81vgwNlekNAiFD4GGuoNYR1WTZT3vkUnlkJDygTda_fKwNt853MND5uHG0fX1ZwqoVW-plmnJNmsjFB5p-FC27RmrlJpWVSohVv9_kr8JwuxL301d9ZXRw7WwApGkj87dynbYjobQ7E=",
+  "elapsed_s": 57.601,
+  "stop_reason": "max_tokens",
+  "raw_text": ""
+ }
+}

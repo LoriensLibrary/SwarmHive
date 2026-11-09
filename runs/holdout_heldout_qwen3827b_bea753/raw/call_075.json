@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 15, \\\"summary\\\": \\\"hinges at site-9: 15 units\\\"}\",\"id\":\"ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_e50172\",\"ver\":1},{\"body\":\"{\\\"units\\\": 15, \\\"summary\\\": \\\"hinges at site-9: 15 units\\\"}\",\"id\":\"ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_b3016b\",\"ver\":1},{\"body\":\"{\\\"units\\\": 15, \\\"note\\\": \\\"observed count of hinges at site-9\\\"}\",\"id\":\"ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_8eeb42\",\"ver\":2}],\"corrections\":[{\"id\":\"ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_8eeb42\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_8eeb42\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_8eeb42\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_8eeb42\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_b3016b\",\"inputs\":[{\"id\":\"ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_8eeb42\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_e50172\",\"inputs\":[{\"id\":\"ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_8eeb42\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_e50172/1, ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_b3016b/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "qwen3.8-27b",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 75,
+  "model": "qwen3.8-27b",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 983,
+  "output_tokens": 1046,
+  "cost": 0.001346,
+  "unit": "credits",
+  "reasoning_tokens": 802,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "qwen3.8-27b",
+  "provider_response_id": "resp_g2mvG_TnRUkt9g_K55epBfi6muCKo69EeS9WlslVSf7qALuRMsFvAXgzFRRmhdeBTU6AUo1QrRydRapSMH3V4Gj5v57M3cxjaQhttlo58O2EWRQMhmN6xOluTtrq8FnhOZ-ahybnclsgC8pLe4g--XjLojz2ELMQIm9Of4VXzZv3qgnQDPKvwT_jxIXW5Ps8Ku_uCKQGljj3XCVjBJrQl6TyATQNij-SVcVsQcwKQltcn9D6vyt5Y3N7SgXg-XWG_eaNVKnhkVyck-GF03J-ljWiOW8HXzUX4TJ9SUnkICG_tcrPnp9B8s6DnS_cOavqw2Fummd6tAsKLJ99yJPGSHM8BTAfdpfAVaRTaXimIVZRLcRpVO984dQchzfAFLdDmM7LghrnSJM9m_51-iSvgQ2x1_sv4xW-aCnuxbZazqbkvANJBGmJL21dty1MMQu42PQvngZqTjkdo7n6VYUxaGMY7MWlFq4jrVvkX_muO5oGFnkM6NOtpst32hqftWb3f2ifj6JZe5nZz8jT4hhLq926Z2k=",
+  "elapsed_s": 7.236,
+  "stop_reason": "end_turn",
+  "raw_text": "\n\n{\"decision\":\"approve\",\"artifact\":\"ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_b3016b\",\"result\":{\"units\":15},\"evidence\":[{\"id\":\"ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_b3016b\",\"ver\":1},{\"id\":\"ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_8eeb42\",\"ver\":2}],\"consulted\":[{\"id\":\"ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_e50172\",\"ver\":1},{\"id\":\"ph3750f3_V6i10_heldout_qwen3827b_ddb4005613cb_8eeb42\",\"ver\":1}]}"
+ }
+}

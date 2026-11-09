@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 25, \\\"summary\\\": \\\"fuses at site-7: 25 units\\\"}\",\"id\":\"ph726468_V11i10_heldout_qwen3827b_7ef03bac6aa2_005a23\",\"ver\":1},{\"body\":\"{\\\"units\\\": 25, \\\"summary\\\": \\\"fuses at site-7: 25 units\\\"}\",\"id\":\"ph726468_V11i10_heldout_qwen3827b_7ef03bac6aa2_e47e9a\",\"ver\":1},{\"body\":\"{\\\"units\\\": 25, \\\"note\\\": \\\"observed count of fuses at site-7\\\"}\",\"id\":\"ph726468_V11i10_heldout_qwen3827b_7ef03bac6aa2_90fc82\",\"ver\":2}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph726468_V11i10_heldout_qwen3827b_7ef03bac6aa2_005a23\",\"inputs\":[{\"id\":\"ph726468_V11i10_heldout_qwen3827b_7ef03bac6aa2_90fc82\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph726468_V11i10_heldout_qwen3827b_7ef03bac6aa2_90fc82\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph726468_V11i10_heldout_qwen3827b_7ef03bac6aa2_90fc82\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph726468_V11i10_heldout_qwen3827b_7ef03bac6aa2_e47e9a\",\"inputs\":[{\"id\":\"ph726468_V11i10_heldout_qwen3827b_7ef03bac6aa2_90fc82\",\"ver\":2}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph726468_V11i10_heldout_qwen3827b_7ef03bac6aa2_005a23/1, ph726468_V11i10_heldout_qwen3827b_7ef03bac6aa2_e47e9a/1 lookup_available=false (your one lookup was used; decide now)\"}",
+    "role": "user"
+   }
+  ],
+  "model": "qwen3.8-27b",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 81,
+  "model": "qwen3.8-27b",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 884,
+  "output_tokens": 1045,
+  "cost": 0.001341,
+  "unit": "credits",
+  "reasoning_tokens": 716,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "qwen3.8-27b",
+  "provider_response_id": "resp_1NUh1vBguu2ir3O7zt7zP-oPk8KyhA-rV_N-Ry-reLKrSsd8ExPzGiriVyIhodImDG__GKTlMjpVE9pAcQhER9FAvf2X0CW_SHkm1o_7SMORQO7HTccqNuwBdrUdQEyneX7-PGKEtu_z9N36yEEBgI7_t-_yOBXwE2vCBDpsnGxQhJwwPXgv_Uj_gfBv10qgFeykiWhtxnNJ08eteUWnRUwCxsdCwx6mqsNbNCoOxE-t4CASukzXB3PqCV0qK1_9hDA2MIJQqFqVnw3BJOCR_CnGaIwEaHc5yArAvcyUTp-R-_qzbab2eZGGnr-DE3PymQjDo54vYnPQEMS9sj_boFzNW3dotpUtDqyjNQJ-Yu8XJ8xuMh5mlIPhqZL1pR3nClWiPhIbfGti8LYW0jwTmrC2ZUI7JOiNXUx4nBgMMMP9RCx42VABHLAzOZiaYJj_7v8iO1pGDykucc9hSmKrwMWcNwN2ioNGMqVfSFw_ubwExMLaFOqhro8DEHkGz8isS1y1eegCI7ffN4c_AJYD0wDceUM=",
+  "elapsed_s": 7.576,
+  "stop_reason": "end_turn",
+  "raw_text": "\n\n{\n  \"decision\": \"approve\",\n  \"artifact\": \"ph726468_V11i10_heldout_qwen3827b_7ef03bac6aa2_e47e9a\",\n  \"result\": {\n    \"units\": 25\n  },\n  \"evidence\": [\n    {\n      \"id\": \"ph726468_V11i10_heldout_qwen3827b_7ef03bac6aa2_e47e9a\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"ph726468_V11i10_heldout_qwen3827b_7ef03bac6aa2_90fc82\",\n      \"ver\": 2\n    }\n  ],\n  \"consulted\": [\n    {\n      \"id\": \"ph726468_V11i10_heldout_qwen3827b_7ef03bac6aa2_005a23\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"ph726468_V11i10_heldout_qwen3827b_7ef03bac6aa2_90fc82\",\n      \"ver\": 1\n    }\n  ]\n}"
+ }
+}

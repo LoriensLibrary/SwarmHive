@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 8, \\\"summary\\\": \\\"brackets at site-3: 8 units\\\"}\",\"id\":\"ph70935c_V11i57_heldout_qwen3827b_82d3094293b5_ff5a84\",\"ver\":1},{\"body\":\"{\\\"units\\\": 8, \\\"summary\\\": \\\"brackets at site-3: 8 units\\\"}\",\"id\":\"ph70935c_V11i57_heldout_qwen3827b_82d3094293b5_46f3c1\",\"ver\":1},{\"body\":\"{\\\"units\\\": 8, \\\"note\\\": \\\"observed count of brackets at site-3\\\"}\",\"id\":\"ph70935c_V11i57_heldout_qwen3827b_82d3094293b5_05f68e\",\"ver\":2}],\"corrections\":[],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph70935c_V11i57_heldout_qwen3827b_82d3094293b5_ff5a84/1, ph70935c_V11i57_heldout_qwen3827b_82d3094293b5_46f3c1/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "qwen3.8-27b",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 746,
+  "model": "qwen3.8-27b",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 661,
+  "output_tokens": 659,
+  "cost": 0.00085,
+  "unit": "credits",
+  "reasoning_tokens": 635,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "qwen3.8-27b",
+  "provider_response_id": "resp_9wjuvW2QmLI-tfd6mIOojNozs7BgqingJbPo9xEBrjxQRl-672LEEeAp8kI-H2s-xUs7EpGpuIWMG_4QbclmenQKDhdsBvMieobErNTViNE9B3aYfzbgeI4MjkjKfvQu21o-PS8H-rB8UOafK-aP6C0fdLoeHsr2L_iq1NbkNKCTTxpaDR4a0FhfTtEsJIH7GiWZQkZ3iGjeM_bqZjGTy9wDIsTc24Z7JN_Lia22kwKFlDNghxf3BqjK-srVbfACOt86hZekTxaiHCKUiItZO7SykHG-YiywK5g-_xLJOohLlZJcY3sUMeYgLs1dUKXLtRKP40lnbd8TduzpM7grOaPQlh4QKyJbN3bdfNEy9KqR1O2UdII0zivIG5lnD2zSrEkw4mnbWF7EVxXMDaQa2XF0HQbvIMW6QwiIi3h5xWdlRjC6vzNEvLJfHzXLx33_7RnDH1vntkVLd9vnRwg2E_2E7N4mJ6D80cm3rjZsocZLe1B2zpU2pSfd4O9_E2EPXCsf4yVxLCjzSQAhzAjJHKlUktc=",
+  "elapsed_s": 5.049,
+  "stop_reason": "end_turn",
+  "raw_text": "\n\n{\"decision\":\"lookup\",\"artifact\":null,\"result\":null,\"evidence\":[],\"consulted\":[]}"
+ }
+}

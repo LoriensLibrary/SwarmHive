@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 28, \\\"summary\\\": \\\"clamps at site-1: 28 units\\\"}\",\"id\":\"phf59a56_V6i51_heldout_qwen35397b_29141a0a9b7b_1d1bea\",\"ver\":1},{\"body\":\"{\\\"units\\\": 28, \\\"summary\\\": \\\"clamps at site-1: 28 units\\\"}\",\"id\":\"phf59a56_V6i51_heldout_qwen35397b_29141a0a9b7b_f131d0\",\"ver\":1},{\"body\":\"{\\\"units\\\": 28, \\\"note\\\": \\\"observed count of clamps at site-1\\\"}\",\"id\":\"phf59a56_V6i51_heldout_qwen35397b_29141a0a9b7b_15e445\",\"ver\":2}],\"corrections\":[{\"id\":\"phf59a56_V6i51_heldout_qwen35397b_29141a0a9b7b_15e445\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"phf59a56_V6i51_heldout_qwen35397b_29141a0a9b7b_15e445\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phf59a56_V6i51_heldout_qwen35397b_29141a0a9b7b_1d1bea/1, phf59a56_V6i51_heldout_qwen35397b_29141a0a9b7b_f131d0/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "qwen3.5-397b",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 707,
+  "model": "qwen3.5-397b",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 670,
+  "output_tokens": 2498,
+  "cost": 0.009111,
+  "unit": "credits",
+  "reasoning_tokens": 2251,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "qwen3.5-397b",
+  "provider_response_id": "resp_ZXkzXHhMCA95lAyNNN0Kqj_7ys_Uql5S5Iwp1XDg8x3UHSp75-viLYrZpY-DSC8Uaeaiz1sRm7S7le27vLQavow-jBHBfMAsTN0v_UT3t2kj7sl80hbGEZvr0FwPG1YOoe8ZjNG4mOnjtevuyCCHjNOisK9CxJ1Ef73SUGz8gZQrPiOCKtyRihPr2EvPl9_AXidh8KMvWLmUgYKBuRroucSlxduNAZLiN1OmzJQ8m_o2mjjV-12sAsi7qaLEupYLSQj7DCw2mNq4HwW0ShsoQAPWc5TciYu04CMCJb_YWecpVrZI1KJgWLa_xDfC37Ks6uu5GeqStTpOF-D10U0s1osQMMIlmzeZsC26tDe7DIBOZeeIN7dHRE4f-mC9O8SEFL96OD77smHjJtOLoCrvFVoaMVKbheptqCitdRrUtx-Og4IDW_-KtbHT1YMVvTcu9SfD4lE2I8C7S4c9UIEnP8GmENUZV1Caoha_tcgEjVFwITQu7jk425SQyeejnbat4-SbMnA4JXD9CMW6aEMq2gZR5M8=",
+  "elapsed_s": 27.231,
+  "stop_reason": "end_turn",
+  "raw_text": "\n\n{\n  \"decision\": \"approve\",\n  \"artifact\": \"phf59a56_V6i51_heldout_qwen35397b_29141a0a9b7b_1d1bea\",\n  \"result\": {\"units\": 28},\n  \"evidence\": [{\"id\": \"phf59a56_V6i51_heldout_qwen35397b_29141a0a9b7b_1d1bea\", \"ver\": 1}],\n  \"consulted\": [{\"id\": \"phf59a56_V6i51_heldout_qwen35397b_29141a0a9b7b_f131d0\", \"ver\": 1}, {\"id\": \"phf59a56_V6i51_heldout_qwen35397b_29141a0a9b7b_15e445\", \"ver\": 2}]\n}"
+ }
+}

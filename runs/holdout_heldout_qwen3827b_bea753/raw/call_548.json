@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 11, \\\"summary\\\": \\\"valves at site-1: 11 units\\\"}\",\"id\":\"phd263d1_V6i43_heldout_qwen3827b_50167ab48454_9e68a7\",\"ver\":1},{\"body\":\"{\\\"units\\\": 11, \\\"summary\\\": \\\"valves at site-1: 11 units\\\"}\",\"id\":\"phd263d1_V6i43_heldout_qwen3827b_50167ab48454_bef954\",\"ver\":1},{\"body\":\"{\\\"units\\\": 11, \\\"note\\\": \\\"observed count of valves at site-1\\\"}\",\"id\":\"phd263d1_V6i43_heldout_qwen3827b_50167ab48454_860d80\",\"ver\":2}],\"corrections\":[{\"id\":\"phd263d1_V6i43_heldout_qwen3827b_50167ab48454_860d80\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"phd263d1_V6i43_heldout_qwen3827b_50167ab48454_860d80\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"phd263d1_V6i43_heldout_qwen3827b_50167ab48454_860d80\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"phd263d1_V6i43_heldout_qwen3827b_50167ab48454_860d80\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"phd263d1_V6i43_heldout_qwen3827b_50167ab48454_9e68a7\",\"inputs\":[{\"id\":\"phd263d1_V6i43_heldout_qwen3827b_50167ab48454_860d80\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phd263d1_V6i43_heldout_qwen3827b_50167ab48454_bef954\",\"inputs\":[{\"id\":\"phd263d1_V6i43_heldout_qwen3827b_50167ab48454_860d80\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phd263d1_V6i43_heldout_qwen3827b_50167ab48454_9e68a7/1, phd263d1_V6i43_heldout_qwen3827b_50167ab48454_bef954/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "qwen3.8-27b",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 548,
+  "model": "qwen3.8-27b",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 1016,
+  "output_tokens": 933,
+  "cost": 0.001206,
+  "unit": "credits",
+  "reasoning_tokens": 592,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "qwen3.8-27b",
+  "provider_response_id": "resp_PDFrA1g_mVo1UkOZNvWYwFKOehnFEIkSgXEPpHy912jBxZ7mcLdQpNUdpoqZrYFLXicDnpYREwYBDE-pJWG_C9ij19yZAtkk1rMfWOBFlpriwCSqn6OoBk_Ff9B4PdQFymc91qfaFZHaa7IPIFbPLm8w68eV7AulupRx2rjRzUbLzeXn3-PcXxko_7bq6JF0jR7PlKdwl18K7D49NuTv6FEpmmZpxrQOVbnkGxFQDPAfe7bh0KoKyd0Fj0wnsPVInidDAaZSIJY_3D3GcNZIARrMaJIHl-R2_naIjbIMpEftvuJVS7DCaOYo4KJ-RiVYtJKH83ziiiAVzrRuTQ-w7Ihdex7tVOqH_jbOAmCAVBq9Wa0fF01ShDTT-1bq05VbmvPb0pjaVyN3N6FemU5QIhfDICSIICujpFTbvZb8OKTml9mywq367DvZBuhacQU8qCqgk4xxFUUBgwMFSnqx1ft4hVubfe-A5qcTrEG1S_9kgYSvha8VBauwDjYohDh0FNLNCo5IhV5twJ0MQmoG5eN7ogQ=",
+  "elapsed_s": 7.618,
+  "stop_reason": "end_turn",
+  "raw_text": "\n\n{\n  \"decision\": \"approve\",\n  \"artifact\": \"phd263d1_V6i43_heldout_qwen3827b_50167ab48454_9e68a7\",\n  \"result\": {\n    \"units\": 11\n  },\n  \"evidence\": [\n    {\n      \"id\": \"phd263d1_V6i43_heldout_qwen3827b_50167ab48454_9e68a7\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"phd263d1_V6i43_heldout_qwen3827b_50167ab48454_860d80\",\n      \"ver\": 2\n    }\n  ],\n  \"consulted\": [\n    {\n      \"id\": \"phd263d1_V6i43_heldout_qwen3827b_50167ab48454_bef954\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"phd263d1_V6i43_heldout_qwen3827b_50167ab48454_860d80\",\n      \"ver\": 1\n    }\n  ]\n}"
+ }
+}

@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 21, \\\"summary\\\": \\\"valves at site-3: 21 units, per phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_8e67ec/1, phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_d0decd/1\\\"}\",\"id\":\"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_26c963\",\"ver\":1},{\"body\":\"{\\\"units\\\": 20, \\\"summary\\\": \\\"valves at site-3: 20 units, per phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_8e67ec/1, phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_d0decd/2\\\"}\",\"id\":\"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_decc08\",\"ver\":1},{\"body\":\"{\\\"units\\\": 10, \\\"note\\\": \\\"observed count of valves at site-3\\\"}\",\"id\":\"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_8e67ec\",\"ver\":1},{\"body\":\"{\\\"units\\\": 10, \\\"note\\\": \\\"observed count of valves at site-3\\\"}\",\"id\":\"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_d0decd\",\"ver\":2}],\"corrections\":[{\"id\":\"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_d0decd\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_d0decd\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_26c963/1, phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_decc08/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 195,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 890,
+  "output_tokens": 668,
+  "cost": 0.000307,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-31b-it",
+  "provider_response_id": "resp_bHYKaCREgJ2STuOZE6zIPQkqKhTYn7TY2wE_pFdg4YA4W93z_xMgQJ3QbNILyIWY7rnu_XngNZfKU_K2v4KC7IAEUiiy6bMkH8hcnOzvEJcS7Qq41BcpJvkydVk2JuRk_aQnqAOk-iKe1D0qndhC8MNhejS6kuzjX6bP3Jcb_qeQ8joEfJtfhQGKyFDfoZtA2iwepe7gVaimt3b7cbAvcdZLIy9-b6FnVAPtB1PoLCAb6FE2YCEJqY33TN0sAIrcr6n2lt5bMX8UCF6CqG-N8NrZiZ9lO5MeC5nSC53rg29LG9P_EAFFQgGmngtN9l9Y1vHzBUQpZOMk_Ep3kXF7Fo0o1T7btx5bNWTXtYtp5ELplHg40cPcv6JzJrzG3I6v-7otE-zet53VQOgjn4xDi7EXc2hCkVMGIf352obhWvqP-ucnNHdbHa4wOK6PZoIVMTgO4kueV3EEozL3JaGeDyw23t5JGDr9OCtcRIqZl4ksFGqc1lU5SROHFyXj9S_1X7iPcYwk1FgYiQsZgsZv48aUn4E=",
+  "elapsed_s": 7.399,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_26c963\", \"result\": {\"units\": 20}, \"evidence\": [{\"id\": \"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_decc08\", \"ver\": 1}, {\"id\": \"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_8e67ec\", \"ver\": 1}, {\"id\": \"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_d0decd\", \"ver\": 2}], \"consulted\": [{\"id\": \"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_26c963\", \"ver\": 1}]}\n```\n\nWait, I must re-evaluate the math.\nSource 1 (`8e67ec/1`): 10 units.\nSource 2 (`d0decd/2`): 10 units.\nTotal = 20 units.\n\nDraft `26c963` claims 21 units (using `d0decd/1` which was withdrawn).\nDraft `decc08` claims 20 units (using `d0decd/2`).\n\nCorrecting the JSON:\n```json\n{\"decision\": \"approve\", \"artifact\": \"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_decc08\", \"result\": {\"units\": 20}, \"evidence\": [{\"id\": \"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_decc08\", \"ver\": 1}, {\"id\": \"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_8e67ec\", \"ver\": 1}, {\"id\": \"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_d0decd\", \"ver\": 2}], \"consulted\": [{\"id\": \"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_26c963\", \"ver\": 1}]}\n```"
+ }
+}

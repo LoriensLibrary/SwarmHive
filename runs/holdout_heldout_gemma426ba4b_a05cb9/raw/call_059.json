@@ -3,20 +3,20 @@
   "max_tokens": 6000,
   "messages": [
    {
-    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 33, \\\"summary\\\": \\\"valves at site-7: 33 units\\\"}\",\"id\":\"phb1132b_V1i04_heldout_gemma426ba4b_bb9278896217_7e9619\",\"ver\":1},{\"body\":\"{\\\"units\\\": 33, \\\"note\\\": \\\"observed count of valves at site-7\\\"}\",\"id\":\"phb1132b_V1i04_heldout_gemma426ba4b_bb9278896217_9f973b\",\"ver\":1},{\"body\":\"{\\\"units\\\": 3, \\\"note\\\": \\\"observed count of valves at site-7\\\"}\",\"id\":\"phb1132b_V1i04_heldout_gemma426ba4b_bb9278896217_29467e\",\"ver\":2}],\"corrections\":[{\"id\":\"phb1132b_V1i04_heldout_gemma426ba4b_bb9278896217_29467e\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"phb1132b_V1i04_heldout_gemma426ba4b_bb9278896217_29467e\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phb1132b_V1i04_heldout_gemma426ba4b_bb9278896217_7e9619/1\"}",
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 16, \\\"summary\\\": \\\"rivets at site-4: 16 units\\\"}\",\"id\":\"phc5a2fb_V11i46_heldout_gemma426ba4b_c88ddc1521f6_713d9f\",\"ver\":1},{\"body\":\"{\\\"units\\\": 16, \\\"summary\\\": \\\"rivets at site-4: 16 units\\\"}\",\"id\":\"phc5a2fb_V11i46_heldout_gemma426ba4b_c88ddc1521f6_e9c595\",\"ver\":1},{\"body\":\"{\\\"units\\\": 16, \\\"note\\\": \\\"observed count of rivets at site-4\\\"}\",\"id\":\"phc5a2fb_V11i46_heldout_gemma426ba4b_c88ddc1521f6_316693\",\"ver\":2}],\"corrections\":[],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phc5a2fb_V11i46_heldout_gemma426ba4b_c88ddc1521f6_713d9f/1, phc5a2fb_V11i46_heldout_gemma426ba4b_c88ddc1521f6_e9c595/1 lookup_available=true\"}",
     "role": "user"
    }
   ],
   "model": "gemma-4-26b-a4b-it",
-  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
  },
  "response": {
   "call": 59,
   "model": "gemma-4-26b-a4b-it",
   "provider": "adaption",
   "temperature": 0.0,
-  "input_tokens": 627,
-  "output_tokens": 243,
+  "input_tokens": 641,
+  "output_tokens": 238,
   "cost": 0.00011,
   "unit": "credits",
   "reasoning_tokens": 0,
@@ -27,9 +27,9 @@
   ],
   "incomplete_reason": null,
   "returned_model": "gemma-4-26b-a4b-it",
-  "provider_response_id": "resp_klxYU_63_7IpPKDUWQ-fA8Yr8_yaFt6LfbtdRAEXpEPzQfKwqN5FWQmiTNRcnXG33V-SlIUmLL-ZKtMuv54KqpcrKKo461LsH2GtFqRsGIl1n86drQlfUS0ApXCmrSAX6oeCJAqAuEe75Y8e9KKWMdDZXTlRPYP4Yh1YIm1MWL-7bJuOUG0Y0_qtBc2iWuK6H4NOVlFEGXRRSTmTxpXPvnfTDD1c5EMaY8ol-iEQFLJKTQQGtkxBs27pFTgrRlhpvGaZsFKfIxWUXX4-k6lWVl24OJqNKiBhVTWhpbNJg3G5Zwp9T0afyoY8fgnTJsBfsBUGp13AQjna89Kk4FhSJH36-4JeBwLxKDvwpCIlriNQcxZ0Y6i7nitOs672Go-49UzlMJchMdmhYXMzZNww-7iTQlVy1ym3gf7fvrm8a5jWKunMiOX5rC83x-PChhHFTQG5qCDH2dAaXUnNAFqMnA0IOwrIrpHebARZggIX8OeissHO1p-e5hE0MX5pztebIgkj25wzT6t1bL5l0iOR5SiY7iU=",
-  "elapsed_s": 1.291,
+  "provider_response_id": "resp_Uj6xnerfJZiACMjgcqo9aOH-d1ZxFZRiQTpIrX7C28uEAhnto5m8wu0AzrKuoac3nsnkV-TKCv9FyX0rgUy05IhXTDakuFZxBmPM8XWQMcdUgLxBSKt3QwDblu1CnWNHQQl5i_mmTsG8rQ4iq01WbNjM8PuK-JAnMi-ShbGYKaNz0VVc9adyDLnHRWMFm_YvJWQLaODZ4TjBf-GEsK94fg_Z8flUCdPRtcmeuHxW1Wa047c63LXG__nngvPOiaJBBCwIAs_r-by8o4Zm3KASI9Zz--Lo1AZUS6V-9ofSKtHfzB4FFCv15FAVQLKZsqt5oYjD-PplTdgkDWCVkoctVZn3iLNlZIFOjLLuXOb8lbwBw1ZS-UKoCFg6eujeccVGfc-alF4lY_VMqkv9KW5qIybwb6W2hjIbz79Btv6RevnXw5R6jOag-6J8FfWuu12OK4F9tawBBRO-CaOwR7oHytd4yTLiVmra4vmjE_sO4IhInT1-AEO_hxS1Jv5LUSdsTGo2_ddX5IB6i4uN1VwwBsw4HEY=",
+  "elapsed_s": 1.445,
   "stop_reason": "end_turn",
-  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"phb1132b_V1i04_heldout_gemma426ba4b_bb9278896217_7e9619\", \"result\": {\"units\": 33}, \"evidence\": [{\"id\": \"phb1132b_V1i04_heldout_gemma426ba4b_bb9278896217_7e9619\", \"ver\": 1}], \"consulted\": [{\"id\": \"phb1132b_V1i04_heldout_gemma426ba4b_bb9278896217_9f973b\", \"ver\": 1}, {\"id\": \"phb1132b_V1i04_heldout_gemma426ba4b_bb9278896217_29467e\", \"ver\": 2}]}\n```"
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"phc5a2fb_V11i46_heldout_gemma426ba4b_c88ddc1521f6_316693\", \"result\": {\"units\": 16}, \"evidence\": [{\"id\": \"phc5a2fb_V11i46_heldout_gemma426ba4b_c88ddc1521f6_316693\", \"ver\": 2}], \"consulted\": [{\"id\": \"phc5a2fb_V11i46_heldout_gemma426ba4b_c88ddc1521f6_713d9f\", \"ver\": 1}, {\"id\": \"phc5a2fb_V11i46_heldout_gemma426ba4b_c88ddc1521f6_e9c595\", \"ver\": 1}]}"
  }
 }

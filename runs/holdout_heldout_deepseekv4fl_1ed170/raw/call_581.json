@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 6, \\\"summary\\\": \\\"valves at site-5: 6 units\\\"}\",\"id\":\"ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_077571\",\"ver\":1},{\"body\":\"{\\\"units\\\": 6, \\\"summary\\\": \\\"valves at site-5: 6 units\\\"}\",\"id\":\"ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_e7bf27\",\"ver\":1},{\"body\":\"{\\\"units\\\": 6, \\\"note\\\": \\\"observed count of valves at site-5\\\"}\",\"id\":\"ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_cd23bb\",\"ver\":2}],\"corrections\":[{\"id\":\"ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_cd23bb\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_cd23bb\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_077571\",\"inputs\":[{\"id\":\"ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_cd23bb\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_cd23bb\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_cd23bb\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_e7bf27\",\"inputs\":[{\"id\":\"ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_cd23bb\",\"ver\":2}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_077571/1, ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_e7bf27/1 lookup_available=false (your one lookup was used; decide now)\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 581,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 940,
+  "output_tokens": 634,
+  "cost": 0.000126,
+  "unit": "credits",
+  "reasoning_tokens": 430,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_m8r7jEmF7EcWt3pDI87wAzIhoZNi_Llv1b82mDQu2STqGN_3d3qw1d8sFAjk9a6RMqA6su06gDHLm8zaOmPbRFunAPx_r0bFF08qJcmV9zPk0v7UmxdZ1MH585qre4ZG1sFd81uwQGez3jOe3JC1hRcMN6m2L1PtkwIg8RwUDWKVLdu4K1u3_gXs53dlCaOXPpECulM-VneuI81qbiQ6LzjSoUlLlrPzWaZK5S-xC_4R-DVVBcMTM0rg8cIhV2DwnW1ZfKCP7y_gFlgqABPyGxEwRfV7YXQWF94nd405Sg0c78vLjOjwlTm26E3OIAnBhJ_H9EWoxTzUa0MagHzoQbwfa9QAj15WIt5r1AujAkDJBbM-hyuoscHNZZiFaKSmEVrFS59xnD2tGMWz61iW5aBwj1k8-Sb-ZNoEEWITmCXmzLk9XKni5ulv4Q4Wtvk06Gmj2AZ-h2RiURxZYow1Aqg44-6X_fsdEsA1JsFg0mnells9pEvN1HcRl_ZdwL8VkqVFJLNkE4bhPbfp5Zn-0483_iA=",
+  "elapsed_s": 8.377,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_e7bf27\",\"result\":{\"units\":6},\"evidence\":[{\"id\":\"ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_e7bf27\",\"ver\":1},{\"id\":\"ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_cd23bb\",\"ver\":2}],\"consulted\":[{\"id\":\"ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_077571\",\"ver\":1},{\"id\":\"ph5ef0f4_V6i46_heldout_deepseekv4fl_900b247958d4_cd23bb\",\"ver\":1}]}"
+ }
+}

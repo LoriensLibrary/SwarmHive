@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 31, \\\"summary\\\": \\\"valves at site-2: 31 units\\\"}\",\"id\":\"phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_e1ae39\",\"ver\":1},{\"body\":\"{\\\"units\\\": 31, \\\"summary\\\": \\\"valves at site-2: 31 units\\\"}\",\"id\":\"phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_ba27c2\",\"ver\":1},{\"body\":\"{\\\"units\\\": 31, \\\"note\\\": \\\"observed count of valves at site-2\\\"}\",\"id\":\"phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_25151c\",\"ver\":2}],\"corrections\":[{\"id\":\"phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_25151c\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_25151c\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_25151c\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_25151c\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_ba27c2\",\"inputs\":[{\"id\":\"phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_25151c\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_e1ae39\",\"inputs\":[{\"id\":\"phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_25151c\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_e1ae39/1, phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_ba27c2/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 406,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 893,
+  "output_tokens": 696,
+  "cost": 0.000132,
+  "unit": "credits",
+  "reasoning_tokens": 519,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_jWdBsMk0jC7GqidUfUWh9BAhahGnjBBZx_13vEMSxLyGDDUCqhajtcgqp5QQMhQKEjAFzlMO5avUHgQWtbjCzpwiYJgjimEM6EASBAmOC_aKjwNzJ9OwomA40gpzK82m9YQ5ksvO34y0ZuY-t64bfCtVzqvEfi96k4E0RFJj9PYVXdvWLoBXKatgC9e9c12-VonJPlSMq6EmMfoR6qgk7NN2ZudDVomfbJpjZ5nleSOFs-AmhU9Y2lzvjFYGuaodQETnn9YROODoqOS_UixuF39Zp7p-EwGcjnIOn5Wsee-b0cbxMkHLm6SPQ1Bjkry5QCeiR2V2nD10EXvnfPE9iRiJVj6yQkOkmlo5TVdJidOUHqGsySN67vYZGPMxS8PSoGrD6WNIYImKesAEYq8XfNloI_uaHv_LGWmBs5aT0EI_rirOUFPWS8gNpKVzQEQ9ZXXS-h5OekhylVgvQ9XaPmuczvqEhXqgMFjv5MjpUgD7pqa2OpcRvYK_hR1JO4kvYuEEbLD6gqs-21ZuMm0Pa047oBY=",
+  "elapsed_s": 10.92,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_ba27c2\", \"result\": {\"units\": 31}, \"evidence\": [{\"id\": \"phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_ba27c2\", \"ver\": 1}, {\"id\": \"phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_25151c\", \"ver\": 2}], \"consulted\": [{\"id\": \"phd25423_V6i34_heldout_deepseekv4fl_4955928ee317_e1ae39\", \"ver\": 1}]}"
+ }
+}

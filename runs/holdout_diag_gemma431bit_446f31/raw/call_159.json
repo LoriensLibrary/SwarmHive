@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 19, \\\"summary\\\": \\\"hinges at site-1: 19 units, per ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_5cc211/1, ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_1fc4bc/2\\\"}\",\"id\":\"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_165c41\",\"ver\":1},{\"body\":\"{\\\"units\\\": 18, \\\"summary\\\": \\\"hinges at site-1: 18 units, per ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_5cc211/1, ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_1fc4bc/1\\\"}\",\"id\":\"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_d1784e\",\"ver\":1},{\"body\":\"{\\\"units\\\": 3, \\\"note\\\": \\\"observed count of hinges at site-1\\\"}\",\"id\":\"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_5cc211\",\"ver\":1},{\"body\":\"{\\\"units\\\": 16, \\\"note\\\": \\\"observed count of hinges at site-1\\\"}\",\"id\":\"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_1fc4bc\",\"ver\":2}],\"corrections\":[{\"id\":\"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_1fc4bc\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_1fc4bc\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_165c41\",\"inputs\":[{\"id\":\"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_1fc4bc\",\"ver\":2},{\"id\":\"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_5cc211\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_1fc4bc\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_1fc4bc\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_5cc211\",\"inputs\":[],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_d1784e\",\"inputs\":[{\"id\":\"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_1fc4bc\",\"ver\":1},{\"id\":\"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_5cc211\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_165c41/1, ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_d1784e/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 159,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 1357,
+  "output_tokens": 330,
+  "cost": 0.000234,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-31b-it",
+  "provider_response_id": "resp_FLNQOQPpXzngkzRxTpOXqlwqnYBgYXpwTDKvD5M3OCldcUTFc9cIOzX0g1AYhA1P7uZH5Ylip-1ZOLbN6gs83s23gKw-MkHhCSEy6isH3LWgiryG8x6_E5cUEozco2m5WadXcliluFt9mJ-zTNvodLdr2_rQNhoDRnkzbRn81Y10fSAs_LJTmgEuZJGlrcrlAzfgwYiZ3a9IfhfKYrcpnHPKnh12OtmfjIH1lRksaa_vAwC5BIOiMwlUgYT7h-CJwVxQ0jlBmC_Gz2ASk0mbKSQ9DcWRjiHeI0ufZOKwjv4jtKp08RYLtBZEmvJ_pHUWFhSG40SqkYmSJbO7AZhFvwrZilMHKd7J06R6E31PyETRWbQGwMBtJkki989ZzXwheqdB5K2CBEn0R-T0c2OhqZfvh-UZFj5sGbQg0EpRfHeqZJ7CGQl9VGRcl9qGlDuErl7ptLTLmivyrMGbzJW9T2d3HUU7hwE-u_axKMYZI0Rx5QfTqOZl-InqMvolv-PgTgN41Lgh2d1Kfzz0Z0B5QTmL_Zw=",
+  "elapsed_s": 3.672,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_165c41\", \"result\": {\"units\": 19}, \"evidence\": [{\"id\": \"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_165c41\", \"ver\": 1}, {\"id\": \"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_5cc211\", \"ver\": 1}, {\"id\": \"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_1fc4bc\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_d1784e\", \"ver\": 1}, {\"id\": \"ph96fde9_V9i05_diag_gemma431bit_a4b63812568c_1fc4bc\", \"ver\": 1}]}\n```"
+ }
+}

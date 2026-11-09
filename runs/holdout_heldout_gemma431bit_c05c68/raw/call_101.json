@@ -3,21 +3,21 @@
   "max_tokens": 6000,
   "messages": [
    {
-    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 35, \\\"summary\\\": \\\"fuses at site-3: 35 units\\\"}\",\"id\":\"ph0a5c83_V6i08_heldout_gemma431bit_710cc5450fcd_7b346f\",\"ver\":1},{\"body\":\"{\\\"units\\\": 35, \\\"summary\\\": \\\"fuses at site-3: 35 units\\\"}\",\"id\":\"ph0a5c83_V6i08_heldout_gemma431bit_710cc5450fcd_d82e3d\",\"ver\":1},{\"body\":\"{\\\"units\\\": 35, \\\"note\\\": \\\"observed count of fuses at site-3\\\"}\",\"id\":\"ph0a5c83_V6i08_heldout_gemma431bit_710cc5450fcd_13061d\",\"ver\":2}],\"corrections\":[{\"id\":\"ph0a5c83_V6i08_heldout_gemma431bit_710cc5450fcd_13061d\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph0a5c83_V6i08_heldout_gemma431bit_710cc5450fcd_13061d\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph0a5c83_V6i08_heldout_gemma431bit_710cc5450fcd_7b346f/1, ph0a5c83_V6i08_heldout_gemma431bit_710cc5450fcd_d82e3d/1\"}",
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 31, \\\"summary\\\": \\\"fuses at site-1: 31 units\\\"}\",\"id\":\"phfe02fd_V11i28_heldout_gemma431bit_460546784b7d_4e3193\",\"ver\":1},{\"body\":\"{\\\"units\\\": 31, \\\"summary\\\": \\\"fuses at site-1: 31 units\\\"}\",\"id\":\"phfe02fd_V11i28_heldout_gemma431bit_460546784b7d_e82a54\",\"ver\":1},{\"body\":\"{\\\"units\\\": 31, \\\"note\\\": \\\"observed count of fuses at site-1\\\"}\",\"id\":\"phfe02fd_V11i28_heldout_gemma431bit_460546784b7d_d1cdd9\",\"ver\":2}],\"corrections\":[],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phfe02fd_V11i28_heldout_gemma431bit_460546784b7d_4e3193/1, phfe02fd_V11i28_heldout_gemma431bit_460546784b7d_e82a54/1 lookup_available=true\"}",
     "role": "user"
    }
   ],
   "model": "gemma-4-31b-it",
-  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
  },
  "response": {
   "call": 101,
   "model": "gemma-4-31b-it",
   "provider": "adaption",
   "temperature": 0.0,
-  "input_tokens": 657,
-  "output_tokens": 231,
-  "cost": 0.000138,
+  "input_tokens": 630,
+  "output_tokens": 7,
+  "cost": 5.9e-05,
   "unit": "credits",
   "reasoning_tokens": 0,
   "max_tokens": 6000,
@@ -27,9 +27,9 @@
   ],
   "incomplete_reason": null,
   "returned_model": "gemma-4-31b-it",
-  "provider_response_id": "resp_jv72_5dq2iErE0E04s-f0bRh8rlZ_KVwhSMlQR8QzJKuxFYQZMCiDaBlJWVzdpPQIo2dMtsptbTCoi09V4LJbUJPQ0BMNvVDNgWSLJd_Dai-ckPYhEKtYptXzqRvl4BlGIYaY5slrpz51c-b1Jez6zo79D0-mNgc3hCBMVPt2y0BrdPMUJO5NLlYQCgNHQC-jnksGBK7DV6V-Gmq4zjS6L-USvkd1k7Az-Jfxvcv6zINirurAzkIDy5VrmWHwuR2TvhIJR0hqOML6J9TtoY78nWOJHg8V6iTub5awDyvKCUo3fZWdKInRiS-GHkUxCsdHe1xvw_0YuMtZyC005lLelp7s1v6IcXdp_co4hoBQEZlotJiXeUNLsVsBq8apWDmsNSm5yFr2V86TUM1FOq8kRT5133O7mBeSF_9c-jnt3MBNVed-n7Pk8tOXJQMfGhAbMy50XxvTpB8k7RKgUA2d-7owqaEWu5UzXaGLIRDDc_0TdWifHoFURWzauzwD2zYDYuJKW1F17ehKl7AEXZJu1HRX6E=",
-  "elapsed_s": 2.834,
+  "provider_response_id": "resp_YlYUfUC1zK3iF31PPvcdJV6Ur0WfjHto2GzLBNw5mmcLCoQJQmEJmGT9GwZS6YdjEqO6jMrGypMgSFYWaJfYwnFbWAZtSY4tu_ADAFosFvaXgDGGryo67kRopmwd31wc6TtLMAUUTZXpvQaKPs_IkEog8HZZFHg2ZglhjKFgHB5YqSj0JxWX0VqCsCRSo0EA9SsQUKU8Dia2GXE9w42-xxLP3O5evZIGxlFgdWGBDB5VlGVGL7DLlcU_YEa4YTVxQ0LEaUrUzT9QCyoBhBHHGwOmLF2bQLpTUFVApG0F4dNR9j-1KaxMoXBAPp5FQQinopx0pcbyFdQznz2-iF-yz9Bo1YLMpZecmex3b8KjcyqTCbixrmYwkAiRk82jb-7o4QsN8zu7KxwkV8mDeydDcJ7IpTx-dqD5nV9iJgrcMG5lVAEIYsadalSRglv-LiOJF19SJrVToaA3zz7xGgTZRBXb-uQcdPMNlImp3pNRFO7uOc2-hWgO1GrI0t9H7XyW16PDaxH8bBfBs78uvE8edaEenB0=",
+  "elapsed_s": 0.433,
   "stop_reason": "end_turn",
-  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"ph0a5c83_V6i08_heldout_gemma431bit_710cc5450fcd_7b346f\", \"result\": {\"units\": 35}, \"evidence\": [{\"id\": \"ph0a5c83_V6i08_heldout_gemma431bit_710cc5450fcd_7b346f\", \"ver\": 1}, {\"id\": \"ph0a5c83_V6i08_heldout_gemma431bit_710cc5450fcd_13061d\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph0a5c83_V6i08_heldout_gemma431bit_710cc5450fcd_d82e3d\", \"ver\": 1}]}\n```"
+  "raw_text": "{\"decision\": \"lookup\"}"
  }
 }

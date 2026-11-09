@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 21, \\\"summary\\\": \\\"valves at site-3: 21 units, per phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_8e67ec/1, phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_d0decd/1\\\"}\",\"id\":\"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_26c963\",\"ver\":1},{\"body\":\"{\\\"units\\\": 20, \\\"summary\\\": \\\"valves at site-3: 20 units, per phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_8e67ec/1, phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_d0decd/2\\\"}\",\"id\":\"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_decc08\",\"ver\":1},{\"body\":\"{\\\"units\\\": 10, \\\"note\\\": \\\"observed count of valves at site-3\\\"}\",\"id\":\"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_8e67ec\",\"ver\":1},{\"body\":\"{\\\"units\\\": 10, \\\"note\\\": \\\"observed count of valves at site-3\\\"}\",\"id\":\"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_d0decd\",\"ver\":2}],\"corrections\":[{\"id\":\"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_d0decd\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_d0decd\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_26c963/1, phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_decc08/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 192,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 979,
+  "output_tokens": 233,
+  "cost": 0.000167,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-31b-it",
+  "provider_response_id": "resp_mmJwUzAK4Z5DS6BmYzgUZuORNubn8zKKdu9t6rWCf6N0Aov24RjLY8zQb5Br2Afxo92RnF5G2suLiQJJlrMtZ-D1DMUUvFw-aeyMPvTTh4MNIncp-mYVy46y-x3AgBXUQTHOt1quP7Ep41Nt76wObXPb56uEGD7_GUEmshgTXm-_npEoz_N0aQfv0601kpUor3KYCusLrxxtdaNfrdPHIT9JmQh8Oj6cz8dhf9d2P87qC0Kip6deYzMf4RvtVPzk87CYTXu274o-3bu32xLKW849zuCdAoJlcFVcj_pI3vuJThVMJwU9bX-JJWxa1x6M5i8Ieg1ftx1JqFsXD1izsG44XpRBMs2N9xLmrKkkMPC6mOXpiym2aJqRlG2xVDkdOnSElGRwKNS64gSzFYTtXhrkyxCbrHJF8FRlJvRnJimuYmO34atb2rF1O7k0vHobaciik2fQU3iYNb-pYvAGVDu-AZx3b5acLplF9gffRXnz6jYSFnHIAtoDd_nGI23A8r2OP5lFKNi3hpszh6nhX9yyWgw=",
+  "elapsed_s": 2.699,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\"decision\": \"reject\", \"artifact\": null, \"result\": null, \"evidence\": [], \"consulted\": [{\"id\": \"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_26c963\", \"ver\": 1}, {\"id\": \"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_decc08\", \"ver\": 1}, {\"id\": \"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_8e67ec\", \"ver\": 1}, {\"id\": \"phde9c4c_V9i06_diag_gemma431bit_e0c70384f08f_d0decd\", \"ver\": 2}]}\n```"
+ }
+}

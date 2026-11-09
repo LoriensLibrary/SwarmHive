@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 14, \\\"summary\\\": \\\"clamps at site-1: 14 units\\\"}\",\"id\":\"ph944512_V6i18_heldout_qwen35397b_21461016f7fb_58c8c7\",\"ver\":1},{\"body\":\"{\\\"units\\\": 14, \\\"summary\\\": \\\"clamps at site-1: 14 units\\\"}\",\"id\":\"ph944512_V6i18_heldout_qwen35397b_21461016f7fb_993037\",\"ver\":1},{\"body\":\"{\\\"units\\\": 14, \\\"note\\\": \\\"observed count of clamps at site-1\\\"}\",\"id\":\"ph944512_V6i18_heldout_qwen35397b_21461016f7fb_397722\",\"ver\":2}],\"corrections\":[{\"id\":\"ph944512_V6i18_heldout_qwen35397b_21461016f7fb_397722\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph944512_V6i18_heldout_qwen35397b_21461016f7fb_397722\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph944512_V6i18_heldout_qwen35397b_21461016f7fb_58c8c7/1, ph944512_V6i18_heldout_qwen35397b_21461016f7fb_993037/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "qwen3.5-397b",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 215,
+  "model": "qwen3.5-397b",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 667,
+  "output_tokens": 1634,
+  "cost": 0.006086,
+  "unit": "credits",
+  "reasoning_tokens": 1347,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "qwen3.5-397b",
+  "provider_response_id": "resp_a23rgB9td7N8OaIPr718RXDP--Q8LYEdVp2zqzpVSwV6Rlfizm23ah2aEBCR5L5zrZQq7GpYqGGwLGJEcuitW9frU55aaxNSuCOJth5HWUawOzdxwewqVKe-tdNJpH3YLHYqV4xHH5OR5nDGn_kHXzv-e8y_SWMDNf6M51QiUsW-mmpMZtWmWHd6u9bsWBIi-PPwgcsz8mVPBDJaqZUG0mAm1EZlvXr8pfroHCdcml-gQFcMpSooTXRb-9U3dZhriZK03QOoMi4sTaqa0fCWfglxb2ccVWCq0hZFrPOcgIQmhRwIkcIsUyKqgpxUta0tdJAG3zUiEVbbuZgjFt-k9xwmF4ntMr9XVP2jradSRu5wCksfnbQxxkq7etm7lyyPCqYu7JZaiSkMQuEi0F-sKjXkrc7pQgEvYDYCSrtgwrGE8N70mZz1Y-Vq74JpJVLMRmvukUm6jaMOh5UtaT44AUfmYzH-DvGkT5MEWyb9RzQt0f2RY8Ge_Am0zyBljHrqVz9YkZ087rhWnQ2FbjLsbPTAlV4=",
+  "elapsed_s": 15.124,
+  "stop_reason": "end_turn",
+  "raw_text": "\n\n{\"decision\": \"approve\", \"artifact\": \"ph944512_V6i18_heldout_qwen35397b_21461016f7fb_58c8c7\", \"result\": {\"units\": 14}, \"evidence\": [{\"id\": \"ph944512_V6i18_heldout_qwen35397b_21461016f7fb_58c8c7\", \"ver\": 1}, {\"id\": \"ph944512_V6i18_heldout_qwen35397b_21461016f7fb_397722\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph944512_V6i18_heldout_qwen35397b_21461016f7fb_993037\", \"ver\": 1}, {\"id\": \"ph944512_V6i18_heldout_qwen35397b_21461016f7fb_397722\", \"ver\": 1}]}"
+ }
+}

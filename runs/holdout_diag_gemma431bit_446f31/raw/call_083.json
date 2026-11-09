@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 35, \\\"summary\\\": \\\"brackets at site-7: 35 units, per ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_87ac25/1\\\"}\",\"id\":\"ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_d31552\",\"ver\":1},{\"body\":\"{\\\"units\\\": 35, \\\"note\\\": \\\"observed count of brackets at site-7\\\"}\",\"id\":\"ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_db9741\",\"ver\":2},{\"body\":\"{\\\"units\\\": 35, \\\"summary\\\": \\\"brackets at site-7: 35 units, per ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_db9741/2\\\"}\",\"id\":\"ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_87ac25\",\"ver\":1}],\"corrections\":[{\"id\":\"ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_db9741\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_db9741\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_87ac25\",\"inputs\":[{\"id\":\"ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_db9741\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_d31552\",\"inputs\":[{\"id\":\"ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_87ac25\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_db9741\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_d31552/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 83,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 959,
+  "output_tokens": 279,
+  "cost": 0.000181,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-31b-it",
+  "provider_response_id": "resp_HF1vxytcMkSEHnGLEsgxcibvGPCqLE7zoJt8euSxU9__9LaL3d_F79-ORv1b5fIakt5hC4pcbtjx80FaJ6nQq_fPjtJn5YTaLX-_T2BcKUv4DM3tFjPZUo2fy5hqX3QOplWSZxjuPE-2LXpSLVxPcVKJm8IO3NhYBTZhKZv4FC2RDKUMY2DF7sfjNOelySrayPHuxW6o7k_R63Y81HZ9sWZtYdHz-xuVgIeCtXiCLFbVCyCxl169kWJ4fTtJnU-W1DThtCM_v442ZFfg87U6f2Y1dQ8epq5pD0lskaSYOhWUNk0wh2yOu8GoksGn7HKd6T1LMPT3ctp4Qkl5OJsIEmMPLsQPb4vn2oyx6DmgtTF1iyKgCVdSveRvvCEyI7CiSKN8lNoEsvib-Kl7kSer5rMQ1KDKVOa6q02oQbE4R7nayvg0tmg1fOtqpYcqSPL4TnLIbdszRwRxWgV38ldi5E2dmiAsms_2l6BQeMYtqT5908BQbd1P317pt3LFf3hJMcmhgLdAWJTE1juhjjZc39nS3U8=",
+  "elapsed_s": 2.972,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\n  \"decision\": \"approve\",\n  \"artifact\": \"ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_d31552\",\n  \"result\": {\n    \"units\": 35\n  },\n  \"evidence\": [\n    {\n      \"id\": \"ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_d31552\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_87ac25\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"ph5c784f_V7i03_diag_gemma431bit_0f5d08d985cf_db9741\",\n      \"ver\": 2\n    }\n  ],\n  \"consulted\": []\n}\n```"
+ }
+}

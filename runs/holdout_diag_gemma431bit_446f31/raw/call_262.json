@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 18, \\\"summary\\\": \\\"spools at site-5: 18 units\\\"}\",\"id\":\"ph829f41_V10i08_diag_gemma431bit_c51330ab6635_b21176\",\"ver\":1},{\"body\":\"{\\\"units\\\": 13, \\\"note\\\": \\\"observed count of spools at site-5\\\"}\",\"id\":\"ph829f41_V10i08_diag_gemma431bit_c51330ab6635_695aa6\",\"ver\":1}],\"corrections\":[],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph829f41_V10i08_diag_gemma431bit_c51330ab6635_b21176/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 262,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 510,
+  "output_tokens": 6,
+  "cost": 4.8e-05,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-31b-it",
+  "provider_response_id": "resp_zisCyc_z_1Q_EH_2nmfZdLTnkowY_JeBMV1fPbWkWQ4DGe6QU3KxhBEqRRDvFI35RRCsWoyzyXZYrIlaI34ohc66jMeI-jUcGg_z6flhuPVIBtsQlG0Ip0bECW6YPqFhiMloJsEShHBH0IgrNZBhIdclhi-r_aG1CYk84bm_JUNaY2DgGlBq25IOOvhYlJ1opkE9Iio956SLbNJfTDGMnhxE3Wtly6yWDnp1ghBeRpel6lH77Tu2xa4bXWf51znZ5nVR05BY6MzV6EeofcwpmHQqAZJlM80T49T8Sp3TplPrRHTnC4WBVcIG8v_o0rxbBnRLT5x6VAeMcyszQyyEhdt5M6UyB2lV_1kdxDyC_eBPp2f9JbdKWB1Id7rkauu5X9TlXBTq92LncHERIReG2hI1gcF2tsqf62kgociUvcu4dJZLhTGH7W3xJpzHPdABIu1BxJ0QguSvmuvUvdXBCc62Ym6E6R4NHC238pyc04-QCO0jmGvOeDF_xl3lZ3KnEjUHtADlpGAwOBgduMVfFKgkvxQ=",
+  "elapsed_s": 0.435,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"lookup\"}"
+ }
+}

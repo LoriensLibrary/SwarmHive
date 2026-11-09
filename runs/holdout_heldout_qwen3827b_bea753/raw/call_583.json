@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 40, \\\"summary\\\": \\\"hinges at site-9: 40 units\\\"}\",\"id\":\"ph848713_V1i45_heldout_qwen3827b_30d639b49d21_666325\",\"ver\":1},{\"body\":\"{\\\"units\\\": 40, \\\"note\\\": \\\"observed count of hinges at site-9\\\"}\",\"id\":\"ph848713_V1i45_heldout_qwen3827b_30d639b49d21_12c768\",\"ver\":1},{\"body\":\"{\\\"units\\\": 3, \\\"note\\\": \\\"observed count of hinges at site-9\\\"}\",\"id\":\"ph848713_V1i45_heldout_qwen3827b_30d639b49d21_f36d77\",\"ver\":2}],\"corrections\":[{\"id\":\"ph848713_V1i45_heldout_qwen3827b_30d639b49d21_f36d77\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"ph848713_V1i45_heldout_qwen3827b_30d639b49d21_f36d77\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph848713_V1i45_heldout_qwen3827b_30d639b49d21_666325/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "qwen3.8-27b",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 583,
+  "model": "qwen3.8-27b",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 738,
+  "output_tokens": 6000,
+  "cost": 0.007529,
+  "unit": "credits",
+  "reasoning_tokens": 6000,
+  "max_tokens": 6000,
+  "empty_text": true,
+  "output_item_types": [
+   "reasoning"
+  ],
+  "incomplete_reason": "max_output_tokens",
+  "returned_model": "qwen3.8-27b",
+  "provider_response_id": "resp_3BUq1zH_OC6jTdqzzmpYARF77M3ox9RMrzm_P-MmhccMVTFFGMggVQEb1FNVvs1rGmBpAYbzAk2cnpgivrVfaV2_WiEFLTZqErYWzJsadQTsV8HZdP4Ruy3CU3-THbOUCQpPYIhcoSS61fFbIymm9jRh2LghjR3blyXDBlLqM0tnsebcG31FfrFOgDP-r1MdIs9VKrBa_C0ZoXaAOlJO1gXFZr0AWrwWvNicJqGxm-xOZROy9grptGFDStU5QV2h2gPAkfQMckhQl30ZTidCa3EQIpPo0Q_kCrFnoMUT5vYVqYBDBPW9oiZRZN5oAaHgYy50F91GaTYNJ8RZDtNdpM72q8Mx7MBHKDk2-udXq65XzshSduvA-J_eJVeMVeIdovllIP6oBQCZTCATYRKRk0FjVcnz1rR30qhIThy214ATbgdiGjf6q4Tqnwfy6VF8ytCuVx2mS0gEk_XT7RoLU5oKgTXfLKLwrIBEgdf6A46jdM9-YhCefb_KxCs9Oc1MbVXDldSb7DBrCDeqTsQqKjBMNqk=",
+  "elapsed_s": 38.591,
+  "stop_reason": "max_tokens",
+  "raw_text": ""
+ }
+}

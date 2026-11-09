@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 31, \\\"summary\\\": \\\"fuses at site-1: 31 units\\\"}\",\"id\":\"phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_79ee97\",\"ver\":1},{\"body\":\"{\\\"units\\\": 31, \\\"summary\\\": \\\"fuses at site-1: 31 units\\\"}\",\"id\":\"phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_f24f3b\",\"ver\":1},{\"body\":\"{\\\"units\\\": 31, \\\"note\\\": \\\"observed count of fuses at site-1\\\"}\",\"id\":\"phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_bbfc90\",\"ver\":2},{\"body\":\"{\\\"units\\\": 31, \\\"note\\\": \\\"observed count of fuses at site-1\\\"}\",\"id\":\"phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_bbfc90\",\"ver\":1}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_79ee97\",\"inputs\":[{\"id\":\"phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_bbfc90\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_bbfc90\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_bbfc90\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_f24f3b\",\"inputs\":[{\"id\":\"phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_bbfc90\",\"ver\":2}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_79ee97/1, phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_f24f3b/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 319,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 906,
+  "output_tokens": 557,
+  "cost": 0.000115,
+  "unit": "credits",
+  "reasoning_tokens": 345,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_SManKzYKHLjSrf1dnDxMZFkTLjhlkcyEJW49IdF6TE3u2VhS6Vzh6-mjQXxW92OfmlEDt0_xAAN5yrpOBy76-xgvPUXd2FkA8rBPm41YKddaAw41WXo7WfcQ3CZ-L_EeYAMtka3K8nOsf3EmxRr6OF7Yiz8tzoc1sxyYblUCgHdJsxxoHMGaJVTwHP70LXwVG4Cp71VUTAIxv5iY1qF2ZqbBEXPQj32R20qiePJGLpE07fqcGI6gtV4oVljOvqJS9tpRwa0-J7JUmcHoibUgcBbQLYtaKU9YsJpaU0N_np6s-W_VX0pAsVqY55Tq7_noaksUAs91FxJ-WiiD9aaZbwmTslUfRYS2Ms7gmGxy0IRXeDg39h8t25_Bw9C6MrcDInKtjAgTx3R2Wtha5_cAaeejZ6YBczoi_JlFBODUUfhjcGTA3pTfQpmFi6W599IuPNHVGe5RFcO_QJ_cuLGLcfSSu43KXtG8ven1-fZvWPTKZf0OSxpGmo1RbqOiVucIJ9bN40kPRDMFng9LJ1WafA73MQ8=",
+  "elapsed_s": 9.205,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_f24f3b\",\"result\":{\"units\":31},\"evidence\":[{\"id\":\"phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_f24f3b\",\"ver\":1},{\"id\":\"phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_bbfc90\",\"ver\":2}],\"consulted\":[{\"id\":\"phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_79ee97\",\"ver\":1},{\"id\":\"phfe02fd_V11i28_heldout_deepseekv4fl_72a4b8c37a65_bbfc90\",\"ver\":1}]}"
+ }
+}

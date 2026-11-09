@@ -3,23 +3,23 @@
   "max_tokens": 6000,
   "messages": [
    {
-    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 39, \\\"summary\\\": \\\"bolts at site-9: 39 units\\\"}\",\"id\":\"ph1b8dec_V11i01_heldout_deepseekv4fl_046d33f21dff_801af8\",\"ver\":1},{\"body\":\"{\\\"units\\\": 39, \\\"summary\\\": \\\"bolts at site-9: 39 units\\\"}\",\"id\":\"ph1b8dec_V11i01_heldout_deepseekv4fl_046d33f21dff_67a714\",\"ver\":1},{\"body\":\"{\\\"units\\\": 39, \\\"note\\\": \\\"observed count of bolts at site-9\\\"}\",\"id\":\"ph1b8dec_V11i01_heldout_deepseekv4fl_046d33f21dff_69142b\",\"ver\":2}],\"corrections\":[],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph1b8dec_V11i01_heldout_deepseekv4fl_046d33f21dff_801af8/1, ph1b8dec_V11i01_heldout_deepseekv4fl_046d33f21dff_67a714/1\"}",
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 35, \\\"summary\\\": \\\"fuses at site-3: 35 units\\\"}\",\"id\":\"ph0a5c83_V6i08_heldout_deepseekv4fl_1a5b3577ba67_9d5d73\",\"ver\":1},{\"body\":\"{\\\"units\\\": 35, \\\"summary\\\": \\\"fuses at site-3: 35 units\\\"}\",\"id\":\"ph0a5c83_V6i08_heldout_deepseekv4fl_1a5b3577ba67_678b69\",\"ver\":1},{\"body\":\"{\\\"units\\\": 35, \\\"note\\\": \\\"observed count of fuses at site-3\\\"}\",\"id\":\"ph0a5c83_V6i08_heldout_deepseekv4fl_1a5b3577ba67_ef6c6e\",\"ver\":2}],\"corrections\":[{\"id\":\"ph0a5c83_V6i08_heldout_deepseekv4fl_1a5b3577ba67_ef6c6e\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph0a5c83_V6i08_heldout_deepseekv4fl_1a5b3577ba67_ef6c6e\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph0a5c83_V6i08_heldout_deepseekv4fl_1a5b3577ba67_9d5d73/1, ph0a5c83_V6i08_heldout_deepseekv4fl_1a5b3577ba67_678b69/1 lookup_available=true\"}",
     "role": "user"
    }
   ],
   "model": "deepseek-v4-flash",
-  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
  },
  "response": {
   "call": 21,
   "model": "deepseek-v4-flash",
   "provider": "adaption",
   "temperature": 0.0,
-  "input_tokens": 562,
-  "output_tokens": 3971,
-  "cost": 0.000554,
+  "input_tokens": 778,
+  "output_tokens": 595,
+  "cost": 0.000114,
   "unit": "credits",
-  "reasoning_tokens": 3784,
+  "reasoning_tokens": 587,
   "max_tokens": 6000,
   "empty_text": false,
   "output_item_types": [
@@ -28,9 +28,9 @@
   ],
   "incomplete_reason": null,
   "returned_model": "deepseek-v4-flash",
-  "provider_response_id": "resp_B0C9PlUl13BiqOyFsNIj81jK8kcXq70emUXu2P6dzrGugLbfcIZ06kLt2WmagpSfXsG-PmXcTfVms1FU-X4YdDBbQnnWWUqSLxxZDu3qD1t1FPFX8jlOns8RoFuWBBVBhWfRyzyJJa2tgz7o9RbRYT1TIbQBO1C8tdnp9vOp3LH-2NHmb6PIh-w_2CuoEp9wFXFGndYBfGeIl3ij2HNljVkon80XCvFH6tliBOHxFOobxcVFkHjVSEt29hG4bM5AXZGMAvfUxZSWH_eneirXexF0Y1Lhws-uCaWHY5YH9KsDf4wKQ-5_Y5GhqsND9zxRrQ3RMBCcCX8Bkm61b3ESSW9SQ860apRLNCd2KrqWYiEl-miNmTeaCVJH9eLthJX4ojeC1-9jBEA266Zcp-1SNYczxMqmMhjITeK5WSabb3C5Jyk4EHa74-eDwUIaLjIOGAwe2NSyQlV4frC9eaaHpsdojVnwDZRkw5hcpnyUzefG-lujxb2-MinjmQyHY0Ug9MFwrxqgUNMZjxnV-RmYkZMga9U=",
-  "elapsed_s": 40.034,
+  "provider_response_id": "resp_sXnMdT-Z4ggMezGsHQYSgXeCTtBV1knDFBir-TtzHxYLCGADDVO88AkV6_2GaZqyGyfbNdb276oUB2a53SflLQUxxfpPLlU_JvHuDRlPhJvfcLi6HhIu42_ZBxnY_e6rtUvsRdPPAWBKj4_9u9XlelddsGcbArVY-pz7xJNzyn9PRppn3xdJg7jJgnyhXxpGTP9YjENLMWocGDkUlubI_29BD_igYr0us2zAme9EEcFuglr25iwvyFrd20aaCvPbwkymxcFiWN-JuQ6BSr9OMPda9Wsq_rg_Q9Rlfmb-SrIKZjxn8X2gxBPpR3OaDyfPDGxDvU2TWfqB15JaCg3sj-zMM6ih_UMwC_z_JGr1lrKCPSQOEwN19jiBbDbdQNO7HeADWWER9sTL6WUR1RLSAjqdDRROjtzDmCQC1ycj6W1ChXDEByNKEwCaEQugnIv0sYrBMpnP7ZHGgrADD0cRSoLCLpnt_8zjLqZRoOWSeCIcylOC_xv2Z3_DgndiFvBgYua8qrDCMMQjy2s8zff_ag4ZvbY=",
+  "elapsed_s": 6.648,
   "stop_reason": "end_turn",
-  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"ph1b8dec_V11i01_heldout_deepseekv4fl_046d33f21dff_801af8\", \"result\": {\"units\": 39}, \"evidence\": [{\"id\": \"ph1b8dec_V11i01_heldout_deepseekv4fl_046d33f21dff_801af8\", \"ver\": 1}], \"consulted\": [{\"id\": \"ph1b8dec_V11i01_heldout_deepseekv4fl_046d33f21dff_67a714\", \"ver\": 1}, {\"id\": \"ph1b8dec_V11i01_heldout_deepseekv4fl_046d33f21dff_69142b\", \"ver\": 2}]}"
+  "raw_text": "{\"decision\":\"lookup\"}"
  }
 }

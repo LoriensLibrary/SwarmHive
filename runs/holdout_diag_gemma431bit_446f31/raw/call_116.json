@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 20, \\\"summary\\\": \\\"fuses at site-7: 20 units, per phb2526a_V7i04_diag_gemma431bit_7d32b8045d50_4bfaa2/1\\\"}\",\"id\":\"phb2526a_V7i04_diag_gemma431bit_7d32b8045d50_6f2e13\",\"ver\":1},{\"body\":\"{\\\"units\\\": 20, \\\"note\\\": \\\"observed count of fuses at site-7\\\"}\",\"id\":\"phb2526a_V7i04_diag_gemma431bit_7d32b8045d50_293246\",\"ver\":2}],\"corrections\":[{\"id\":\"phb2526a_V7i04_diag_gemma431bit_7d32b8045d50_293246\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"phb2526a_V7i04_diag_gemma431bit_7d32b8045d50_293246\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"phb2526a_V7i04_diag_gemma431bit_7d32b8045d50_293246\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"phb2526a_V7i04_diag_gemma431bit_7d32b8045d50_4bfaa2\",\"inputs\":[{\"id\":\"phb2526a_V7i04_diag_gemma431bit_7d32b8045d50_293246\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phb2526a_V7i04_diag_gemma431bit_7d32b8045d50_6f2e13\",\"inputs\":[{\"id\":\"phb2526a_V7i04_diag_gemma431bit_7d32b8045d50_4bfaa2\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phb2526a_V7i04_diag_gemma431bit_7d32b8045d50_6f2e13/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 116,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 856,
+  "output_tokens": 184,
+  "cost": 0.00014,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-31b-it",
+  "provider_response_id": "resp_fqJfvjssY_1oFTs8QdJVO4gbYEH9LDD52q5kzIZt_lmhzUztb6Axt_zXw4Yh_hsNFVH_nHOpcOmyIVMiZC2JykXM2Q0LE_h3xi2NUbtkLLIi0kIwoI1iVx6cAsV4URAgi40KlGQ2jxGYjsvVukJls9p4Xw0QQy5ocFU4QBFa9gbUu6aq-jIBP2UaLi8sl744EgGlanF5P3Zhi6ofLMs0dRsrl_8tqpg4ywBdUr6oAR-OimVRI-WBqSgPtm5JtbNiPxXMn4NkSG6fDP3eJLD8tDKafnuQjUoOOh-aavZzx_yKddKLApERhAJK76CJ2x0xF3YoB0IBapsMj3R7y1wNi60ukNuOhQjn5BPNW-KWtiBzFMD8jpQ0pV_ijnnAFjilqwELBvUwNnl6woZaRp3b7js0-HMX5Y-ihksXbMGUBcg_j4cyG1M4w4bTagWYeqjekAsOU8ViVKYyjfRBPXmsUti4_tz_PYrt9KJ35wH7SIO3pOk40YRppWM4Q0_g4bUKqzjTFbq9WTg8GNJCnnrcKHX9bUs=",
+  "elapsed_s": 2.148,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"phb2526a_V7i04_diag_gemma431bit_7d32b8045d50_6f2e13\", \"result\": {\"units\": 20}, \"evidence\": [{\"id\": \"phb2526a_V7i04_diag_gemma431bit_7d32b8045d50_6f2e13\", \"ver\": 1}, {\"id\": \"phb2526a_V7i04_diag_gemma431bit_7d32b8045d50_293246\", \"ver\": 2}], \"consulted\": []}\n```"
+ }
+}

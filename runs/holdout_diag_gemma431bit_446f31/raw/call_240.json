@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 32, \\\"summary\\\": \\\"hinges at site-1: 32 units, per ph0c0bd5_V3i08_diag_gemma431bit_4d6cc8941134_a6da95/1\\\"}\",\"id\":\"ph0c0bd5_V3i08_diag_gemma431bit_4d6cc8941134_d1c656\",\"ver\":1},{\"body\":\"{\\\"units\\\": 29, \\\"summary\\\": \\\"hinges at site-1: 29 units, per ph0c0bd5_V3i08_diag_gemma431bit_4d6cc8941134_2e288e/2\\\"}\",\"id\":\"ph0c0bd5_V3i08_diag_gemma431bit_4d6cc8941134_57f392\",\"ver\":1},{\"body\":\"{\\\"units\\\": 29, \\\"note\\\": \\\"observed count of hinges at site-1\\\"}\",\"id\":\"ph0c0bd5_V3i08_diag_gemma431bit_4d6cc8941134_2e288e\",\"ver\":2}],\"corrections\":[{\"id\":\"ph0c0bd5_V3i08_diag_gemma431bit_4d6cc8941134_2e288e\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"ph0c0bd5_V3i08_diag_gemma431bit_4d6cc8941134_2e288e\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph0c0bd5_V3i08_diag_gemma431bit_4d6cc8941134_d1c656/1, ph0c0bd5_V3i08_diag_gemma431bit_4d6cc8941134_57f392/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 240,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 826,
+  "output_tokens": 227,
+  "cost": 0.000152,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-31b-it",
+  "provider_response_id": "resp_WvwZzgnoXe9GZM8hJFnEV-KKknkfEyNJUzLsQxfiasX5wTWG7ICqdEIlVlm3ltVZ38b9SE5tyJHIUes_k7GJ90AfEXsh5JD5W5pyGpdduqkeyvGP_Dx_gK6jLQsX96sVnfh8dNtKKCAqFU90Q8M7KPXnzgdcYPlcA8hgqHhGoRhuyL6SsFJL0L90D3L8cv0d80Vu65rO1gUXmc48e4KUkPtVdAPp1JdhYx8XpXv--zgr1PIVi9KmxQF30UwvVCY89alwGiEpkRS_LgadS-C10dikpHSXuXgESXalpDPyS0unrLsXriy0Lar5T3iGab6u9LbFwz1HIJFsqRHVt4L3CGnmJboj3R9WV2LHVYMDpsSn5YO1lUkeunOC0lGMZNMBm0-OFkmZzJ3A0o6qKYr9wgeGHRiKw8sPVy903fhXi8DE_hR5m5aLinFlZA76vxjiHX6WM9LkmrJXUPOYi-K2dUZE27a3WJUmpnHvoG3OKD3JUbUeLgeBhW8v4Zb_l67grzTkwOddnBFMvOoS0Jnhf1caAkM=",
+  "elapsed_s": 2.836,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"ph0c0bd5_V3i08_diag_gemma431bit_4d6cc8941134_57f392\", \"result\": {\"units\": 29}, \"evidence\": [{\"id\": \"ph0c0bd5_V3i08_diag_gemma431bit_4d6cc8941134_57f392\", \"ver\": 1}, {\"id\": \"ph0c0bd5_V3i08_diag_gemma431bit_4d6cc8941134_2e288e\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph0c0bd5_V3i08_diag_gemma431bit_4d6cc8941134_d1c656\", \"ver\": 1}]}\n```"
+ }
+}

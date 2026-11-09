@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 32, \\\"summary\\\": \\\"fuses at site-2: 32 units, per phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_441e88/1\\\"}\",\"id\":\"phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_4bca7a\",\"ver\":1},{\"body\":\"{\\\"units\\\": 32, \\\"note\\\": \\\"observed count of fuses at site-2\\\"}\",\"id\":\"phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_b7198b\",\"ver\":2},{\"body\":\"{\\\"units\\\": 32, \\\"summary\\\": \\\"fuses at site-2: 32 units, per phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_b7198b/2\\\"}\",\"id\":\"phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_441e88\",\"ver\":1}],\"corrections\":[{\"id\":\"phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_b7198b\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_b7198b\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_441e88\",\"inputs\":[{\"id\":\"phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_b7198b\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_4bca7a\",\"inputs\":[{\"id\":\"phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_441e88\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_b7198b\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_4bca7a/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 252,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 942,
+  "output_tokens": 271,
+  "cost": 0.000177,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-31b-it",
+  "provider_response_id": "resp__Di__iclOi3ih6VgEaTkrQHTzG88eq_dz52Lb7QJVcT7EdyXD8gULtuqAWH1bTNV4YTWPPb_H6h6y3ROvCn0ngx2Xm7P86Fwx9RumNAfFZ8mY-FVXaISA5YZbCz0QwcLBN8OBvULHWf9uPJAQqwrB11XdY628dVx0eiTlGGXPbXCkxndtRmKE-gCeapYvzoEIBSE2b_o6pIj5IQCPi4uGPfaTuQVVvUi33ArYzLho5XdaAhUvyt-GOs9EUfT8yNUO3NgO3LyBitp-0-OwQOO4NjFtcT8xNJW2tD2sHUE_7q8X2Tmn53YkuYAtIS_Gb6XJXCPKIw0RjfSWkmo__TIhlNvv2HQ8caBeG5XrwBYjtJbMTSdJniACFZtm9iGTkmI2xajq0AqykcoFrGudeabnHnuvoDN5WN2Cdhzdjo_Nlf8DJMoIj036kONOdqg5jFWSR69OE0jBahi_uYyoZU4r1aCir9rth9cBFZDagEPFcl5ax53Nhl-9ddebpE6wacW1vlNtDaHE1B6bdBkDU4k4mJ6anQ=",
+  "elapsed_s": 3.208,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\n  \"decision\": \"approve\",\n  \"artifact\": \"phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_4bca7a\",\n  \"result\": {\n    \"units\": 32\n  },\n  \"evidence\": [\n    {\n      \"id\": \"phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_4bca7a\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_441e88\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"phf31c31_V7i08_diag_gemma431bit_2ef982be4fe4_b7198b\",\n      \"ver\": 2\n    }\n  ],\n  \"consulted\": []\n}\n```"
+ }
+}

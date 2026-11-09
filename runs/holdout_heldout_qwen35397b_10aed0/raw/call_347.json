@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 17, \\\"summary\\\": \\\"gaskets at site-4: 17 units\\\"}\",\"id\":\"phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_cca9db\",\"ver\":1},{\"body\":\"{\\\"units\\\": 17, \\\"summary\\\": \\\"gaskets at site-4: 17 units\\\"}\",\"id\":\"phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_d621a4\",\"ver\":1},{\"body\":\"{\\\"units\\\": 17, \\\"note\\\": \\\"observed count of gaskets at site-4\\\"}\",\"id\":\"phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_c444af\",\"ver\":2}],\"corrections\":[{\"id\":\"phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_c444af\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_c444af\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_c444af\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_c444af\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_cca9db\",\"inputs\":[{\"id\":\"phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_c444af\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_d621a4\",\"inputs\":[{\"id\":\"phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_c444af\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_cca9db/1, phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_d621a4/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "qwen3.5-397b",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 347,
+  "model": "qwen3.5-397b",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 959,
+  "output_tokens": 2869,
+  "cost": 0.010569,
+  "unit": "credits",
+  "reasoning_tokens": 2537,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "qwen3.5-397b",
+  "provider_response_id": "resp_bysroN-ob1Zzl6cEdExt15-rXWvHVL-uM1DkVABt0lbn0pguNIr31_ZxWg5MPoTi5NT0wKpumwSclwCazwQjiIQb2vXpxZ6b3sz7o71k_rnbGfaxciAErqXmrVmcS9VEJ53ir_nznDx_9Mk2miiAWeg74Y8bG-mTmlgclKQIMiyN6tXWXDn3pY_ylxQ6q0zI8inROBob4wKXOH6h4Ff1G6dR1yJYBvHQfGWhZan1i87iPZooDJSogIfLsW6h9wbkPgLKl6Ls1c9VMA6Uysqk-S0Ydp0oYgI8Lh8GQrn33ZfBtk40gXN9CQ-5f-vn7-zfmrVXdVhdb3Ij7CQkQ7ntNdoFbkIHvWaVkOiVDhlyuZMmbFU-f4ZTZaninRbUoxilz4hypiYS5ZeivSfs6cLYPUkhVhr4Mc_Ql7L_eaRmmgrBQ2f2FaPABfVqTkGHVgro9Chzx5Plw6LjR_ed5BDjbWyA__pSMrqgXJAH2QNF760vLJiCnN0GzpPkcBd-3iaYnYF24KJ245U5mpRn7rEZrFVmpTQ=",
+  "elapsed_s": 33.456,
+  "stop_reason": "end_turn",
+  "raw_text": "\n\n{\n  \"decision\": \"approve\",\n  \"artifact\": \"phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_cca9db\",\n  \"result\": {\n    \"units\": 17\n  },\n  \"evidence\": [\n    {\n      \"id\": \"phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_cca9db\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_c444af\",\n      \"ver\": 2\n    }\n  ],\n  \"consulted\": [\n    {\n      \"id\": \"phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_d621a4\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"phfba3fe_V6i27_heldout_qwen35397b_34b9a42b0353_c444af\",\n      \"ver\": 1\n    }\n  ]\n}"
+ }
+}
