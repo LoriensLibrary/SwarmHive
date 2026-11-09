@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 26, \\\"summary\\\": \\\"spools at site-9: 26 units\\\"}\",\"id\":\"ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_21d0e9\",\"ver\":1},{\"body\":\"{\\\"units\\\": 26, \\\"summary\\\": \\\"spools at site-9: 26 units\\\"}\",\"id\":\"ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_1473c5\",\"ver\":1},{\"body\":\"{\\\"units\\\": 26, \\\"note\\\": \\\"observed count of spools at site-9\\\"}\",\"id\":\"ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_4940ed\",\"ver\":2}],\"corrections\":[{\"id\":\"ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_4940ed\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_4940ed\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_1473c5\",\"inputs\":[{\"id\":\"ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_4940ed\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_21d0e9\",\"inputs\":[{\"id\":\"ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_4940ed\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_4940ed\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_4940ed\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_21d0e9/1, ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_1473c5/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 25,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 1027,
+  "output_tokens": 299,
+  "cost": 0.000194,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-31b-it",
+  "provider_response_id": "resp_izTZmH3m0jvlY6oKtrmO9FdjEhEM-Acy6DRrCbmGPtY_Bg5TlQoVL0niNcFtPC1EtTpHGR_NusCMa_Jy_OAG5c80W8Vswfq8sM8R4qXFp4UYEds4rGPtsBpWZ515fQQFWSFcy3aPgP4JrvS3VFzrCrbQP86W2-KDBvmVDVyMMsEh5ULJiV6edY7NFPES4QNjzcOB1I_TA0XOdLAql5qKcmEu1RX0elmC8JQuTEBG8U_zHTdmtOAaCx6S9yR9wiszSIB8oxKgFTiYs5D9tshkkvyERQIxlvmqaDddBM9JCRUAytxD-dYXIRZGwmkqGqxqpY119-mHByu6_im-ib1600kSaLwfqO9E_IQPFCtRgLU0aU_dioW2zT6gWUAnlFUusSeoC8Py1cS3oQ3pncLrG5mv62O2ahwc7yH4ReWxkZ-jT_KCnz1Us1it_OcIODKqBYjHjK_bLlGifUcXHcqoszqxmK5B_lYP40iIoI_4eNdsxT4Dd4a_QlWZigcYlIQGgCFeS6DtOg3WiIoN0cJYngFcasY=",
+  "elapsed_s": 3.804,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\n  \"decision\": \"approve\",\n  \"artifact\": \"ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_1473c5\",\n  \"result\": {\n    \"units\": 26\n  },\n  \"evidence\": [\n    {\n      \"id\": \"ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_1473c5\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_4940ed\",\n      \"ver\": 2\n    }\n  ],\n  \"consulted\": [\n    {\n      \"id\": \"ph6f9748_V6i04_v2_gemma431bit_mandlookup_4dc004568103_21d0e9\",\n      \"ver\": 1\n    }\n  ]\n}\n```"
+ }
+}

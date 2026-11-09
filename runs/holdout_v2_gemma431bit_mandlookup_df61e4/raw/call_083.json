@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 25, \\\"summary\\\": \\\"fuses at site-4: 25 units\\\"}\",\"id\":\"ph37a846_V11i13_v2_gemma431bit_mandlookup_278124ad760b_5526b3\",\"ver\":1},{\"body\":\"{\\\"units\\\": 25, \\\"summary\\\": \\\"fuses at site-4: 25 units\\\"}\",\"id\":\"ph37a846_V11i13_v2_gemma431bit_mandlookup_278124ad760b_abac24\",\"ver\":1},{\"body\":\"{\\\"units\\\": 25, \\\"note\\\": \\\"observed count of fuses at site-4\\\"}\",\"id\":\"ph37a846_V11i13_v2_gemma431bit_mandlookup_278124ad760b_bb7d97\",\"ver\":2}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph37a846_V11i13_v2_gemma431bit_mandlookup_278124ad760b_5526b3\",\"inputs\":[{\"id\":\"ph37a846_V11i13_v2_gemma431bit_mandlookup_278124ad760b_bb7d97\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph37a846_V11i13_v2_gemma431bit_mandlookup_278124ad760b_abac24\",\"inputs\":[{\"id\":\"ph37a846_V11i13_v2_gemma431bit_mandlookup_278124ad760b_bb7d97\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph37a846_V11i13_v2_gemma431bit_mandlookup_278124ad760b_bb7d97\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph37a846_V11i13_v2_gemma431bit_mandlookup_278124ad760b_bb7d97\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph37a846_V11i13_v2_gemma431bit_mandlookup_278124ad760b_5526b3/1, ph37a846_V11i13_v2_gemma431bit_mandlookup_278124ad760b_abac24/1 lookup_available=false (your one lookup was used; decide now)\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 83,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 920,
+  "output_tokens": 301,
+  "cost": 0.000185,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-31b-it",
+  "provider_response_id": "resp_mZgLXO9XLv-o4y8amKV0wJPy6DK6ci0ajbKBmLmungXphATdKsR_nfWSKU5szZjMH5cuB4XpEbDNHQuGmTwBSMculWixSW7nHjPnJhF-PW8KQkS_MY6hdw1I8cXP6wK9hJLH5F62GmMUg7HmorosYfReCZrId5wvMiNR_bxKscjOR6cRRfATkfTIUtjHNnpSJQ7tjCagt25qRPHVDwGkSBAveJHjDbQjWjlZ8EMC9v_j85YxljK7cL-MQUjO6CRH_MpujbhF2jqLv0e7tHi0WclyIsov7lD1nN2dctrpp_TyjXyskqpnwDYd3pWFgjqG1GAiTNt9EHQz5dDekOHEzAUqgSHtAsGjV2Ww65MIGi41W4BBkaWK46DrluY-B9qEFbPeeIGxXxtZbaHfd2xlCf7Q3bYFt3oc0i41n8SxTJ06aOD4brbhGBOoVFwaL0SiXBjfbtATZ2vAY_nGbHg8szvSTyfyzgg74PJR7mbywf8Kr8YWSNdjW6hSUjKucEKerSIj7qHABCQNFDZmlhezKTekTfo=",
+  "elapsed_s": 3.766,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\n  \"decision\": \"approve\",\n  \"artifact\": \"ph37a846_V11i13_v2_gemma431bit_mandlookup_278124ad760b_5526b3\",\n  \"result\": {\n    \"units\": 25\n  },\n  \"evidence\": [\n    {\n      \"id\": \"ph37a846_V11i13_v2_gemma431bit_mandlookup_278124ad760b_5526b3\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"ph37a846_V11i13_v2_gemma431bit_mandlookup_278124ad760b_bb7d97\",\n      \"ver\": 2\n    }\n  ],\n  \"consulted\": [\n    {\n      \"id\": \"ph37a846_V11i13_v2_gemma431bit_mandlookup_278124ad760b_abac24\",\n      \"ver\": 1\n    }\n  ]\n}\n```"
+ }
+}

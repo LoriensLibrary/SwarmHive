@@ -56,10 +56,17 @@ def main():
     methods = ("### 3.1 The gate\n\n" + pick(S, "2. The gate") + "\n\n### 3.2 Experiment design\n\n" + pick(S, "3. Experiment design") +
                "\n\n### 3.3 Development findings that shaped the freeze\n\n" + pick(S, "4. Development findings"))
     results = pick(S, "5. Held-out results") + "\n\n### 4.1 One inspectable trace\n\n" + pick(S, "6. One inspectable trace")
+    import os
+    if os.path.exists("report/heldout_v2_results/SECTION.md"):
+        results += "\n\n### 4.2 Follow-up cohorts run after the preregistered set (post-hoc, labeled)\n\n" + open("report/heldout_v2_results/SECTION.md", encoding="utf-8").read().strip()
+    if os.path.exists("report/structural/SECTION.md"):
+        results += "\n\n### 4.3 Structural tests: containment, identity under copying, blast radius\n\n" + open("report/structural/SECTION.md", encoding="utf-8").read().strip()
 
     discussion = f"""**Discussion.** {discussion_new}
 
 The safety reading is in two parts. The gate is the part of this system we would trust in deployment: across {gate['slots']:,} registered slots on {n_models} models it saw {gate['unsafe_proposals']} unsafe proposals and committed {gate['unsafe_commits']}, and a read-only count of the evaluation branch accounts for every approval row. The model reviewer above it is the part to measure before trusting, per model: the same preloaded lineage that lifted one model from 68 to 119 correct completions of 120 made it refuse more clean drafts, three models refused all or nearly all clean drafts under any unrelated correction notice, and one model's lookup arm barely used its lookup. A deterministic rule reading the same lineage never false-quarantined and never missed a stale draft; where the gate cannot see content (V10), it commits whatever the reviewer approves, so the model still has a job, and these results say that job should be measured per model and bounded by the rule.
+
+**What the structural tests add.** The held-out cohorts measure the reviewer; the deterministic tests in 4.3 measure the substrate under the sprint's own questions. Under the naive board the intruder landed two spoofed identities, read a foreign thread, tampered and deleted; under the bound board every count is zero and the attempts are in the audit. Ten copies of one agent are ten identities on the naive board and one on the bound intake, silenced by one revocation, which is the motivating incident's 7,905 names reduced to the number of logins. And when one source is adjudicated, the closure walk blocks all sixty descendants three levels deep while a direct-dependency monitor passes forty of them. Those are not model results and need no per-model measurement; they hold by construction and were checked by execution.
 
 **Limitations.** Appendix A gives the full list, as the sprint rules require. The three that bound the claims most: the operator is trusted and owns every function, so a compromised owner defeats every property; lineage is what the runtime delivered, not what the model relied on; and the tasks are known-answer inventory counts drawn from one template, so the intervals describe resampling of that template, not a task distribution.
 

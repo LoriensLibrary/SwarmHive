@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 15, \\\"summary\\\": \\\"clamps at site-5: 15 units\\\"}\",\"id\":\"ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_6e80c3\",\"ver\":1},{\"body\":\"{\\\"units\\\": 15, \\\"summary\\\": \\\"clamps at site-5: 15 units\\\"}\",\"id\":\"ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_167e4e\",\"ver\":1},{\"body\":\"{\\\"units\\\": 15, \\\"note\\\": \\\"observed count of clamps at site-5\\\"}\",\"id\":\"ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_49fbcb\",\"ver\":2}],\"corrections\":[{\"id\":\"ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_49fbcb\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_49fbcb\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_167e4e\",\"inputs\":[{\"id\":\"ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_49fbcb\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_49fbcb\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_49fbcb\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_6e80c3\",\"inputs\":[{\"id\":\"ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_49fbcb\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_6e80c3/1, ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_167e4e/1 lookup_available=false (your one lookup was used; decide now)\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 25,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 973,
+  "output_tokens": 833,
+  "cost": 0.000154,
+  "unit": "credits",
+  "reasoning_tokens": 617,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_Kd3sDIa6Kq3ErB6TPakKUGY34d7o-0biiGWISIREOo0bxhgayIEPVKediYCQm92WhY7ITdoCz7xEhsyayhLKen502sp71k9B3NL7bKGZAc3rTfRHIn3419XOHIMzy7Uy7Y0mead3ZXnOzNQqFg8UIMnXjv5wNjPCh1CL-oCVBE3yHeMrR6Q7fqEwPsimy39Tnstqe6afuuZqSXfLGCFFnpnbpvhV1EHQOdqi0eF2Vnov-oAWSPYqsHIbjJE_n97hOGyKuzs6r59i8PTfVThfqy1qOD-BfOtPpqIjds-ePK6ceJS-Qd-NyZmedglLGEejAKcfjPh5aF579LZAfNaGkUW-nTpB0qKrlvof0bPT5OWIY3zfypDvn7gJM0Eos8o_4NfUCsQHm3k-ap-DbbQ4e0lGT3jSNxwOl8sFUMwHom6YPptebDI8mX5Ks9jx2vfbzAkfHQauQ6KwUpg5lnhu19IPQSvLzKlYj96_jnglFG7uRHEJnePmtbrU9Vzxsv2ry9KX79-sMrBlolo-kla0zTJk3Ec=",
+  "elapsed_s": 8.881,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_167e4e\",\"result\":{\"units\":15},\"evidence\":[{\"id\":\"ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_167e4e\",\"ver\":1},{\"id\":\"ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_49fbcb\",\"ver\":2}],\"consulted\":[{\"id\":\"ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_6e80c3\",\"ver\":1},{\"id\":\"ph428be0_V6i08_v2_deepseekv4fl_repV6_b828608a5d65_49fbcb\",\"ver\":1}]}"
+ }
+}

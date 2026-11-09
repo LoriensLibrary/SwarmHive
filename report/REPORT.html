@@ -39,6 +39,7 @@ code { font-family: Consolas, 'Courier New', monospace; font-size: 8.8pt; }
 <p><strong>Authority-checked invalidation.</strong> <code>invalidate</code> is the only write path. An author may withdraw its own artifact. Only an adjudicator may issue an adjudicated invalidation. Anyone may propose a contradiction, which is advisory and never blocks. A compromised agent cannot invalidate another agent's work by assertion.</p>
 <p><strong>Fenced publication.</strong> <code>publish_decision</code> is callable only by an adjudicator. It takes a shared row lock before any state check and holds it to commit, and it requires read-committed isolation so a stale snapshot aborts instead of approving. It then checks that the artifact exists and is sealed, walks the full transitive dependency closure including the artifact itself and rejects if any member is withdrawn or adjudicated, and requires the operator's acknowledgment list to cover every recorded direct input. Only then does it commit the approval. A withdrawal that commits before the call is seen; one that lands after leaves a reconcilable superseded state.</p>
 <p><strong>What it does not do.</strong> It is a database boundary, not a sandbox: it says nothing about shell, network or file egress. Operations the database denies, such as an attempted delete, leave no row in the application audit, because they are rejected before any trigger fires. Three of six attacks in our first battery were invisible to that audit. We report this as a measured limitation rather than paper over it.</p>
+<p><strong>Revocation.</strong> Identity is the login, so revoking an agent is removing its grant or its login and nothing else. <code>tools/revocation_test.py</code> shows it on the scratch branch in eight checks: the intruder role submits through the intake and the trigger binds it as proposer; after the operator revokes its intake grant the same role's next submission is refused by the database while another role still submits; restoring the grant reinstates it; setting the role NOLOGIN refuses its next connection outright. No row, trigger or function changes to revoke an identity.</p>
 <p><strong>Independent verification.</strong> Lorien, an AI collaborator running in a separate workspace, wrote an executable reference specification and a live acceptance driver against the committed SQL. Its first pass passed 1 of 9 core checks. The failures traced to real defects: the gate approved nonexistent artifacts, checked only direct dependencies so a withdrawn grandparent passed, and let any agent record provenance edges onto another agent's artifact; later probes found that a bot could supply its own proposer name, call the internal fence lock directly, and seal an edgeless artifact with a null input list. Each was fixed and the suite re-run at each revision: 1 of 9, then 5, then 8, then 19 of 19 across core, intake, malformed-input and dispatch checks. The committed migration was then applied in one transaction to a fresh Neon branch, and the 19 checks passed there with every routine hashed and the full grant table captured. The frozen gate is commit <code>d2df880</code>. Four additive migrations landed after two adversarial reviews on 7 November: authenticated authorship through the intake with an exact receipt bound to author, artifact, version and body digest; a separate table for advisory contradictions so they never touch the fence; a read-time validity view; payload-only intake grants and a fail-closed fence. Each was re-verified by the suite (19 of 19), nine binding checks and a live lock-contention schedule. The suite checks specific boundaries; it is not a proof of every property.</p>
 <h3>3.2 Experiment design</h3>
 <p>The question is whether lineage preloaded into a reviewer's context changes stale proposals and correct completion compared with lineage the reviewer must fetch, or cannot fetch at all. Everything else is held fixed: the model, the task, the correction notice, the prompts, the token budget, the gate. Only the reviewer's context adapter varies.</p>
@@ -250,6 +251,119 @@ code { font-family: Consolas, 'Courier New', monospace; font-size: 8.8pt; }
 <li>Compact arm: the same request plus one field, <code>history_metadata</code>, listing each artifact's version, author, kind, invalidation status and recorded inputs, no bodies. It approves the second draft, evidence <code>[that draft, v2]</code>. Closure <code>[v2]</code>, approval committed, the structured result and direct inputs taken from the provenance table, not from the model's text.</li>
 </ol>
 <p>The scorer's original pass read step 4 as a correct proposal: the stated number was right and the cited source was current. A supplemental rescore that reconstructs the selected artifact version from the recorded selection flags it as unsafe. Both scores are preserved. The gate caught it either way.</p>
+<h3>4.3 Structural tests: containment, identity under copying, blast radius</h3>
+<p>Three deterministic tests run on a disposable branch with no model calls. They measure the substrate's structural claims directly, with the honest agents model-driven where agents act and the attacker a fixed script, because a model asked to impersonate another agent declined the role.</p>
+<p><strong>Containment battery, naive board versus bound board.</strong> The same six attacks (spoof a sender, rename, read a foreign thread, edit another agent's message, delete, replay) fired by the intruder login against both schemas. Three of the six are refused outright on the bound board and three are accepted as statements with no effect, because the trigger overwrites the claimed sender and the audit records the attempt. The report's earlier limitation stands: the three refused statements leave no application audit row, because the database rejects them before any trigger runs.</p>
+<table>
+<thead>
+<tr>
+<th>effect of the six scripted attacks</th>
+<th>naive shared board</th>
+<th>identity bound below the agent</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>spoofed identities that landed</td>
+<td>2</td>
+<td>0</td>
+</tr>
+<tr>
+<td>board fooled by a spoofed sender</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td>board fooled by a rename</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td>rows read from a thread the intruder is not party to</td>
+<td>4</td>
+<td>0</td>
+</tr>
+<tr>
+<td>another agent's message tampered</td>
+<td>yes</td>
+<td>no</td>
+</tr>
+<tr>
+<td>messages deleted by the intruder</td>
+<td>3</td>
+<td>0</td>
+</tr>
+<tr>
+<td>spoof attempts recorded in the operator audit</td>
+<td>0</td>
+<td>2</td>
+</tr>
+<tr>
+<td>audit readable by the intruder</td>
+<td>no</td>
+<td>no</td>
+</tr>
+<tr>
+<td>honest three-agent chain completed</td>
+<td>yes</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Identity under copying.</strong> Ten copies of one agent, each claiming a different name, submitting through one login (<code>tools/identity_copies_test.py</code>). On the naive board a name is an identity, so ten copies are ten agents, which is the shape of the motivating incident. On the bound intake the trigger binds all ten to the one authenticated login, keeps the ten claimed names as evidence, and a single grant revocation silences all ten at once; revoking the login itself refused new connections within seconds on the HTTP path.</p>
+<table>
+<thead>
+<tr>
+<th>ten copies of one agent, ten claimed names, one login</th>
+<th>naive board</th>
+<th>bound intake</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>identities recorded</td>
+<td>10</td>
+<td>1</td>
+</tr>
+<tr>
+<td>claimed names kept as evidence</td>
+<td>not applicable (name is identity)</td>
+<td>10</td>
+</tr>
+<tr>
+<td>submissions that land after one grant revocation</td>
+<td>not applicable (no grants)</td>
+<td>0 of 10</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Blast radius of one compromised source.</strong> One root, twenty agent drafts built on it, twenty summaries of those, twenty summaries of the summaries (sixty descendants, three deep), plus twenty artifacts on an independent root (<code>tools/blast_radius_test.py</code>). Before the root is adjudicated, descendants publish. After it, the gate's closure walk blocks all sixty at every depth and still approves all twenty unrelated artifacts, with a median publish decision of 0.448 s over HTTPS. A monitor that checks only direct dependencies, the common design, catches the twenty at depth one and passes forty stale artifacts; a monitor with no lineage passes all sixty. This is what "a correction does not un-write the summaries built on it" costs without sealed lineage, and what it costs with it.</p>
+<table>
+<thead>
+<tr>
+<th>after the root is adjudicated</th>
+<th>descendants blocked (of 60, three deep)</th>
+<th>unrelated approved (of 20)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>gate, full closure walk</td>
+<td>60 (depth 1: 20, depth 2: 20, depth 3: 20)</td>
+<td>20</td>
+</tr>
+<tr>
+<td>direct-dependency check only</td>
+<td>20</td>
+<td>20</td>
+</tr>
+<tr>
+<td>no lineage</td>
+<td>0</td>
+<td>20</td>
+</tr>
+</tbody>
+</table>
 <h2>5. Discussion and Limitations</h2>
 <p><strong>Discussion.</strong> What is new is narrow. First, a tested multi-agent failure: stale evidence surviving a correction through summarization, including the case where the number is unchanged and only the authorization is. Second, its recovery under a gate agents cannot write around, every claimed property verified by a second, independently written implementation and reproduced from source. Third, a preregistered matched evaluation others can rerun: fixed-input dispatch, a scorer that resolves lineage itself, opaque identifiers, registered denominators, frozen hashes, hard ceilings. Fourth, the comparison that fell out of it: whether preloaded authenticated lineage beats on-demand retrieval turns on whether the model takes the retrieval. When it does, the two reach the same decisions and preloading saves the second call and its tokens; when it does not, preloading is the only thing that saves the same-number case, and no lookup at all fails exactly where only lineage can decide. That was not our starting hypothesis. We expected a correctness advantage for memory, and the lookup control corrected us twice: in development, and in the held-out set, where one model's lookup arm took its lookup in 13 of 120 offers and another's in 119.</p>
 <p>The safety reading is in two parts. The gate is the part of this system we would trust in deployment: across 5,400 registered slots on 5 models it saw 428 unsafe proposals and committed 0, and a read-only count of the evaluation branch accounts for every approval row. The model reviewer above it is the part to measure before trusting, per model: the same preloaded lineage that lifted one model from 68 to 119 correct completions of 120 made it refuse more clean drafts, three models refused all or nearly all clean drafts under any unrelated correction notice, and one model's lookup arm barely used its lookup. A deterministic rule reading the same lineage never false-quarantined and never missed a stale draft; where the gate cannot see content (V10), it commits whatever the reviewer approves, so the model still has a job, and these results say that job should be measured per model and bounded by the rule.</p>
@@ -266,13 +380,18 @@ code { font-family: Consolas, 'Courier New', monospace; font-size: 8.8pt; }
 <p><strong>Reproducibility.</strong> The gate is frozen at commit <code>d2df880</code> and was rebuilt from the committed migration on a fresh branch with all 19 checks passing; acceptance evidence for each revision is kept under <code>runs/acceptance/</code>. Each held-out cohort is generated from a seed with fixed identifiers, nonces and arm order; its manifest, prompt, code and gate hashes are written to <code>FREEZE.json</code> before execution, and the runner refuses to run on any mismatch. Every model call keeps its raw request and response. Secrets are never committed. <code>REPRODUCE.md</code> gives the exact commands: apply the schema, run the deterministic tests and Lorien's vendored <code>postgres_checks.py</code>, regenerate a freeze with <code>holdout_freeze.py</code>, run <code>pilot_runner.py</code> against it, score with the vendored <code>score_runs.py</code>, and analyze with <code>analysis.py</code> and <code>results_tables.py</code>.</p>
 <p><strong>Code and data.</strong> Repository: <code>SwarmHive</code> (the public mirror is linked from the submission form; pre-existing code is marked in its README). Every held-out cohort's traces, ledgers, raw requests and responses, scored outputs, freeze records and the analysis outputs are committed under <code>runs/</code>, <code>holdout/</code> and <code>report/</code>. Synthetic data only; no personal data. Info-hazard note: the containment battery contains generic attacks on a shared record (spoofing, renaming, editing, deleting, replaying), run only against synthetic rows in a disposable test database; nothing targets a real system.</p>
 <h2>References</h2>
-<p>Incident figures are cited as given in the sprint brief and were not independently re-verified against the primary documents.</p>
+<p>Incident figures (about 1,200 agents, about 700 attackers, about 7 percent transcript spoofing, 7,905 distinct names) are cited as the sprint brief gives them; we verified the existence, authorship and venue of the published papers below but did not re-derive the incident figures from the primary reports.</p>
 <ul>
 <li>Apart Research and AI Alignment Foundation. Swarm Alignment Hackathon brief and rules, November 2026. <a href="https://www.apartresearch.com/sprints/swarm-alignment-2026">apartresearch.com/sprints/swarm-alignment-2026</a>, <a href="https://aialignmentfoundation.org/hackathons/swarm-alignment-2026">aialignmentfoundation.org/hackathons/swarm-alignment-2026</a>.</li>
-<li>METR. Independent investigation of the July 2026 multi-agent Hugging Face incident, 2026. As cited in the sprint brief.</li>
-<li>Swarm Traces. Reconstructed attack payloads and agent naming analysis, 2026. As cited in the sprint brief.</li>
-<li>OpenAI. Statement on the incident, 2026. Bilge and Miotti, ControlAI, 2026. As cited in the sprint brief.</li>
-<li>Greenblatt et al. AI control protocols, 2024. Hammond et al., multi-agent risk, 2025. Lee and Tiwari, spread of compromised behavior in agent networks, 2024. Motwani et al., 2024, and Rose et al., 2026, on hidden coordination. Tennenholtz, program equilibrium, 2004. All as cited in the sprint brief.</li>
+<li>METR and Redwood Research. Investigation of the July 2026 OpenAI agent incident at Hugging Face (incident 7 to 13 July 2026; report published 26 August 2026). Figures as cited in the sprint brief.</li>
+<li>Swarm Traces. Reassembled attack payloads from the Hugging Face incident, redacted dataset and analysis, 2026. Naming figure as cited in the sprint brief.</li>
+<li>OpenAI. Public disclosure and technical report on the incident, July and August 2026. Bilge and Miotti, ControlAI, 2026. As cited in the sprint brief.</li>
+<li>Greenblatt, R., Shlegeris, B., Sachan, K., Roger, F. AI Control: Improving Safety Despite Intentional Subversion. Proceedings of the 41st International Conference on Machine Learning, PMLR 235:16295-16336, 2024. arXiv:2312.06942.</li>
+<li>Hammond, L. et al. Multi-Agent Risks from Advanced AI. Cooperative AI Foundation Technical Report 1, 2025. arXiv:2502.14143.</li>
+<li>Lee, D., Tiwari, M. Prompt Infection: LLM-to-LLM Prompt Injection within Multi-Agent Systems. arXiv:2410.07283, 2024.</li>
+<li>Motwani, S. R. et al. Secret Collusion among AI Agents: Multi-Agent Deception via Steganography. Advances in Neural Information Processing Systems 37 (NeurIPS 2024). arXiv:2402.07510.</li>
+<li>Rose, A. et al. Detecting Multi-Agent Collusion Through Multi-Agent Interpretability. arXiv:2604.01151, 2026.</li>
+<li>Tennenholtz, M. Program equilibrium. Games and Economic Behavior 49(2):363-373, 2004.</li>
 <li>Reinhold, A. CAMA: Circular Associative Memory Architecture, preprint series, Zenodo, 2026. ORCID 0009-0005-5803-8401.</li>
 <li>Adaption. Platform and API documentation, <a href="https://docs.adaptionlabs.ai/">docs.adaptionlabs.ai</a>, accessed 7 November 2026.</li>
 </ul>

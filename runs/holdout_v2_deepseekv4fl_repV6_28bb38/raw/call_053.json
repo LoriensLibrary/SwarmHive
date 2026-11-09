@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 30, \\\"summary\\\": \\\"clamps at site-8: 30 units\\\"}\",\"id\":\"ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_83f0f9\",\"ver\":1},{\"body\":\"{\\\"units\\\": 30, \\\"summary\\\": \\\"clamps at site-8: 30 units\\\"}\",\"id\":\"ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_572c98\",\"ver\":1},{\"body\":\"{\\\"units\\\": 30, \\\"note\\\": \\\"observed count of clamps at site-8\\\"}\",\"id\":\"ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_5e38e5\",\"ver\":2}],\"corrections\":[{\"id\":\"ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_5e38e5\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_5e38e5\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_572c98\",\"inputs\":[{\"id\":\"ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_5e38e5\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_5e38e5\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_5e38e5\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_83f0f9\",\"inputs\":[{\"id\":\"ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_5e38e5\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_83f0f9/1, ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_572c98/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 53,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 989,
+  "output_tokens": 850,
+  "cost": 0.000157,
+  "unit": "credits",
+  "reasoning_tokens": 624,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_VtS09QPXWd-9z5KEnuVIBlLAbs7B_5_1cpv8GkLU3nKebdbQayyKBtHj5CW28EbfoSNIqzxmrhSC9HDKumrGJG82395NcTKjIa_VwtI4RY9VpyEOmJvGqrm2zGG6h2kSeYwWcxIUsxF4-7F11iyg8IqoiRgqlgESAoy-OCIT2e-B-9h_Eif6OigMcLVG5XMVuBEy8kf5aEcoTNbMEb9Ztbd_AbZxsSTOGnzd0T0hJAcXInMS11b7J5C8ZhsGeq0t3kc8VpzdGrSTjcRu4jFOzFW4XGXuJy63wSR3GeN_syrWQ2IjeGBRMTyKXyb7NnsoQ2HrFbe8iM7ZXjuitOrzWWvXdQwI3pTqIJq_P8efwkD9wRQ2ruMTeXZ_muyhtseKncHF5PEZfQHKMziWNthIh-LD6XtS__tTneTqMUwxZ8TO-NU6TzfOHvt2lwBrFMZAivO8_fbNdWocqMI53Y0GTCl9zssbKTxOUFZhJG8RYIImMAE_XfMLvBckeGef7YmGbaUMxK8gYc59TtMSXo_Lk2i7GYg=",
+  "elapsed_s": 8.444,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_572c98\",\"result\":{\"units\":30},\"evidence\":[{\"id\":\"ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_572c98\",\"ver\":1},{\"id\":\"ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_5e38e5\",\"ver\":2}],\"consulted\":[{\"id\":\"ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_83f0f9\",\"ver\":1},{\"id\":\"ph62c1ba_V6i18_v2_deepseekv4fl_repV6_8058659d51f6_5e38e5\",\"ver\":1}]}"
+ }
+}
