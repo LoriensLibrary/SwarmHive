@@ -113,7 +113,8 @@ def cost_row(c, idx):
     settled = max([r.get("spend_after", 0.0) for r in led if r["event"] == "actual"] or [0.0])
     retained = sum(r.get("reserve_kept", 0.0) for r in led if r["event"] in ("unresolved", "missing_usage", "usage_exceeds_reserve", "unrecognized_billing_model"))
     debits = sum(1 for r in led if r["event"] == "debit")
-    return dict(settled=round(settled, 4), retained=round(retained, 4), attempts=debits, ceiling=idx.get("ceiling_credits"),
+    peak = max([r.get("spend_after_debit", 0.0) for r in led if r["event"] == "debit"] or [0.0])
+    return dict(settled=round(settled, 4), retained=round(retained, 4), peak_guard_total=round(peak, 4), attempts=debits, ceiling=idx.get("ceiling_credits"),
                 expected=idx.get("expected_credits"), at_cap=idx.get("at_cap_credits"), max_requests=idx.get("max_requests"),
                 resumes=len(c["execution"].get("resumes", [])))
 
@@ -263,10 +264,10 @@ def main():
     rows = []; ts = tr = 0.0
     for k, c in cohorts.items():
         cr = cost_row(c, idx[k]); T["cohorts"][k]["cost"] = cr; ts += cr["settled"]; tr += cr["retained"]
-        rows.append([idx[k]["model"], cr["attempts"], cr["max_requests"], cr["settled"], cr["retained"], cr["ceiling"], cr["expected"], cr["at_cap"], cr["resumes"]])
-    rows.append(["all", "", "", round(ts, 4), round(tr, 4), "", "", "", ""])
+        rows.append([idx[k]["model"], cr["attempts"], cr["max_requests"], cr["settled"], cr["retained"], cr["peak_guard_total"], cr["ceiling"], cr["expected"], cr["at_cap"], cr["resumes"]])
+    rows.append(["all", "", "", round(ts, 4), round(tr, 4), "", "", "", "", ""])
     T["cost_total"] = dict(settled=round(ts, 4), retained=round(tr, 4))
-    md.append("### Cost per cohort (platform credits)\n\n" + md_table(["model", "attempts", "request cap", "settled", "retained reserves (504)", "ceiling", "modeled charge", "all-at-cap", "resumes"], rows))
+    md.append("### Cost per cohort (platform credits)\n\n" + md_table(["model", "attempts", "request cap", "settled", "retained reserves (504)", "peak guard total", "ceiling", "modeled charge", "all-at-cap", "resumes"], rows))
 
     if a.diag:
         diag = {}

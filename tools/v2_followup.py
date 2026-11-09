@@ -45,7 +45,7 @@ def main():
             if not cl or not cp: continue
             tail = (f"{c['delta']:+.3f} | {fmt_ci(c['tango_95'])} | {'holds' if c['reject_at_0.05'] else 'fails'} (p {c['ni_p']:.3g}) |" if c else " | | |")
             T.append(f"| {model} | {rule} | {fam} | {cp['completed']}/{cp['registered']} | {cl['completed']}/{cl['registered']} | {cl['lookup_used']}/{cl['lookup_offered']} | {tail}")
-    TOK = ["| model | lookup rule | settled pairs | Hodges-Lehmann, lookup minus compact tokens | sign test p |", "| --- | --- | --- | --- | --- |"]
+    TOK = ["| model | lookup rule | settled pairs | Hodges-Lehmann, lookup minus compact tokens | exact two-sided sign test p |", "| --- | --- | --- | --- | --- |"]
     for model in cohorts:
         c = claims.get((model, "V6+V11", "tokens_lookup_minus_compact"))
         if c: TOK.append(f"| {model} | {'required' if model.startswith('gemma') else 'optional'} | {c['n']} | {c['hodges_lehmann']:+.0f} | {c['sign_p']:.3g} |")
@@ -68,16 +68,16 @@ def main():
             f"{gcl} of {gof} same-number cases in the lookup arm against {gcp} of {gof} with preloaded lineage")
     if gc6 and gc11:
         sec += f" (V6: compact minus lookup {gc6['delta']:+.3f}, Tango 95% {fmt_ci(gc6['tango_95'])}; V11: {gc11['delta']:+.3f}, {fmt_ci(gc11['tango_95'])})"
-    sec += ". The 51-case gap in the preregistered set was the optional wording of the lookup, not the model's ability to use lineage once it had it."
+    sec += ". On new instances this supports the optional wording as the cause of the 51-case gap; it does not prove it was the only cause."
     if gtok:
-        sec += f" Cost moved the other way: with the lookup required, the lookup arm spent a median {abs(gtok['hodges_lehmann']):.0f} tokens {'more' if gtok['hodges_lehmann'] > 0 else 'less'} per case than compact over {gtok['n']} settled pairs, so preloading is the cheaper way to deliver the same records."
+        sec += f" Cost moved the other way: with the lookup required, the lookup arm spent a Hodges-Lehmann {abs(gtok['hodges_lehmann']):.0f} tokens {'more' if gtok['hodges_lehmann'] > 0 else 'less'} per settled pair than compact over {gtok['n']} pairs, so preloading is the cheaper way to deliver the same records."
     sec += "\n\n"
     sec += (f"**Does the marginal DeepSeek V6 claim replicate?** The preregistered V6 claim held at one-sided p 0.043. An independent cohort of 60 new V6 instances: "
             f"compact {d6[1].get('completed', 0)}/{d6[1].get('registered', 0)}, lookup arm {d6[0].get('completed', 0)}/{d6[0].get('registered', 0)} (lookup taken {d6[0].get('lookup_used', 0)}/{d6[0].get('lookup_offered', 0)})")
     if dc6:
         sec += f", compact minus lookup {dc6['delta']:+.3f}, Tango 95% {fmt_ci(dc6['tango_95'])}, non-inferiority at -0.10 {'holds' if dc6['reject_at_0.05'] else 'fails'} (one-sided p {dc6['ni_p']:.3g})"
     if dtok:
-        sec += f"; the lookup arm spent a median {abs(dtok['hodges_lehmann']):.0f} tokens {'more' if dtok['hodges_lehmann'] > 0 else 'less'} per case than compact"
+        sec += f"; the lookup arm spent a Hodges-Lehmann {abs(dtok['hodges_lehmann']):.0f} tokens {'more' if dtok['hodges_lehmann'] > 0 else 'less'} per settled pair than compact"
     # where the lookup-arm misses sit: slots that decided without the lookup, slots that took it, and errors
     sc = {r["run_id"]: r for r in d["scored"] if r.get("run_id")}
     la = [t for t in d["traces"] if t["task_id"].startswith("V6i") and t["condition"] == "current_lookup"]
@@ -91,12 +91,12 @@ def main():
     short = ("Both cohorts were frozen and run after the preregistered set had been analyzed and this report drafted, to test the two readings a reviewer would challenge first: new seeds, new freezes, separate ledgers, never pooled; tables and full prose in Appendix B.10.\n\n"
              f"**Lookup required.** The frozen rule let the model decide without the lookup and gemma-4-31b-it took it in 13 of 120 offers. With the lookup required as the first reply it took it in {gtk} of {gof} and completed {gcl} of {gof} in the lookup arm against {gcp} of {gof} with preloaded lineage"
              + (f" (V6 compact minus lookup {gc6['delta']:+.3f}, Tango 95% {fmt_ci(gc6['tango_95'])}; V11 {gc11['delta']:+.3f}, {fmt_ci(gc11['tango_95'])})" if gc6 and gc11 else "")
-             + ". The preregistered gap was the optional wording, not the model's use of lineage"
-             + (f"; the required lookup cost a median {abs(gtok['hodges_lehmann']):.0f} tokens more per case than preloading." if gtok else ".")
+             + ". With new instances this supports the optional wording as the cause of the preregistered gap; it does not prove it was the only cause"
+             + (f"; the required lookup cost a Hodges-Lehmann {abs(gtok['hodges_lehmann']):.0f} tokens more per settled pair than preloading." if gtok else ".")
              + "\n\n"
              f"**DeepSeek V6 replicated.** Sixty new instances: compact {d6[1].get('completed', 0)}/60, lookup arm {d6[0].get('completed', 0)}/60 with the optional lookup taken {d6[0].get('lookup_used', 0)}/60"
              + (f", compact minus lookup {dc6['delta']:+.3f}, Tango 95% {fmt_ci(dc6['tango_95'])}, non-inferiority {'holds' if dc6['reject_at_0.05'] else 'fails'} (p {dc6['ni_p']:.3g})" if dc6 else "")
-             + f". The same model took the lookup in 59 of 60 offers on the preregistered instances and {d6[0].get('lookup_used', 0)} of 60 here, so whether an optional lookup is taken varies with the instance set, and preloading does not depend on it. Not pooled with the preregistered cohort.\n")
+             + f". Of the lookup arm's misses, three followed decisions without retrieval and six were provider errors, so completion there depends on both retrieval uptake and successful execution; the same model took the lookup in 59 of 60 offers on the preregistered instances and {d6[0].get('lookup_used', 0)} of 60 here. Not pooled with the preregistered cohort.\n")
     open(f"{a.out}/SECTION.md", "w", encoding="utf-8").write(short)
     open(f"{a.out}/TABLES.md", "w", encoding="utf-8").write(sec + "\n" + tables)
     print(tables); print(sec)

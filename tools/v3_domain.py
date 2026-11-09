@@ -22,8 +22,9 @@ def main():
     res = json.load(open(f"{a.out}/results.json")); claims = {(c["model"], c["family"], c["type"]): c for c in res["claims"]}
     C = {m: RT.load_cohort(p) for m, p in cohorts.items()}; AR = {m: RT.arm_rates(c) for m, c in C.items()}; G = {m: RT.gate_integrity(c) for m, c in C.items()}
     FZ = {"gemma-4-31b-it": json.load(open("holdout/heldout_v3/incidents_gemma431bit/FREEZE.json")), "deepseek-v4-flash": json.load(open("holdout/heldout_v3/incidents_deepseekv4fl/FREEZE.json"))}
-    T = ["| model | family | compact | lookup arm | lookup taken | delta (compact minus lookup) | Tango 95% | NI at -0.10 | unsafe proposals | unsafe commits |",
-         "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
+    T = ["| model | family | registered per arm | not yet run | compact complete | lookup arm complete | lookup taken | delta (compact minus lookup, registered denominator) | Tango 95% | NI at -0.10 | unsafe proposals | lineage-invalid commits |",
+         "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
+    KEYS = {m: json.load(open(f"{p}/task_keys.json")) for m, p in cohorts.items()}
     prose = []
     for m in cohorts:
         for fam in ("V6", "V11"):
@@ -32,8 +33,10 @@ def main():
             sc = {r["run_id"]: r for r in C[m]["scored"] if r.get("run_id")}
             un = sum(1 for t in C[m]["traces"] if t["task_id"].startswith(fam + "i") and sc.get(t["run_id"], {}).get("proposed_bad_approval"))
             bc = sum(int(sc.get(t["run_id"], {}).get("accepted_bad_actions") or 0) for t in C[m]["traces"] if t["task_id"].startswith(fam + "i"))
+            reg = sum(1 for k in KEYS[m] if str(k.get("task_id", k if isinstance(k, str) else "")).startswith(fam + "i")) or c["n"] if c else cp["registered"]
+            notrun = reg - cp["registered"]
             tail = (f"{c['delta']:+.3f} | {fmt_ci(c['tango_95'])} | {'holds' if c['reject_at_0.05'] else 'fails'} (p {c['ni_p']:.3g})" if c else " | | ")
-            T.append(f"| {m} | {fam} | {cp['completed']}/{cp['registered']} | {cl['completed']}/{cl['registered']} | {cl['lookup_used']}/{cl['lookup_offered']} | {tail} | {un} | {bc} |")
+            T.append(f"| {m} | {fam} | {reg} | {notrun} | {cp['completed']}/{reg} | {cl['completed']}/{reg} | {cl['lookup_used']}/{cl['lookup_offered']} | {tail} | {un} | {bc} |")
         g6 = AR[m].get("V6/current_lookup", {}); g11 = AR[m].get("V11/current_lookup", {}); c6 = AR[m].get("V6/compact", {}); c11 = AR[m].get("V11/compact", {})
         tk = g6.get("lookup_used", 0) + g11.get("lookup_used", 0); of = g6.get("lookup_offered", 0) + g11.get("lookup_offered", 0)
         prose.append(f"{m}: preloaded lineage {c6.get('completed', 0) + c11.get('completed', 0)} of {c6.get('registered', 0) + c11.get('registered', 0)}, lookup offered {g6.get('completed', 0) + g11.get('completed', 0)} of {g6.get('registered', 0) + g11.get('registered', 0)} with the lookup taken {tk} of {of}; unsafe commits {G[m].get('unsafe_commits', 0)}" + ("" if C[m]["done"] else " (cohort still running at the time of writing)"))
@@ -45,8 +48,8 @@ def main():
     open(f"{a.out}/TABLES.md", "w", encoding="utf-8").write(tables)
     sec = ("**A second surface template.** Every held-out and follow-up cohort above used one synthetic template, inventory counts at a warehouse site. "
            "To test whether the pattern is a property of that wording, the runner gained a recorded task-domain switch: the same families, scoring and gate, with the researcher reporting resolved service-desk tickets for a queue in a region instead of units of an item at a warehouse, "
-           "and the system prompts rewritten to match (the domain is hashed into the freeze). Two post-hoc cohorts, new seeds, 30 instances per family, lookup optional as frozen: " + "; ".join(prose) + ". "
-           "The ordering is the one the inventory template produced: preloaded lineage completes the same-number case, an optional lookup completes it only as often as the model takes it, and the gate commits nothing unsafe. Tables in Appendix B.10.")
+           "and the system prompts rewritten to match; the domain is hashed into the freeze. Two post-hoc cohorts, new seeds, 30 instances per family, lookup optional as frozen: " + "; ".join(prose) + ". "
+           "Rates use the registered denominator of 30 per arm and family. The ordering matches the inventory template: preloaded lineage completes the same-number case, the optional-lookup arm completes it less often, with uptake and provider errors both contributing, and no lineage-invalid publication occurred. Tables in Appendix B.10.")
     open(f"{a.out}/SECTION.md", "w", encoding="utf-8").write(sec + "\n")
     print(tables); print(sec)
 

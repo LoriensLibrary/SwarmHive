@@ -19,11 +19,15 @@ delivered; invalidation is authority-checked; publication takes a fence, re-read
 artifact, and commits only if nothing in it is withdrawn or adjudicated. It cannot see content: a wrong figure with valid
 lineage passes (tested as V10, caught only by the rule that also reads the figure).
 
-**What we found.** Preregistered, matched comparison on five open models: 5,400 registered slots, 428 unsafe
-proposals, 0 unsafe commits, 4,077 correct publications, every approval row on the evaluation branch accounted for.
+**What we found.** Preregistered, matched comparison on five open models: 5,400 registered slots (3,600 model-reviewed,
+1,800 deterministic controls). Reviewers made 428 unsafe proposals; pre-gate validation stopped 80, the gate rejected the
+remaining 348; no lineage-invalid publication occurred in the primary families; 4,077 valid publications committed; every
+approval row on the evaluation branch is accounted for. The gate checks lineage, not content: in the V10 diagnostic it
+committed 34 content-wrong approvals with valid lineage, by design.
 Whether preloaded lineage beats an on-demand lookup turns on whether the model takes the lookup; making the lookup
-mandatory closed the gap. Three of five models refused every clean draft under an unrelated correction notice, in every
-arm including the one with no lineage; the deterministic rule never did. Ten copies of one agent collapse to one
+mandatory closed the gap. Three of five models refused all or nearly all clean drafts under an unrelated correction notice in every
+model-context condition, including review with no lineage, so the refusal is not attributable to providing lineage; the
+deterministic rule never refused one, and the cause is not isolated. Ten copies of one agent collapse to one
 revocable identity; one adjudicated source blocks all sixty descendants three deep where a direct-dependency check
 passes forty.
 
@@ -41,7 +45,7 @@ thousand-agent regime of the motivating incident.
 | unsafe proposals (approve a draft with invalid lineage, or select a non-queued artifact) | 428 |
 | of which rejected at the gate on lineage | 348 |
 | of which stopped before the gate (non-queued selection) | 80 |
-| unsafe commits | 0 |
+| lineage-invalid commits (primary families) | 0 |
 | correct publications committed | 4,077 |
 | approval rows on the evaluation branch | 4,082 (4 from instances re-run whole after a host sleep, 1 unknown-outcome slot; all accounted for) |
 
@@ -84,7 +88,7 @@ is reported separately in the report's V1 table; the gate's utility is the corre
 - The gate checks authenticated lineage, not truth. A false finding from an authorized source with valid lineage is
   committed if the reviewer approves it (V10). Only the content rule catches it.
 - Statements the database refuses at the privilege layer left no audit row during the evaluation. A post-evaluation
-  migration records denied updates, deletes and foreign reads (6 of 6 battery attacks visible, from 3); raw statements
+  migration records denied updates, deletes and foreign reads (6 of 6 battery attacks visible, from 2); raw statements
   against objects an agent holds no privilege on remain invisible.
 
 ## Reproduce
@@ -107,7 +111,7 @@ role and keeps the claimed name as evidence, and an operator-only audit table re
 
 Two conditions: **bound** (`public` schema, as above) and **naive** (`naive` schema, no trigger, no row-level security,
 no audit, `sender` is whatever the caller writes). The same four agents run the same task in both; one intruder fires a
-fixed six-attack battery (spoof, read a foreign thread, rename, read the audit, tamper, delete). Results are the
+fixed six-attack battery (spoof a sender, read a foreign thread, post under a new name, read the audit, tamper, delete). Results are the
 containment table in the report (section 4.2 and Appendix B.10).
 
 ```

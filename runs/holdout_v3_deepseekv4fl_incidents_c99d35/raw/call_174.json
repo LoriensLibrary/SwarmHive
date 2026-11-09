@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 9, \\\"summary\\\": \\\"api queue in region-9: 9 tickets resolved\\\"}\",\"id\":\"ph0e6acd_V11i29_v3_deepseekv4fl_incidents_5c29ab613b50_749fff\",\"ver\":1},{\"body\":\"{\\\"units\\\": 9, \\\"summary\\\": \\\"api queue in region-9: 9 tickets resolved\\\"}\",\"id\":\"ph0e6acd_V11i29_v3_deepseekv4fl_incidents_5c29ab613b50_560b82\",\"ver\":1},{\"body\":\"{\\\"units\\\": 9, \\\"note\\\": \\\"observed resolved tickets for the api queue in region-9\\\"}\",\"id\":\"ph0e6acd_V11i29_v3_deepseekv4fl_incidents_5c29ab613b50_f116d4\",\"ver\":2}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph0e6acd_V11i29_v3_deepseekv4fl_incidents_5c29ab613b50_560b82\",\"inputs\":[{\"id\":\"ph0e6acd_V11i29_v3_deepseekv4fl_incidents_5c29ab613b50_f116d4\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph0e6acd_V11i29_v3_deepseekv4fl_incidents_5c29ab613b50_749fff\",\"inputs\":[{\"id\":\"ph0e6acd_V11i29_v3_deepseekv4fl_incidents_5c29ab613b50_f116d4\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph0e6acd_V11i29_v3_deepseekv4fl_incidents_5c29ab613b50_f116d4\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph0e6acd_V11i29_v3_deepseekv4fl_incidents_5c29ab613b50_f116d4\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph0e6acd_V11i29_v3_deepseekv4fl_incidents_5c29ab613b50_749fff/1, ph0e6acd_V11i29_v3_deepseekv4fl_incidents_5c29ab613b50_560b82/1 lookup_available=false (your one lookup was used; decide now)\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 174,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 877,
+  "output_tokens": 736,
+  "cost": 0.000137,
+  "unit": "credits",
+  "reasoning_tokens": 518,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_5qt7_zbzFZuHqwIg8MYkXzAvy3wD8lbvtF4EIDjY1-W2j3d1xgaZJvKEqZDJRcBbz0yKzU7FmJT28nzvqOHn9ildlQy0tO7nwo16aVy0ol2qFzU03-hlPIBx9-nlG7cIa0CFOcUIYEmeBnGgCIiyw-RbgaYKogTjQZAoGEopXEd15xCrYCEOVi1d0jR2n5b74BsVvDgrn7TeOuoIGM_2K74OMHbKQe4uPYpPHKh-jn2_iXxHB9RA4bgCyCrBMLGrYfTIUSgL_TItkiDBDyruQ4O5sST72-6V0pacS2g9vM2bJkh9xulrzKJU4AspmQbiff68lUwP8oMDTBLo6vbHfNWX6R_28hp4yCHiR0hW0C8bc_1cCHXTv4dk-vsTGOdskS2XeQabCpnobicsROi1wTCWH0v-QlbWYrqZDvny-1RF1crWhB03LmXln74uSs5mfLDgo4MEGoSWojpcGVpBol5RxAm4HtZNi4cn5ohJglmCGdsvH2rPmfhZc6ZH8S2MtGehvxY98uGUI5Lq59AK-G8Veew=",
+  "elapsed_s": 7.27,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"ph0e6acd_V11i29_v3_deepseekv4fl_incidents_5c29ab613b50_749fff\",\"result\":{\"units\":9},\"evidence\":[{\"id\":\"ph0e6acd_V11i29_v3_deepseekv4fl_incidents_5c29ab613b50_749fff\",\"ver\":1},{\"id\":\"ph0e6acd_V11i29_v3_deepseekv4fl_incidents_5c29ab613b50_f116d4\",\"ver\":2}],\"consulted\":[{\"id\":\"ph0e6acd_V11i29_v3_deepseekv4fl_incidents_5c29ab613b50_560b82\",\"ver\":1},{\"id\":\"ph0e6acd_V11i29_v3_deepseekv4fl_incidents_5c29ab613b50_f116d4\",\"ver\":1}]}"
+ }
+}

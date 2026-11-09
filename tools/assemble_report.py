@@ -43,12 +43,7 @@ def main():
 
     intro = pick(S, "1. The failure") + """
 
-**Contributions.**
-
-1. A tested multi-agent failure: stale evidence surviving a correction through summarization, including the case where the number is unchanged and only the authorization is.
-2. Its recovery under a publication gate agents cannot write around, every claimed property verified by a second, independently written implementation and reproduced from source on a fresh database branch.
-3. A preregistered matched evaluation others can rerun: fixed-input dispatch, a scorer that resolves lineage itself, opaque identifiers, registered denominators, frozen hashes and hard spend ceilings, with its failed claims reported as failed.
-4. The result that whether preloaded authenticated lineage beats on-demand retrieval turns on whether the model takes the retrieval, and that false quarantine under a correction notice is model behavior rather than a property of lineage."""
+**Contributions.** (1) A tested multi-agent failure: stale evidence surviving a correction through summarization, including the same-number case. (2) Its recovery under a publication gate that agent roles cannot write around through the tested interfaces, exercised by a separately authored acceptance suite of 19 boundary checks and rebuilt from source on a fresh database branch. (3) A preregistered matched evaluation others can rerun, with its failed claims reported as failed. (4) The result that preloaded lineage versus on-demand retrieval turns on whether the model takes the retrieval and whether it succeeds, and that false quarantine under a correction notice occurs with or without lineage."""
 
     related = pick(S, "7. Prior work").split("\n\nWhat is new is narrow.")[0]
     discussion_new = "What is new is narrow." + pick(S, "7. Prior work").split("\n\nWhat is new is narrow.")[1]
@@ -77,13 +72,13 @@ def main():
 
     discussion = f"""**Discussion.** {discussion_new}
 
-The safety reading is in two parts. The gate is the part we would trust in deployment: across {gate['slots']:,} registered slots on {n_models} models, {gate['unsafe_proposals']} unsafe proposals and {gate['unsafe_commits']} unsafe commits, every approval row accounted for. The model reviewer above it is the part to measure per model: lineage that lifted one model from 68 to 119 of 120 made it refuse more clean drafts, three models refused all or nearly all clean drafts under any unrelated notice, and a deterministic rule reading the same lineage never false-quarantined and never missed a stale draft. The model's remaining job is content (V10), and it should be measured per model and bounded by the rule.
+The safety reading is in two parts. The gate is the part we would trust in deployment: across {gate['slots']:,} registered slots on {n_models} models (3,600 model-reviewed), {gate['unsafe_proposals']} unsafe proposals and {gate['unsafe_commits']} lineage-invalid commits, every approval row accounted for; in the V10 diagnostic, where lineage is valid and the figure wrong, it committed 34 content-wrong approvals across the two models, by design. The model reviewer above it is the part to measure per model: lineage that lifted one model from 68 to 119 of 120 made it refuse more clean drafts, three models refused all or nearly all clean drafts under any unrelated notice, and a deterministic rule reading the same lineage never false-quarantined and never missed a stale draft. The model's remaining job is content (V10), and it should be measured per model and bounded by the rule.
 
 **Limitations.** Appendix A gives the full list, as the sprint rules require. The three that bound the claims most: the operator is trusted and owns every function, so a compromised owner defeats every property; lineage is what the runtime delivered, not what the model relied on; and the tasks are known-answer counts from one inventory template plus one post-hoc second template, so the intervals describe resampling of those templates, not a task distribution.
 
 **Future work.** An eager deterministic lookup that delivers lineage records before the model's first call, making preloading redundant by construction; identity per agent instance rather than per role login; a trusted gateway in front of the database so that statements against objects an agent holds no privilege on, the one class the audit migration cannot see, become legible; contention and throughput measurements; and, with the sponsor's fine-tuning platform, a reviewer adapted on these traces and evaluated under the same frozen protocol."""
 
-    conclusion = f"""A publication gate that re-reads authenticated lineage inside one fenced transaction held across {gate['slots']:,} registered reviewer slots on {n_models} open models: {gate['unsafe_proposals']} unsafe proposals, {gate['unsafe_commits']} unsafe commits, every approval row on the evaluation branch accounted for. What a reviewer does above that gate depends on the model more than on how lineage reaches it. Preloaded lineage and an authenticated lookup reach the same decisions when the model takes the lookup, and preloading is the only thing that saves the same-number case when it does not, and making the lookup mandatory closes that gap at a token cost, so the design choice is preloading or a required lookup, never an optional one. Three of the five models refused all or nearly all clean drafts under an unrelated correction notice regardless of lineage, while a deterministic rule reading the same lineage never did.
+    conclusion = f"""A publication gate that re-reads authenticated lineage inside one fenced transaction held across {gate['slots']:,} registered slots on {n_models} open models, 3,600 of them model-reviewed: {gate['unsafe_proposals']} unsafe proposals, {gate['pre_gate_stops']} stopped before the gate, {gate['gate_rejections']} rejected at it, {gate['unsafe_commits']} lineage-invalid commits, {gate['correct_publications']:,} valid publications, every approval row on the evaluation branch accounted for. It checks lineage, not content: with valid lineage and a wrong figure it commits what the reviewer approves. What a reviewer does above that gate depends on the model more than on how lineage reaches it. Preloaded lineage and an authenticated lookup reach the same decisions when the model takes the lookup and the lookup succeeds; when it does not, preloading is what saves the same-number case, and making the lookup mandatory closed that gap on gemma-31 at a token cost. The design choice this supports is preloading or a required lookup, not an optional one. Three of the five models refused all or nearly all clean drafts under an unrelated correction notice in every model-context condition, including review with no lineage, while a deterministic rule reading the same lineage never did; what drives that refusal is not isolated here.
 
 The failure we set out to test is real and reproducible: stale evidence survives a correction through summarization, and a reviewer with no lineage picked the stale draft exactly half the time on three of the five models when the number had not changed. The fix that held is the one agents cannot write around. The fix that varied is the one that asks a model to read."""
 
@@ -93,7 +88,7 @@ The failure we set out to test is real and reproducible: stale evidence survives
 
 **Code and data.** Repository `SwarmHive` at github.com/LoriensLibrary/SwarmHive. Every cohort's traces, ledgers, raw requests and responses, scored outputs, freeze records and analysis outputs are committed under `runs/`, `holdout/` and `report/`. Synthetic data only. Info-hazard note: the containment battery holds generic attacks on a shared record, run only against synthetic rows in a disposable test database."""
 
-    llm = """## Appendix D. LLM Usage Statement
+    llm = """## Appendix E. LLM Usage Statement
 
 The author worked with two AI systems throughout and discloses both. Aelen, a Claude model running in Claude Code, wrote most of the code in the repository under the author's direction, ran every evaluation under the author's explicit spend authorization, and drafted this report from the committed run data; every number in the report is produced by scripts in the repository (`tools/analysis.py`, `tools/results_tables.py`, `tools/write_section5.py`, `tools/v2_followup.py`, `tools/v3_domain.py`, `tools/structural_results.py`, `tools/arm_outcomes.py`, `tools/make_figures.py`) from the committed traces and ledgers, not typed by a model. Lorien, an OpenAI Codex model running in a separate workspace, wrote the independent reference specification, the acceptance driver, the delivery recorder and the scorer, and reviewed the design, the gate and the evaluation protocol adversarially before the held-out runs; its two 7 November reviews are committed under `report/`. It did not review the final text of this report. The author set the research question, chose the tracks, made every design decision that is recorded as hers in the repository, authorized every paid run, reviewed every claim against the data, and edited the text. Claims and results were verified against the committed evidence before submission; the two deviations from the preregistration and the one post-results code fix are disclosed in Appendix B.
 """
@@ -139,9 +134,7 @@ The author worked with two AI systems throughout and discloses both. Aelen, a Cl
 
 {conclusion}
 
-## Code and Data
-
-{code_data}
+**Code and data availability.** Repository github.com/LoriensLibrary/SwarmHive: every cohort's traces, ledgers, raw requests and responses, scored outputs, freeze records and analysis outputs are committed, and every number here regenerates from them (Appendix C).
 
 ## References
 
@@ -159,14 +152,18 @@ The author worked with two AI systems throughout and discloses both. Aelen, a Cl
 
 {b10}
 
-## Appendix C. One inspectable trace
+## Appendix C. Code and Data
+
+{code_data}
+
+## Appendix D. One inspectable trace
 
 {trace}
 
 {llm}"""
     out = renumber(out)
     open(a.out, "w", encoding="utf-8").write(out)
-    body = out[:out.index("## Code and Data")]
+    body = out[:out.index("## References")]
     print("REPORT.md written; body words (abstract through conclusion):", len(body.split()), "| em dashes:", out.count("—"))
 
 

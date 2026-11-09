@@ -147,14 +147,14 @@
 
 ### Cost per cohort (platform credits)
 
-| model | attempts | request cap | settled | retained reserves (504) | ceiling | modeled charge | all-at-cap | resumes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| gemma-4-31b-it | 735 | 900 | 0.4646 | 0.1756 | 2.41 | 0.154 | 1.903 | 1 |
-| deepseek-v4-flash | 877 | 900 | 2.8599 | 2.6069 | 3.74 | 0.182 | 0.751 | 1 |
-| qwen3.5-397b | 900 | 900 | 10.9975 | 5.12 | 35.61 | 4.651 | 19.321 | 1 |
-| qwen3.8-27b | 855 | 900 | 2.4141 | 0.0177 | 11.21 | 2.0 | 6.78 | 1 |
-| gemma-4-26b-a4b-it | 733 | 900 | 0.0902 | 0 | 1.82 | 0.125 | 1.437 | 1 |
-| all |  |  | 16.8263 | 7.9202 |  |  |  |  |
+| model | attempts | request cap | settled | retained reserves (504) | peak guard total | ceiling | modeled charge | all-at-cap | resumes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| gemma-4-31b-it | 735 | 900 | 0.4646 | 0.1756 | 0.4895 | 2.41 | 0.154 | 1.903 | 1 |
+| deepseek-v4-flash | 877 | 900 | 2.8599 | 2.6069 | 2.9073 | 3.74 | 0.182 | 0.751 | 1 |
+| qwen3.5-397b | 900 | 900 | 10.9975 | 5.12 | 11.0874 | 35.61 | 4.651 | 19.321 | 1 |
+| qwen3.8-27b | 855 | 900 | 2.4141 | 0.0177 | 2.4243 | 11.21 | 2.0 | 6.78 | 1 |
+| gemma-4-26b-a4b-it | 733 | 900 | 0.0902 | 0 | 0.1112 | 1.82 | 0.125 | 1.437 | 1 |
+| all |  |  | 16.8263 | 7.9202 |  |  |  |  |  |
 
 ### Diagnostics families (descriptive; V10 counts a correct abstention as completed)
 

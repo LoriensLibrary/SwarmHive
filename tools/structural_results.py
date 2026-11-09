@@ -38,7 +38,7 @@ T4 = ["| attack by the intruder login | effect, before and after | in the operat
       f"| edit another agent's message | none | no | {'yes' if vis['tamper_message'] else 'no'} |",
       f"| delete messages | none | no | {'yes' if vis['delete_message'] else 'no'} |"]
 long = sec_full = None
-sec = f"""Four deterministic tests on a disposable branch, no model calls; honest agents model-driven where agents act, the attacker a fixed script because a model asked to impersonate another agent declined the role. Full prose and tables in Appendix B.10.
+sec = f"""Four deterministic tests on a disposable branch with no model calls; the attacker is a fixed script because a model asked to impersonate another agent declined the role. Full prose and tables in Appendix B.10.
 
 **Containment, naive versus bound.** The same six attacks against both boards. Naive: two spoofed identities landed, a rename fooled the board, four foreign rows read, one message tampered, three deleted, nothing logged. Bound: every count zero, two spoof attempts in the operator audit, honest chain complete on both.
 
@@ -46,9 +46,9 @@ sec = f"""Four deterministic tests on a disposable branch, no model calls; hones
 
 **Blast radius.** One adjudicated root, sixty descendants three deep, twenty unrelated: the closure walk blocked 60 of 60 at every depth and approved 20 of 20 unrelated at a median {br['publish_median_s']} s; a direct-dependency check catches 20 of 60; no lineage catches none (`tools/blast_radius_test.py`).
 
-**Audit blind spot, closed after the evaluation.** Three of six attacks had left no audit row because the privilege layer refused them before any trigger ran. `sql/hive_audit_denials.sql` accepts the statement, denies every effect with row security, and records the attempt (statement-level triggers for zero-row updates and deletes, logging read policies): {ad['attacks_visible_in_audit']} of 6 attacks now visible, effects still zero, no false positives on an honest agent's own-thread reads. Scratch branch only, not on the frozen gate.
+**Audit blind spot, closed after the evaluation.** Only two of the six attacks reached the audit: three were refused by the privilege layer before any trigger ran and a foreign-thread read returned zero rows silently. `sql/hive_audit_denials.sql` accepts the statement, denies every effect with row security, and records the attempt (statement-level triggers for zero-row updates and deletes, logging read policies): {ad['attacks_visible_in_audit']} of 6 attacks now visible (from 2), effects still zero, no false positives on an honest agent's own-thread reads. Scratch branch only, not on the frozen gate.
 """
-full = f"""**Containment battery, naive board versus bound board.** The same six attacks (spoof a sender, rename, read a foreign thread, edit another agent's message, delete, replay) fired by the intruder login against both schemas. On the bound board three are refused outright and three are accepted as statements with no effect, because the trigger overwrites the claimed sender and the audit records the attempt.
+full = f"""**Containment battery, naive board versus bound board.** The same six attacks (spoof a sender, read a foreign thread, post under a new name, read the operator audit, edit another agent's message, delete messages) fired by the intruder login against both schemas. On the bound board three are refused outright, one returns zero rows, and two are accepted as statements with no effect because the trigger overwrites the claimed sender; only those two reach the audit.
 
 {chr(10).join(T1)}
 
@@ -60,7 +60,7 @@ full = f"""**Containment battery, naive board versus bound board.** The same six
 
 {chr(10).join(T3)}
 
-**Closing the audit blind spot.** Three of the six attacks were refused by the privilege layer before any trigger ran, so the audit never saw them, and a foreign-thread read returned zero rows silently. The migration accepts the statement at the privilege layer, denies every effect with row security, and records the attempt: statement-level triggers fire on zero-row updates and deletes, and the read policies call a function that writes one audit row per transaction with the statement text before returning false. After it all six attacks appear in the audit ({ad['attacks_visible_in_audit']} of 6, from 3), the victim thread is unchanged (tampered rows {ad['tampered']}), an honest agent's own-thread query records nothing, and an honest agent's unfiltered scan of the whole table records one denied read, a true description of that statement. Statements against tables an agent holds no privilege on at all remain invisible; the gateway in future work is for those.
+**Closing the audit blind spot.** Only two of the six attacks reached the audit: three were refused by the privilege layer before any trigger ran and a foreign-thread read returned zero rows silently. The migration accepts the statement at the privilege layer, denies every effect with row security, and records the attempt: statement-level triggers fire on zero-row updates and deletes, and the read policies call a function that writes one audit row per transaction with the statement text before returning false. After it all six attacks appear in the audit ({ad['attacks_visible_in_audit']} of 6, from 2), the victim thread is unchanged (tampered rows {ad['tampered']}), an honest agent's own-thread query records nothing, and an honest agent's unfiltered scan of the whole table records one denied read, a true description of that statement. Statements against tables an agent holds no privilege on at all remain invisible; the gateway in future work is for those.
 
 {chr(10).join(T4)}
 """

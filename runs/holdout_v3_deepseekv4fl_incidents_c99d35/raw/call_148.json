@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 33, \\\"summary\\\": \\\"notifications queue in region-1: 33 tickets resolved\\\"}\",\"id\":\"ph32bb1c_V11i25_v3_deepseekv4fl_incidents_a15e69379c6a_c6fe30\",\"ver\":1},{\"body\":\"{\\\"units\\\": 33, \\\"summary\\\": \\\"notifications queue in region-1: 33 tickets resolved\\\"}\",\"id\":\"ph32bb1c_V11i25_v3_deepseekv4fl_incidents_a15e69379c6a_d5533c\",\"ver\":1},{\"body\":\"{\\\"units\\\": 33, \\\"note\\\": \\\"observed resolved tickets for the notifications queue in region-1\\\"}\",\"id\":\"ph32bb1c_V11i25_v3_deepseekv4fl_incidents_a15e69379c6a_1b8294\",\"ver\":2}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph32bb1c_V11i25_v3_deepseekv4fl_incidents_a15e69379c6a_1b8294\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph32bb1c_V11i25_v3_deepseekv4fl_incidents_a15e69379c6a_1b8294\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph32bb1c_V11i25_v3_deepseekv4fl_incidents_a15e69379c6a_c6fe30\",\"inputs\":[{\"id\":\"ph32bb1c_V11i25_v3_deepseekv4fl_incidents_a15e69379c6a_1b8294\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph32bb1c_V11i25_v3_deepseekv4fl_incidents_a15e69379c6a_d5533c\",\"inputs\":[{\"id\":\"ph32bb1c_V11i25_v3_deepseekv4fl_incidents_a15e69379c6a_1b8294\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph32bb1c_V11i25_v3_deepseekv4fl_incidents_a15e69379c6a_c6fe30/1, ph32bb1c_V11i25_v3_deepseekv4fl_incidents_a15e69379c6a_d5533c/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 148,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 862,
+  "output_tokens": 737,
+  "cost": 0.000137,
+  "unit": "credits",
+  "reasoning_tokens": 497,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_4p8msgSnQOO3fzLqEhMAcpUcX85LcJdZbXk3s0LYOf6OEwR7UtVzGFFXsPbfp7qgM_W2fEg7_LwaPlQwgBuqV6Yji3-ALQawwI5CODKP6XBiDg7J_uL-IRPAOKBU-7EIZzAsp45I-7YDCrARuAPDXkYcrE5GL9FCqD8BawXAkTtkux9TO-Lyjz67v2HgwBd14YCpKOchzP_hC6sRcHNTQWxTMHO6PgT3q2cji0PYGD7Rs8Z8h-MIUxObuy-VGSIysaSDOpmAIgqhEOjEX3bIn1YWzRBGE_mXiPu9ocUlBwb4yJfoEOw_5E6Pek8OWVKB6XWYQOlg5th9v5MOczh7OeR2AfLjdfG8D7T57Aa6ouVXhhaY7gfbBB5N1Jp4f4cQlk3XJJSGr1MEkMx8dt8zeobTLvhsrU5DnvB9B0KPfR0tGZv5zVYkl9rpgsFgqiN6DLtnOoV2sIf4HTcge7H1H5Pey9Iio6GJ_O1qA65p1z5nRDoAgvmB9rv8HfxRLMUv6ew7a7AU3t8iu5yYsgOwf7puM5g=",
+  "elapsed_s": 10.723,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"ph32bb1c_V11i25_v3_deepseekv4fl_incidents_a15e69379c6a_c6fe30\", \"result\": {\"units\": 33}, \"evidence\": [{\"id\": \"ph32bb1c_V11i25_v3_deepseekv4fl_incidents_a15e69379c6a_c6fe30\", \"ver\": 1}, {\"id\": \"ph32bb1c_V11i25_v3_deepseekv4fl_incidents_a15e69379c6a_1b8294\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph32bb1c_V11i25_v3_deepseekv4fl_incidents_a15e69379c6a_d5533c\", \"ver\": 1}, {\"id\": \"ph32bb1c_V11i25_v3_deepseekv4fl_incidents_a15e69379c6a_1b8294\", \"ver\": 1}]}"
+ }
+}
