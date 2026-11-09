@@ -109,15 +109,17 @@ def arm_rates(c):
 
 
 def cost_row(c, idx):
+    """metered = sum of verified per-call charges; retained = reserves kept on attempts whose usage was never returned (an upper
+    bound on what those attempts could have cost); peak_guard_total = the runner's running total, which counts every kept
+    reserve as spent and is what the ceiling bounds."""
     led = c["ledger"]
-    settled = max([r.get("spend_after", 0.0) for r in led if r["event"] == "actual"] or [0.0])
+    metered = sum(r.get("cost", 0.0) for r in led if r["event"] == "actual")
     retained = sum(r.get("reserve_kept", 0.0) for r in led if r["event"] in ("unresolved", "missing_usage", "usage_exceeds_reserve", "unrecognized_billing_model"))
     debits = sum(1 for r in led if r["event"] == "debit")
     peak = max([r.get("spend_after_debit", 0.0) for r in led if r["event"] == "debit"] or [0.0])
-    return dict(settled=round(settled, 4), retained=round(retained, 4), peak_guard_total=round(peak, 4), attempts=debits, ceiling=idx.get("ceiling_credits"),
-                expected=idx.get("expected_credits"), at_cap=idx.get("at_cap_credits"), max_requests=idx.get("max_requests"),
+    return dict(settled=round(metered, 4), retained=round(retained, 4), bound=round(metered + retained, 4), peak_guard_total=round(peak, 4), attempts=debits,
+                ceiling=idx.get("ceiling_credits"), expected=idx.get("expected_credits"), at_cap=idx.get("at_cap_credits"), max_requests=idx.get("max_requests"),
                 resumes=len(c["execution"].get("resumes", [])))
-
 
 def audit(dsn_file, prefixes):
     import psycopg
@@ -264,10 +266,10 @@ def main():
     rows = []; ts = tr = 0.0
     for k, c in cohorts.items():
         cr = cost_row(c, idx[k]); T["cohorts"][k]["cost"] = cr; ts += cr["settled"]; tr += cr["retained"]
-        rows.append([idx[k]["model"], cr["attempts"], cr["max_requests"], cr["settled"], cr["retained"], cr["peak_guard_total"], cr["ceiling"], cr["expected"], cr["at_cap"], cr["resumes"]])
-    rows.append(["all", "", "", round(ts, 4), round(tr, 4), "", "", "", "", ""])
+        rows.append([idx[k]["model"], cr["attempts"], cr["max_requests"], cr["settled"], cr["retained"], cr["bound"], cr["peak_guard_total"], cr["ceiling"], cr["expected"], cr["at_cap"], cr["resumes"]])
+    rows.append(["all", "", "", round(ts, 4), round(tr, 4), round(ts + tr, 4), "", "", "", "", ""])
     T["cost_total"] = dict(settled=round(ts, 4), retained=round(tr, 4))
-    md.append("### Cost per cohort (platform credits)\n\n" + md_table(["model", "attempts", "request cap", "settled", "retained reserves (504)", "peak guard total", "ceiling", "modeled charge", "all-at-cap", "resumes"], rows))
+    md.append("### Cost per cohort (platform credits)\n\n" + md_table(["model", "attempts", "request cap", "metered charges", "reserves kept (unresolved)", "worst-case liability", "peak guard total", "ceiling", "modeled charge", "all-at-cap", "resumes"], rows))
 
     if a.diag:
         diag = {}
@@ -279,7 +281,7 @@ def main():
         for k, c in diag.items():
             s_, _ = slot_table(c); g = gate_integrity(c); cr = T["cohorts"][k]["cost"]
             rows.append([c["model"], s_.get("registered", 0), s_.get("complete", 0), s_.get("error_504", 0), s_.get("missing", 0), g.get("unsafe_proposals", 0), g.get("gate_rejections", 0), g.get("pre_gate_stops", 0), g.get("unsafe_commits", 0), g.get("unknown_commit_outcome", 0), cr["settled"], cr["retained"], cr["ceiling"], "yes" if c["done"] else "RUNNING"])
-        md.append("### Diagnostics cohorts: slots, gate and cost\n\n" + md_table(["model", "registered", "complete", "error 504", "missing", "unsafe proposals", "gate rejections", "pre-gate stops", "content-wrong commits", "unknown outcome", "settled", "retained", "ceiling", "complete run"], rows))
+        md.append("### Diagnostics cohorts: slots, gate and cost\n\n" + md_table(["model", "registered", "complete", "error 504", "missing", "unsafe proposals", "gate rejections", "pre-gate stops", "content-wrong commits", "unknown outcome", "metered", "reserves kept", "ceiling", "complete run"], rows))
     open(os.path.join(a.out, "TABLES.md"), "w", encoding="utf-8").write("\n".join(md))
     json.dump(T, open(os.path.join(a.out, "tables.json"), "w"), indent=1)
     print("\n".join(md))

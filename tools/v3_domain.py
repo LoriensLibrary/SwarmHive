@@ -40,7 +40,7 @@ def main():
         g6 = AR[m].get("V6/current_lookup", {}); g11 = AR[m].get("V11/current_lookup", {}); c6 = AR[m].get("V6/compact", {}); c11 = AR[m].get("V11/compact", {})
         tk = g6.get("lookup_used", 0) + g11.get("lookup_used", 0); of = g6.get("lookup_offered", 0) + g11.get("lookup_offered", 0)
         prose.append(f"{m}: preloaded lineage {c6.get('completed', 0) + c11.get('completed', 0)} of {c6.get('registered', 0) + c11.get('registered', 0)}, lookup offered {g6.get('completed', 0) + g11.get('completed', 0)} of {g6.get('registered', 0) + g11.get('registered', 0)} with the lookup taken {tk} of {of}; lineage-invalid commits {G[m].get('unsafe_commits', 0)}" + ("" if C[m]["done"] else " (cohort still running at the time of writing)"))
-    SL = ["| cohort | registered | complete | unsafe proposals | gate rejections | lineage-invalid commits | settled | ceiling | complete run |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
+    SL = ["| cohort | registered | complete | unsafe proposals | gate rejections | lineage-invalid commits | metered | ceiling | complete run |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
     for m, p in cohorts.items():
         sl = RT.slot_table(C[m])[0]; cost = RT.cost_row(C[m], {"ceiling_credits": FZ[m]["ceiling"], "max_requests": FZ[m]["max_authorized_requests"]})
         SL.append(f"| {FZ[m]['cohort']} | {sl['registered']} | {sl['complete']} | {G[m].get('unsafe_proposals', 0)} | {G[m].get('gate_rejections', 0)} | {G[m].get('unsafe_commits', 0)} | {cost['settled']} | {cost['ceiling']} | {'yes' if C[m]['done'] else 'RUNNING'} |")

@@ -147,14 +147,14 @@
 
 ### Cost per cohort (platform credits)
 
-| model | attempts | request cap | settled | retained reserves (504) | peak guard total | ceiling | modeled charge | all-at-cap | resumes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| gemma-4-31b-it | 735 | 900 | 0.4646 | 0.1756 | 0.4895 | 2.41 | 0.154 | 1.903 | 1 |
-| deepseek-v4-flash | 877 | 900 | 2.8599 | 2.6069 | 2.9073 | 3.74 | 0.182 | 0.751 | 1 |
-| qwen3.5-397b | 900 | 900 | 10.9975 | 5.12 | 11.0874 | 35.61 | 4.651 | 19.321 | 1 |
-| qwen3.8-27b | 855 | 900 | 2.4141 | 0.0177 | 2.4243 | 11.21 | 2.0 | 6.78 | 1 |
-| gemma-4-26b-a4b-it | 733 | 900 | 0.0902 | 0 | 0.1112 | 1.82 | 0.125 | 1.437 | 1 |
-| all |  |  | 16.8263 | 7.9202 |  |  |  |  |  |
+| model | attempts | request cap | metered charges | reserves kept (unresolved) | worst-case liability | peak guard total | ceiling | modeled charge | all-at-cap | resumes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| gemma-4-31b-it | 735 | 900 | 0.1135 | 0.1756 | 0.289 | 0.4895 | 2.41 | 0.154 | 1.903 | 1 |
+| deepseek-v4-flash | 877 | 900 | 0.1582 | 2.6069 | 2.7651 | 2.9073 | 3.74 | 0.182 | 0.751 | 1 |
+| qwen3.5-397b | 900 | 900 | 4.9467 | 5.12 | 10.0666 | 11.0874 | 35.61 | 4.651 | 19.321 | 1 |
+| qwen3.8-27b | 855 | 900 | 2.3787 | 0.0177 | 2.3964 | 2.4243 | 11.21 | 2.0 | 6.78 | 1 |
+| gemma-4-26b-a4b-it | 733 | 900 | 0.0902 | 0 | 0.0902 | 0.1112 | 1.82 | 0.125 | 1.437 | 1 |
+| all |  |  | 7.6873 | 7.9202 | 15.6075 |  |  |  |  |  |
 
 ### Diagnostics families (descriptive; V10 counts a correct abstention as completed)
 
@@ -179,7 +179,7 @@
 
 ### Diagnostics cohorts: slots, gate and cost
 
-| model | registered | complete | error 504 | missing | unsafe proposals | gate rejections | pre-gate stops | content-wrong commits | unknown outcome | settled | retained | ceiling | complete run |
+| model | registered | complete | error 504 | missing | unsafe proposals | gate rejections | pre-gate stops | content-wrong commits | unknown outcome | metered | reserves kept | ceiling | complete run |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| gemma-4-31b-it | 480 | 476 | 2 | 0 | 27 | 5 | 1 | 21 | 0 | 0.1534 | 0.0502 | 1.09 | yes |
-| deepseek-v4-flash | 480 | 465 | 13 | 0 | 14 | 0 | 1 | 13 | 0 | 0.6727 | 0.6162 | 1.89 | yes |
+| gemma-4-31b-it | 480 | 476 | 2 | 0 | 27 | 5 | 1 | 21 | 0 | 0.0531 | 0.0502 | 1.09 | yes |
+| deepseek-v4-flash | 480 | 465 | 13 | 0 | 14 | 0 | 1 | 13 | 0 | 0.0565 | 0.6162 | 1.89 | yes |

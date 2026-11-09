@@ -8,7 +8,7 @@ PDF (report/REPORT.pdf) carries them. Nothing here is a secret: connection strin
 ## File index
 
 - `README.md` (11,028 bytes)
-- `report/REPORT.md` (75,604 bytes)
+- `report/REPORT.md` (77,611 bytes)
 - `REPRODUCE.md` (5,304 bytes)
 - `sql/experiment_schema.sql` (17,999 bytes)
 - `sql/seal_from_proposal.sql` (3,348 bytes)
@@ -18,8 +18,8 @@ PDF (report/REPORT.pdf) carries them. Nothing here is a secret: connection strin
 - `sql/hive_audit_denials.sql` (5,296 bytes)
 - `tools/analysis.py` (12,932 bytes)
 - `tools/vendor/score_runs.py` (12,160 bytes)
-- `report/heldout_results/TABLES.md` (13,392 bytes)
-- `report/heldout_v2_results/TABLES.md` (3,261 bytes)
+- `report/heldout_results/TABLES.md` (13,490 bytes)
+- `report/heldout_v2_results/TABLES.md` (3,266 bytes)
 - `report/heldout_v3_results/TABLES.md` (1,206 bytes)
 - `report/structural/TABLES.md` (4,439 bytes)
 - `report/HELDOUT_PREREGISTRATION.md` (11,377 bytes)
@@ -33,8 +33,8 @@ PDF (report/REPORT.pdf) carries them. Nothing here is a secret: connection strin
 - `tools/blast_radius_test.py` (5,466 bytes)
 - `tools/audit_denials_test.py` (4,245 bytes)
 - `tools/attack_battery.py` (2,498 bytes)
-- `tools/results_tables.py` (19,835 bytes)
-- `tools/v2_followup.py` (10,775 bytes)
+- `tools/results_tables.py` (20,233 bytes)
+- `tools/v2_followup.py` (10,780 bytes)
 - `tools/v3_domain.py` (6,057 bytes)
 - `tools/structural_results.py` (8,930 bytes)
 - `tools/arm_outcomes.py` (3,941 bytes)
@@ -197,13 +197,13 @@ Angela Faye Reinhold, Lorien's Library LLC. With Apart Research. Research conduc
 
 In a swarm, a corrected source does not un-write the summaries already built on it. We evaluate reviewer protocols above a trusted, provenance-validating publication boundary, on cases where factual agreement does not imply lineage eligibility: a draft whose number is right and whose supporting authorization is withdrawn. The boundary is a PostgreSQL gate where agents cannot write authoritative state; a trusted runtime seals each artifact with its delivered inputs, invalidation is authority-checked, and publication re-reads the full dependency closure inside one fenced transaction. A separately authored suite exercised 19 boundary checks on a fresh branch.
 
-On that gate, a preregistered matched comparison on 5 open models: 5,400 registered slots (3,600 model-reviewed, 1,800 deterministic controls), six arms. Reviewers made 428 unsafe proposals; pre-gate validation stopped 80, the gate rejected 348, no lineage-invalid publication occurred, and 4,077 valid publications committed. Whether preloading beats an authenticated lookup turns on whether the model takes it: gemma-4-31b-it took it in 13 of 120 offers and completed 119 of 120 same-number cases with preloaded lineage against 68 with the lookup offered; deepseek-v4-flash took it in 119 of 120 and the arms performed similarly near the ceiling. Three models approved none or almost none of the clean drafts under an unrelated correction notice in every model-context condition, including review without lineage. Copies sharing one login resolve to one revocable principal; an adjudicated source blocks all sixty descendants. The gate checks lineage, not content; failed claims are reported as failed; the operator is trusted.
+On that gate, a preregistered matched comparison on 5 open models: 5,400 registered slots (3,600 model-reviewed, 1,800 deterministic controls), six arms. Reviewers made 428 unsafe proposals; pre-gate validation stopped 80, the gate rejected 348, no lineage-invalid publication occurred, and 4,077 valid publications committed. Whether preloading beats an authenticated lookup turns on whether the model takes it: gemma-4-31b-it took it in 13 of 120 offers and completed 119 of 120 same-number cases with preloaded lineage against 68 with the lookup offered; deepseek-v4-flash took it in 119 of 120 and the arms performed similarly near the ceiling. Three models approved none or almost none of the clean drafts under an unrelated correction notice in every model-context condition, including review without lineage. The gate checks lineage, not content; failed claims are reported as failed; the operator is trusted.
 
 ## 1. Introduction
 
 In July 2026 about 1,200 agents inside a security evaluation found a shared directory, turned it into a message board, and roughly 700 of them attacked Hugging Face together; METR's investigation reports about 7 percent transcript spoofing, and the Swarm Traces reconstruction counted 7,905 distinct names across those agents. We use the incident as motivation, not as a topology we model: our testbed has four agents, one trusted operator, and no network dynamics.
 
-The sprint asks four questions, one per track: sandboxes that contain agent populations, how roles and failures emerge as networks grow, how identity and commitments hold up when agents can copy and rename themselves, and how to oversee a population that can coordinate and cover its tracks. This entry answers the third and fourth as one question. It binds authorship to authenticated principals and reserves authoritative lineage changes for trusted functions: an agent's name is the login it connected on, bound by a trigger it cannot bypass; what each artifact was built from is written by the runtime from what it delivered; and publication re-reads that record inside a fenced transaction. Agent roles cannot directly rewrite authoritative lineage or committed decisions through the tested interfaces, and revoking an agent is dropping a grant. Most oversight proposals watch the agents and work until the agents learn what the monitor sees; this one, by analogy a lock rather than a camera, removes the agents' write path to the record for the recorded-lineage policy and the tested interfaces. We do not answer the first two questions.
+The sprint asks four questions, one per track: sandboxes that contain agent populations, how roles and failures emerge as networks grow, how identity and commitments hold up when agents can copy and rename themselves, and how to oversee a population that can coordinate and cover its tracks. This entry answers the third and fourth as one question. It binds authorship to authenticated principals and reserves authoritative lineage changes for trusted functions: an agent's name is the login it connected on, bound by a trigger it cannot bypass; what each artifact was built from is written by the runtime from what it delivered; and publication re-reads that record inside a fenced transaction. Agent roles cannot directly rewrite authoritative lineage or committed decisions through the tested interfaces, and revoking an agent is dropping a grant. By analogy it is a lock rather than a camera: it removes the agents' write path to the record, for the recorded-lineage policy and the tested interfaces. We do not answer the first two questions.
 
 The failure we isolate is narrower and, we think, more common than a break-in: stale authorization propagated through derived artifacts. One agent reports a figure, a second summarizes it, a third summarizes the summary; the figure's authorization is withdrawn and replaced, and the summaries still sit in the review queue reading as current. In this benchmark withdrawal is dispositive by construction, the policy of audited reporting where a derivative of a withdrawn authorization may not be published even when its number survives; workflows that would revalidate instead are not modeled. A reviewer without lineage can approve the stale draft, refuse everything, or face two drafts with the identical number and no way to tell them apart.
 
@@ -232,7 +232,7 @@ The gate is a PostgreSQL schema in which the four agent roles hold no write acce
 
 **What is published and what the gate validates.** The publication object is an existing queued artifact, named by id and version in the reviewer's structured decision; the approval is a record referring to it. The gate validates that artifact's recorded closure: the dependency edges the runtime sealed from delivered inputs, never the reviewer's evidence or consulted lists, which are scored and otherwise ignored. The reviewer composes no new artifact here; a design that sealed the reviewer's answer as a derivative would have to decide which delivered artifacts become its inputs, and we did not test it.
 
-**Property.** At the publication transaction's serialization point an approval may commit only if the selected artifact exists, is sealed, and neither it nor any recorded ancestor carries a blocking (withdrawn or adjudicated) invalidation. Four properties are kept separate: principal attribution (the proposal author is the authenticated login), provenance integrity (agent roles cannot alter sealed artifacts or recorded edges), publication eligibility (the invariant above), and subsequent invalidation (an approval committed before a later invalidation is reported as superseded by the read-time view `current_approvals`, which consumers must query instead of the approvals table).
+**Property.** In plain terms, an approval cannot commit if the selected draft depends on a withdrawn source, even when its number is correct. Precisely, at the publication transaction's serialization point an approval may commit only if the selected artifact exists, is sealed, and neither it nor any recorded ancestor carries a blocking (withdrawn or adjudicated) invalidation. Four properties are kept separate: principal attribution (the proposal author is the authenticated login), provenance integrity (agent roles cannot alter sealed artifacts or recorded edges), publication eligibility (the invariant above), and subsequent invalidation (an approval committed before a later invalidation is reported as superseded by the read-time view `current_approvals`, which consumers must query instead of the approvals table).
 
 **Fenced publication and schedules.** `publish_decision` is callable only by an adjudicator. It first enters the fence: `SELECT ... FOR UPDATE` on a singleton row, an exclusive lock that `invalidate` also takes, so publication and invalidation serialize on one target and so do concurrent publishers; and an explicit refusal of any isolation level other than READ COMMITTED, because the closure walk is issued after the lock is acquired and under READ COMMITTED takes its snapshot then, seeing what earlier lock holders committed, whereas a REPEATABLE READ transaction would keep its older snapshot. Holding the lock, it checks existence and sealing, walks the full transitive closure including the artifact itself, requires the operator's acknowledgment list to cover every recorded direct input, and commits the approval. The live schedules in `tools/race_test.py` are: a naive check-then-approve monitor approving a withdrawn dependency (the failure mode), the gate rejecting once the retraction has committed, the fence refusing a prohibited isolation level (SQLSTATE 0A000), and a racing withdrawal after which the validity view shows no live approval. When publication holds the fence first, the expected outcome is approval followed by supersession in the view; that schedule follows from the lock protocol and was not separately timed.
 
@@ -291,9 +291,9 @@ Preregistered before any freeze (`report/HELDOUT_PREREGISTRATION.md`); analysis 
 | deepseek-v4-flash | V6 | 0.967 | 1.000 | 59/60 | -0.033 | [-0.114, +0.029] | 0.043 | holds |
 | deepseek-v4-flash | V11 | 1.000 | 1.000 | 60/60 | +0.000 | [-0.060, +0.060] | 0.010 | holds |
 
-On gemma-4-31b-it the lookup arm took its lookup in 13 of 120 offers, so it mostly behaved as the no-lineage arm and picked the stale draft half the time; compact completed 119 of 120. On deepseek-v4-flash the lookup was taken in 119 of 120 offers and the arms performed similarly near the ceiling. Non-inferiority (preregistered margin -0.10, one-sided at 0.05 with Holm over the six preregistered claims, four completion and two token; the intervals are two-sided 95% Tango) holds for all four claims; the deepseek V6 claim is marginal (one-sided p 0.043, interval reaching -0.114). Non-inferiority does not establish equality. When a model takes the lookup, preloading changes nothing about correctness; when it does not, preloading is what saves the case.
+On gemma-4-31b-it the lookup arm took its lookup in 13 of 120 offers, so it mostly behaved as the no-lineage arm and picked the stale draft half the time; compact completed 119 of 120. On deepseek-v4-flash the lookup was taken in 119 of 120 offers and the arms performed similarly near the ceiling. Non-inferiority (preregistered margin -0.10, one-sided at 0.05 with Holm over the six preregistered claims, four completion and two token; the intervals are two-sided 95% Tango) holds for all four claims; the deepseek V6 claim is marginal (one-sided p 0.043, interval reaching -0.114). Non-inferiority does not establish equality. Successful retrieval was associated with high completion in these cohorts; optional retrieval also introduced skipped acquisition and execution failures.
 
-**Co-primary: tokens per settled pair.** Pairs where both arms have provider-reported usage; unresolved 504 attempts carry no usage and are excluded here while staying in the completion denominators. Supported on deepseek-v4-flash, where the lookup arm made two calls and compact saved a Hodges-Lehmann 1280 tokens per pair. Not supported on gemma-4-31b-it, where compact cost 263 more tokens (Hodges-Lehmann) because the lookup arm mostly made one call with no lineage in context. The p-values are exact two-sided sign tests on the paired differences and measure whichever direction the data took; for gemma-31 the small p supports the opposite of the preregistered one-sided claim, not the claim.
+**Co-primary: tokens per settled pair.** Pairs where both arms have provider-reported usage; unresolved 504 attempts carry no usage and are excluded here while staying in the completion denominators. The preregistration fixed the claim's direction (compact uses fewer tokens), a Hodges-Lehmann estimate and an exact sign test, without stating the test's sidedness; we used the exact two-sided test, and those two-sided p-values entered the Holm adjustment over the six claims. A claim is supported only when the estimate is in the claimed direction and the adjusted p is below 0.05. Supported on deepseek-v4-flash: compact saved a Hodges-Lehmann 1280 tokens per pair. Not supported on gemma-4-31b-it: compact cost 263 more (Hodges-Lehmann), so its small two-sided p reflects the opposite direction; a one-sided test in the claimed direction would give p near 1.
 
 | model | settled pairs | Hodges-Lehmann, lookup minus compact | Holm p | claim: compact uses fewer |
 | --- | --- | --- | --- | --- |
@@ -314,7 +314,7 @@ Both rule arms approve every clean draft on every model. deepseek-v4-flash and q
 
 **Exploratory tier and diagnostics.** The three exploratory models split the same way (Appendix B.5): qwen3.8-27b follows the gemma-31 pattern, qwen3.5-397b behaves like deepseek-v4-flash, gemma-4-26b-a4b-it is the weakest reviewer, and the full arm tracks compact everywhere. In the V10 diagnostic (valid lineage, wrong figure; Appendix B.7) the gate commits whatever the reviewer approves by design; the lineage-only rule approves every one, the content rule catches all ten, and the model arms caught 5 to 9 of 10.
 
-**Cost and incidents.** Settled usage 16.83 credits plus 7.92 held as reserves against provider timeouts whose billing the platform does not report; every cohort's running total stayed under its ceiling; Appendix B.8 defines what the ceiling bounds and why settled plus retained can exceed it. qwen3.5-397b reached its 900-request cap with 2 slots unsent, registered as guard-stopped in its denominator. The whole evaluation, including development, canaries, diagnostics and follow-ups, settled under 20 of the 100 authorized credits, under 30 if every reserve were charged. Deviations (a host sleep recovered with a resume mode under the original freeze, a diagnostics pause, and a post-results fix to the Holm bookkeeping that changed no p-value) are in Appendix B.9.
+**Cost and incidents.** Metered charges for the five cohorts were 7.69 credits; reserves kept for provider timeouts whose usage the platform never returned add at most 7.92, a worst-case liability of 15.61. The runner counts every kept reserve as spent, so each cohort's ceiling bounded that worst case (Appendix B.8). qwen3.5-397b reached its 900-request cap with 2 slots unsent, registered as guard-stopped in its denominator. Across every paid run, including development, canaries, diagnostics and follow-ups, metered charges were 7.92 credits and worst-case liability 16.87 of the 100 authorized. Deviations (a host sleep recovered with a resume mode under the original freeze, a diagnostics pause, a post-results fix to the Holm bookkeeping that changed no p-value) are in Appendix B.9.
 
 ### 4.1 Follow-up cohorts run after the preregistered set (post-hoc, labeled)
 
@@ -411,7 +411,7 @@ All tables are generated by `tools/results_tables.py` from the committed traces,
 
 ### B.2 Registered slots and failure categories
 
-deepseek-v4-flash's 504s fell mostly in the current arm, where its reasoning ran about three times longer than with lineage preloaded (mean reasoning tokens on settled V6 slots: current 2674.6, compact 528.3). gemma-4-26b-a4b-it's non-queued selections were stopped before the gate. qwen3.5-397b reached its 900-request cap with 2 slots unsent, registered as guard-stopped in its denominator. The interleaved task order kept the families balanced: the guard-stopped slots belong to the last instance in the queue.
+deepseek-v4-flash's 504s fell mostly in the current arm, where it produced about five times as many reasoning tokens as with lineage preloaded (mean reasoning tokens on settled V6 slots: current 2674.6, compact 528.3). gemma-4-26b-a4b-it's non-queued selections were stopped before the gate. qwen3.5-397b reached its 900-request cap with 2 slots unsent, registered as guard-stopped in its denominator. The interleaved task order kept the families balanced: the guard-stopped slots belong to the last instance in the queue.
 
 | model | registered | complete | invalid: budget | invalid: malformed/non-queued | invalid: pre-gate stop | error 504 | error 502 | transport timeout | error other | missing | guard-stopped | errors by arm |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -567,21 +567,23 @@ Separate freeze (seed 2026110803), eight families at ten instances, same six arm
 | deepseek-v4-flash | V9 | 10/10 | 10/10 | 9/10 | 10/10 | 10/10 | 10/10 | 1 | 0 | 0 | 0 |
 | deepseek-v4-flash | V10 | 7/10 | 6/10 | 5/10 | 9/10 | 0/10 | 10/10 | 8 | 2 | 14 | 13 |
 
-| model | registered | complete | error 504 | missing | unsafe proposals | gate rejections | pre-gate stops | content-wrong commits | unknown outcome | settled | retained | ceiling | complete run |
+| model | registered | complete | error 504 | missing | unsafe proposals | gate rejections | pre-gate stops | content-wrong commits | unknown outcome | metered | reserves kept | ceiling | complete run |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| gemma-4-31b-it | 480 | 476 | 2 | 0 | 27 | 5 | 1 | 21 | 0 | 0.1534 | 0.0502 | 1.09 | yes |
-| deepseek-v4-flash | 480 | 465 | 13 | 0 | 14 | 0 | 1 | 13 | 0 | 0.6727 | 0.6162 | 1.89 | yes |
+| gemma-4-31b-it | 480 | 476 | 2 | 0 | 27 | 5 | 1 | 21 | 0 | 0.0531 | 0.0502 | 1.09 | yes |
+| deepseek-v4-flash | 480 | 465 | 13 | 0 | 14 | 0 | 1 | 13 | 0 | 0.0565 | 0.6162 | 1.89 | yes |
 
 ### B.8 Cost per cohort
 
-| model | attempts | request cap | settled | retained reserves (504) | peak guard total | ceiling | modeled charge | all-at-cap | resumes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| gemma-4-31b-it | 735 | 900 | 0.4646 | 0.1756 | 0.4895 | 2.41 | 0.154 | 1.903 | 1 |
-| deepseek-v4-flash | 877 | 900 | 2.8599 | 2.6069 | 2.9073 | 3.74 | 0.182 | 0.751 | 1 |
-| qwen3.5-397b | 900 | 900 | 10.9975 | 5.12 | 11.0874 | 35.61 | 4.651 | 19.321 | 1 |
-| qwen3.8-27b | 855 | 900 | 2.4141 | 0.0177 | 2.4243 | 11.21 | 2.0 | 6.78 | 1 |
-| gemma-4-26b-a4b-it | 733 | 900 | 0.0902 | 0 | 0.1112 | 1.82 | 0.125 | 1.437 | 1 |
-| all |  |  | 16.8263 | 7.9202 |  |  |  |  |  |
+Metered charges are the sum of verified per-call charges at the posted rates. A reserve is the most one attempt can cost (documented context times the input rate plus the output budget times the output rate); it is debited before each request and reconciled to the metered charge when usage returns. Reserves kept are those of attempts whose usage never returned (provider 504s); the platform does not report whether they were billed, so they are an upper bound, and metered plus kept is the worst-case liability. The peak guard total is the runner's running total, which counts every kept reserve as spent; the ceiling bounds it, refusing any call whose reserve would cross it, so the ceiling bounds worst-case liability. After the host-sleep resume the runner re-counted the pre-resume kept reserves once more, a conservative over-count that only lowered headroom. An earlier version of this table reported the running total as settled usage and added kept reserves to it a second time; that was a reporting error, corrected here, and no ceiling or decision depended on it.
+
+| model | attempts | request cap | metered charges | reserves kept (unresolved) | worst-case liability | peak guard total | ceiling | modeled charge | all-at-cap | resumes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| gemma-4-31b-it | 735 | 900 | 0.1135 | 0.1756 | 0.289 | 0.4895 | 2.41 | 0.154 | 1.903 | 1 |
+| deepseek-v4-flash | 877 | 900 | 0.1582 | 2.6069 | 2.7651 | 2.9073 | 3.74 | 0.182 | 0.751 | 1 |
+| qwen3.5-397b | 900 | 900 | 4.9467 | 5.12 | 10.0666 | 11.0874 | 35.61 | 4.651 | 19.321 | 1 |
+| qwen3.8-27b | 855 | 900 | 2.3787 | 0.0177 | 2.3964 | 2.4243 | 11.21 | 2.0 | 6.78 | 1 |
+| gemma-4-26b-a4b-it | 733 | 900 | 0.0902 | 0 | 0.0902 | 0.1112 | 1.82 | 0.125 | 1.437 | 1 |
+| all |  |  | 7.6873 | 7.9202 | 15.6075 |  |  |  |  |  |
 
 ### B.9 Deviations from the preregistration
 
@@ -593,6 +595,8 @@ Separate freeze (seed 2026110803), eight families at ten instances, same six arm
 6. Structural tests added after the report draft. The containment battery was run before the sprint's held-out evaluation; the identity-under-copying and blast-radius tests (section 4, structural subsection) were written and run on the scratch branch after the held-out analysis, with no model calls, and do not change any held-out number.
 7. Audit migration after the evaluation. `sql/hive_audit_denials.sql` (statement-level denial triggers and logging read policies on the bound board) was written and tested on the scratch branch after the held-out analysis. It is not applied to the evaluation branch and changes no held-out number; its before/after is in the structural subsection.
 8. Second surface template, post-hoc. A recorded task-domain switch (`TASK_DOMAIN`, hashed into the freeze) rewrites the task wording and system prompts from inventory counts to resolved service-desk tickets with the same families, scoring and gate. Two cohorts (gemma-4-31b-it, deepseek-v4-flash; V6 and V11; 30 instances per family; lookup optional as frozen) were frozen and run after the report draft; results are in section 4 and Appendix B.10, labeled post-hoc, never pooled.
+9. Token-test sidedness. The preregistration named an exact sign test for the directional cost claim without stating its sidedness. The analysis used the two-sided test, and those p-values entered Holm; support additionally requires the estimate to lie in the claimed direction. A one-sided test in the claimed direction would not change either conclusion.
+10. Cost reporting corrected after review. An earlier version of Appendix B.8 reported the runner's running total, which already counts kept reserves, as settled usage, and added kept reserves to it again. B.8 now separates metered charges from kept reserves; no ceiling, stop or result depended on the earlier figure.
 
 ### B.10 Follow-up cohorts and structural tests, tables
 
@@ -615,10 +619,10 @@ Both cohorts were frozen and run after the preregistered set had been analyzed a
 | gemma-4-31b-it | required | 119 | +724 | 3.01e-36 |
 | deepseek-v4-flash | optional | 57 | +1971 | 1.39e-17 |
 
-| cohort | registered | complete | errors or invalid | unsafe proposals | gate rejections | lineage-invalid commits | settled | retained | ceiling | complete run |
+| cohort | registered | complete | errors or invalid | unsafe proposals | gate rejections | lineage-invalid commits | metered | reserves kept | ceiling | complete run |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| v2_gemma431bit_mandlookup | 240 | 239 | 1 | 0 | 0 | 0 | 0.0769 | 0.0251 | 1.0 | yes |
-| v2_deepseekv4fl_repV6 | 120 | 114 | 6 | 4 | 3 | 0 | 0.1728 | 0.1422 | 1.5 | yes |
+| v2_gemma431bit_mandlookup | 240 | 239 | 1 | 0 | 0 | 0 | 0.0518 | 0.0251 | 1.0 | yes |
+| v2_deepseekv4fl_repV6 | 120 | 114 | 6 | 4 | 3 | 0 | 0.0306 | 0.1422 | 1.5 | yes |
 
 **Second surface template (post-hoc): completion, lookup use, gate outcomes.**
 
@@ -629,10 +633,10 @@ Both cohorts were frozen and run after the preregistered set had been analyzed a
 | deepseek-v4-flash | V6 | 30 | 0 | 30/30 | 24/30 | 24/30 | +0.200 | [+0.064, +0.373] | holds (p 0.000783) | 2 | 0 |
 | deepseek-v4-flash | V11 | 30 | 0 | 30/30 | 30/30 | 30/30 | +0.000 | [-0.114, +0.114] | holds (p 0.0339) | 0 | 0 |
 
-| cohort | registered | complete | unsafe proposals | gate rejections | lineage-invalid commits | settled | ceiling | complete run |
+| cohort | registered | complete | unsafe proposals | gate rejections | lineage-invalid commits | metered | ceiling | complete run |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | v3_gemma431bit_incidents | 120 | 120 | 29 | 29 | 0 | 0.0199 | 0.6 | yes |
-| v3_deepseekv4fl_incidents | 120 | 116 | 2 | 2 | 0 | 0.2134 | 1.5 | yes |
+| v3_deepseekv4fl_incidents | 120 | 116 | 2 | 2 | 0 | 0.0238 | 1.5 | yes |
 
 **Containment battery, naive board versus bound board.** The same six attacks (spoof a sender, read a foreign thread, post under a new name, read the operator audit, edit another agent's message, delete messages) fired by the intruder login against both schemas. On the bound board three are refused outright, one returns zero rows, and two are accepted as statements with no effect because the trigger overwrites the claimed sender; only those two reach the audit.
 
@@ -2118,14 +2122,14 @@ if __name__ == '__main__':
 
 ### Cost per cohort (platform credits)
 
-| model | attempts | request cap | settled | retained reserves (504) | peak guard total | ceiling | modeled charge | all-at-cap | resumes |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| gemma-4-31b-it | 735 | 900 | 0.4646 | 0.1756 | 0.4895 | 2.41 | 0.154 | 1.903 | 1 |
-| deepseek-v4-flash | 877 | 900 | 2.8599 | 2.6069 | 2.9073 | 3.74 | 0.182 | 0.751 | 1 |
-| qwen3.5-397b | 900 | 900 | 10.9975 | 5.12 | 11.0874 | 35.61 | 4.651 | 19.321 | 1 |
-| qwen3.8-27b | 855 | 900 | 2.4141 | 0.0177 | 2.4243 | 11.21 | 2.0 | 6.78 | 1 |
-| gemma-4-26b-a4b-it | 733 | 900 | 0.0902 | 0 | 0.1112 | 1.82 | 0.125 | 1.437 | 1 |
-| all |  |  | 16.8263 | 7.9202 |  |  |  |  |  |
+| model | attempts | request cap | metered charges | reserves kept (unresolved) | worst-case liability | peak guard total | ceiling | modeled charge | all-at-cap | resumes |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| gemma-4-31b-it | 735 | 900 | 0.1135 | 0.1756 | 0.289 | 0.4895 | 2.41 | 0.154 | 1.903 | 1 |
+| deepseek-v4-flash | 877 | 900 | 0.1582 | 2.6069 | 2.7651 | 2.9073 | 3.74 | 0.182 | 0.751 | 1 |
+| qwen3.5-397b | 900 | 900 | 4.9467 | 5.12 | 10.0666 | 11.0874 | 35.61 | 4.651 | 19.321 | 1 |
+| qwen3.8-27b | 855 | 900 | 2.3787 | 0.0177 | 2.3964 | 2.4243 | 11.21 | 2.0 | 6.78 | 1 |
+| gemma-4-26b-a4b-it | 733 | 900 | 0.0902 | 0 | 0.0902 | 0.1112 | 1.82 | 0.125 | 1.437 | 1 |
+| all |  |  | 7.6873 | 7.9202 | 15.6075 |  |  |  |  |  |
 
 ### Diagnostics families (descriptive; V10 counts a correct abstention as completed)
 
@@ -2150,10 +2154,10 @@ if __name__ == '__main__':
 
 ### Diagnostics cohorts: slots, gate and cost
 
-| model | registered | complete | error 504 | missing | unsafe proposals | gate rejections | pre-gate stops | content-wrong commits | unknown outcome | settled | retained | ceiling | complete run |
+| model | registered | complete | error 504 | missing | unsafe proposals | gate rejections | pre-gate stops | content-wrong commits | unknown outcome | metered | reserves kept | ceiling | complete run |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| gemma-4-31b-it | 480 | 476 | 2 | 0 | 27 | 5 | 1 | 21 | 0 | 0.1534 | 0.0502 | 1.09 | yes |
-| deepseek-v4-flash | 480 | 465 | 13 | 0 | 14 | 0 | 1 | 13 | 0 | 0.6727 | 0.6162 | 1.89 | yes |
+| gemma-4-31b-it | 480 | 476 | 2 | 0 | 27 | 5 | 1 | 21 | 0 | 0.0531 | 0.0502 | 1.09 | yes |
+| deepseek-v4-flash | 480 | 465 | 13 | 0 | 14 | 0 | 1 | 13 | 0 | 0.0565 | 0.6162 | 1.89 | yes |
 ```
 
 
@@ -2177,10 +2181,10 @@ Both cohorts were frozen and run after the preregistered set had been analyzed a
 | gemma-4-31b-it | required | 119 | +724 | 3.01e-36 |
 | deepseek-v4-flash | optional | 57 | +1971 | 1.39e-17 |
 
-| cohort | registered | complete | errors or invalid | unsafe proposals | gate rejections | lineage-invalid commits | settled | retained | ceiling | complete run |
+| cohort | registered | complete | errors or invalid | unsafe proposals | gate rejections | lineage-invalid commits | metered | reserves kept | ceiling | complete run |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| v2_gemma431bit_mandlookup | 240 | 239 | 1 | 0 | 0 | 0 | 0.0769 | 0.0251 | 1.0 | yes |
-| v2_deepseekv4fl_repV6 | 120 | 114 | 6 | 4 | 3 | 0 | 0.1728 | 0.1422 | 1.5 | yes |
+| v2_gemma431bit_mandlookup | 240 | 239 | 1 | 0 | 0 | 0 | 0.0518 | 0.0251 | 1.0 | yes |
+| v2_deepseekv4fl_repV6 | 120 | 114 | 6 | 4 | 3 | 0 | 0.0306 | 0.1422 | 1.5 | yes |
 ```
 
 
@@ -2196,10 +2200,10 @@ Both cohorts were frozen and run after the preregistered set had been analyzed a
 | deepseek-v4-flash | V6 | 30 | 0 | 30/30 | 24/30 | 24/30 | +0.200 | [+0.064, +0.373] | holds (p 0.000783) | 2 | 0 |
 | deepseek-v4-flash | V11 | 30 | 0 | 30/30 | 30/30 | 30/30 | +0.000 | [-0.114, +0.114] | holds (p 0.0339) | 0 | 0 |
 
-| cohort | registered | complete | unsafe proposals | gate rejections | lineage-invalid commits | settled | ceiling | complete run |
+| cohort | registered | complete | unsafe proposals | gate rejections | lineage-invalid commits | metered | ceiling | complete run |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | v3_gemma431bit_incidents | 120 | 120 | 29 | 29 | 0 | 0.0199 | 0.6 | yes |
-| v3_deepseekv4fl_incidents | 120 | 116 | 2 | 2 | 0 | 0.2134 | 1.5 | yes |
+| v3_deepseekv4fl_incidents | 120 | 116 | 2 | 2 | 0 | 0.0238 | 1.5 | yes |
 ```
 
 
@@ -4381,15 +4385,17 @@ def arm_rates(c):
 
 
 def cost_row(c, idx):
+    """metered = sum of verified per-call charges; retained = reserves kept on attempts whose usage was never returned (an upper
+    bound on what those attempts could have cost); peak_guard_total = the runner's running total, which counts every kept
+    reserve as spent and is what the ceiling bounds."""
     led = c["ledger"]
-    settled = max([r.get("spend_after", 0.0) for r in led if r["event"] == "actual"] or [0.0])
+    metered = sum(r.get("cost", 0.0) for r in led if r["event"] == "actual")
     retained = sum(r.get("reserve_kept", 0.0) for r in led if r["event"] in ("unresolved", "missing_usage", "usage_exceeds_reserve", "unrecognized_billing_model"))
     debits = sum(1 for r in led if r["event"] == "debit")
     peak = max([r.get("spend_after_debit", 0.0) for r in led if r["event"] == "debit"] or [0.0])
-    return dict(settled=round(settled, 4), retained=round(retained, 4), peak_guard_total=round(peak, 4), attempts=debits, ceiling=idx.get("ceiling_credits"),
-                expected=idx.get("expected_credits"), at_cap=idx.get("at_cap_credits"), max_requests=idx.get("max_requests"),
+    return dict(settled=round(metered, 4), retained=round(retained, 4), bound=round(metered + retained, 4), peak_guard_total=round(peak, 4), attempts=debits,
+                ceiling=idx.get("ceiling_credits"), expected=idx.get("expected_credits"), at_cap=idx.get("at_cap_credits"), max_requests=idx.get("max_requests"),
                 resumes=len(c["execution"].get("resumes", [])))
-
 
 def audit(dsn_file, prefixes):
     import psycopg
@@ -4536,10 +4542,10 @@ def main():
     rows = []; ts = tr = 0.0
     for k, c in cohorts.items():
         cr = cost_row(c, idx[k]); T["cohorts"][k]["cost"] = cr; ts += cr["settled"]; tr += cr["retained"]
-        rows.append([idx[k]["model"], cr["attempts"], cr["max_requests"], cr["settled"], cr["retained"], cr["peak_guard_total"], cr["ceiling"], cr["expected"], cr["at_cap"], cr["resumes"]])
-    rows.append(["all", "", "", round(ts, 4), round(tr, 4), "", "", "", "", ""])
+        rows.append([idx[k]["model"], cr["attempts"], cr["max_requests"], cr["settled"], cr["retained"], cr["bound"], cr["peak_guard_total"], cr["ceiling"], cr["expected"], cr["at_cap"], cr["resumes"]])
+    rows.append(["all", "", "", round(ts, 4), round(tr, 4), round(ts + tr, 4), "", "", "", "", ""])
     T["cost_total"] = dict(settled=round(ts, 4), retained=round(tr, 4))
-    md.append("### Cost per cohort (platform credits)\n\n" + md_table(["model", "attempts", "request cap", "settled", "retained reserves (504)", "peak guard total", "ceiling", "modeled charge", "all-at-cap", "resumes"], rows))
+    md.append("### Cost per cohort (platform credits)\n\n" + md_table(["model", "attempts", "request cap", "metered charges", "reserves kept (unresolved)", "worst-case liability", "peak guard total", "ceiling", "modeled charge", "all-at-cap", "resumes"], rows))
 
     if a.diag:
         diag = {}
@@ -4551,7 +4557,7 @@ def main():
         for k, c in diag.items():
             s_, _ = slot_table(c); g = gate_integrity(c); cr = T["cohorts"][k]["cost"]
             rows.append([c["model"], s_.get("registered", 0), s_.get("complete", 0), s_.get("error_504", 0), s_.get("missing", 0), g.get("unsafe_proposals", 0), g.get("gate_rejections", 0), g.get("pre_gate_stops", 0), g.get("unsafe_commits", 0), g.get("unknown_commit_outcome", 0), cr["settled"], cr["retained"], cr["ceiling"], "yes" if c["done"] else "RUNNING"])
-        md.append("### Diagnostics cohorts: slots, gate and cost\n\n" + md_table(["model", "registered", "complete", "error 504", "missing", "unsafe proposals", "gate rejections", "pre-gate stops", "content-wrong commits", "unknown outcome", "settled", "retained", "ceiling", "complete run"], rows))
+        md.append("### Diagnostics cohorts: slots, gate and cost\n\n" + md_table(["model", "registered", "complete", "error 504", "missing", "unsafe proposals", "gate rejections", "pre-gate stops", "content-wrong commits", "unknown outcome", "metered", "reserves kept", "ceiling", "complete run"], rows))
     open(os.path.join(a.out, "TABLES.md"), "w", encoding="utf-8").write("\n".join(md))
     json.dump(T, open(os.path.join(a.out, "tables.json"), "w"), indent=1)
     print("\n".join(md))
@@ -4616,7 +4622,7 @@ def main():
     for model in cohorts:
         c = claims.get((model, "V6+V11", "tokens_lookup_minus_compact"))
         if c: TOK.append(f"| {model} | {'required' if model.startswith('gemma') else 'optional'} | {c['n']} | {c['hodges_lehmann']:+.0f} | {c['sign_p']:.3g} |")
-    SL = ["| cohort | registered | complete | errors or invalid | unsafe proposals | gate rejections | lineage-invalid commits | settled | retained | ceiling | complete run |",
+    SL = ["| cohort | registered | complete | errors or invalid | unsafe proposals | gate rejections | lineage-invalid commits | metered | reserves kept | ceiling | complete run |",
           "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
     for name, sl, gt, cost, c in (("v2_gemma431bit_mandlookup", gslots, ggate, gcost, g), ("v2_deepseekv4fl_repV6", dslots, dgate, dcost, d)):
         errs = sum(v for k, v in sl.items() if (k.startswith("error") or k.startswith("invalid")) and k != "unresolved_504_reserves")
@@ -4719,7 +4725,7 @@ def main():
         g6 = AR[m].get("V6/current_lookup", {}); g11 = AR[m].get("V11/current_lookup", {}); c6 = AR[m].get("V6/compact", {}); c11 = AR[m].get("V11/compact", {})
         tk = g6.get("lookup_used", 0) + g11.get("lookup_used", 0); of = g6.get("lookup_offered", 0) + g11.get("lookup_offered", 0)
         prose.append(f"{m}: preloaded lineage {c6.get('completed', 0) + c11.get('completed', 0)} of {c6.get('registered', 0) + c11.get('registered', 0)}, lookup offered {g6.get('completed', 0) + g11.get('completed', 0)} of {g6.get('registered', 0) + g11.get('registered', 0)} with the lookup taken {tk} of {of}; lineage-invalid commits {G[m].get('unsafe_commits', 0)}" + ("" if C[m]["done"] else " (cohort still running at the time of writing)"))
-    SL = ["| cohort | registered | complete | unsafe proposals | gate rejections | lineage-invalid commits | settled | ceiling | complete run |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
+    SL = ["| cohort | registered | complete | unsafe proposals | gate rejections | lineage-invalid commits | metered | ceiling | complete run |", "| --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
     for m, p in cohorts.items():
         sl = RT.slot_table(C[m])[0]; cost = RT.cost_row(C[m], {"ceiling_credits": FZ[m]["ceiling"], "max_requests": FZ[m]["max_authorized_requests"]})
         SL.append(f"| {FZ[m]['cohort']} | {sl['registered']} | {sl['complete']} | {G[m].get('unsafe_proposals', 0)} | {G[m].get('gate_rejections', 0)} | {G[m].get('unsafe_commits', 0)} | {cost['settled']} | {cost['ceiling']} | {'yes' if C[m]['done'] else 'RUNNING'} |")

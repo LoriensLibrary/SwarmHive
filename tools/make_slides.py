@@ -56,7 +56,7 @@ bullets(s, ["A researcher reports 12 units. A writer drafts \"12 units\" from th
 # 3 invariant and trust boundary
 s = prs.slides.add_slide(blank); title(s, "The invariant and the trust boundary")
 s.shapes.add_picture("report/figures/fig0_gate.png", Inches(1.3), Inches(1.25), width=Inches(10.7))
-note(s, "Invariant: at the publication transaction's serialization point an approval commits only if the selected artifact exists, is sealed, and neither it nor any recorded ancestor carries a blocking invalidation. Authorship is bound to authenticated principals; authoritative lineage changes are reserved for trusted functions. Assumes the trusted runtime and operator are uncompromised. Exercised by a separately authored suite of 19 boundary checks.", top=6.45, size=11)
+note(s, "In plain terms: an approval cannot commit if the selected draft depends on a withdrawn source, even when its number is correct. Invariant: at the publication transaction's serialization point an approval commits only if the selected artifact exists, is sealed, and neither it nor any recorded ancestor carries a blocking invalidation. Authorship is bound to authenticated principals; authoritative lineage changes are reserved for trusted functions. Assumes the trusted runtime and operator are uncompromised. Exercised by a separately authored suite of 19 boundary checks.", top=6.45, size=11)
 
 # 4 safety accounting and evidence delivery
 s = prs.slides.add_slide(blank); title(s, "Held-out evaluation (preregistered)")
@@ -83,5 +83,5 @@ bullets(s, ["Lineage is not truth: with valid lineage and a wrong figure (V10), 
             "A controlled reviewer-protocol evaluation over synthetic matched artifacts, not an adaptive swarm: two templates, four agents, one operator, no throughput measurements.",
             f"Supporting structural tests: copies sharing one login are attributed to one principal and revoked together; one adjudicated source blocks {br['gate_blocked']}/60 descendants where a direct-dependency check catches {br['direct_check_catches']}. The audit extension recorded all six tested attacks in committed statements; attacker-controlled rollback remains a blind spot."],
         0.6, 1.4, 12.1, 5.0, size=16)
-note(s, "Reproducibility: every number regenerates from committed traces (github.com/LoriensLibrary/SwarmHive). Whole evaluation under 20 of 100 authorized credits. Deviations and post-hoc additions: report Appendix B.9.", color=NAVY, size=10)
+note(s, "Reproducibility: every number regenerates from committed traces (github.com/LoriensLibrary/SwarmHive). Whole evaluation: 7.92 credits metered, worst case 16.87 with timeout reserves, of 100 authorized. Deviations and post-hoc additions: report Appendix B.9.", color=NAVY, size=10)
 prs.save("report/SLIDES.pptx"); print("slides written")
