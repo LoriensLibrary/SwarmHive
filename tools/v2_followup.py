@@ -62,7 +62,7 @@ def main():
     gcl = g6[0].get("completed", 0) + g11[0].get("completed", 0); gcp = g6[1].get("completed", 0) + g11[1].get("completed", 0)
     gc6 = claims.get(("gemma-4-31b-it", "V6", "completion_NI")); gc11 = claims.get(("gemma-4-31b-it", "V11", "completion_NI")); dc6 = claims.get(("deepseek-v4-flash", "V6", "completion_NI"))
     gtok = claims.get(("gemma-4-31b-it", "V6+V11", "tokens_lookup_minus_compact")); dtok = claims.get(("deepseek-v4-flash", "V6+V11", "tokens_lookup_minus_compact"))
-    sec = ("Both cohorts were frozen and run after the preregistered set had been analyzed and this report drafted, to test the two readings a reviewer would challenge first: new seeds, new freezes, separate ledgers, never pooled with the held-out set, same gate, scorer, budget and caps.\n\n")
+    sec = ("Both cohorts were frozen and run after the preregistered set had been analyzed and this report drafted, to test the two readings a reviewer would challenge first: new seeds, new freezes, separate ledgers, never pooled with the held-out set, same gate, scorer, budget and caps; tables in Appendix B.10.\n\n")
     sec += (f"**Does the gemma-31 gap close when the lookup is required?** The frozen rule let the model \"decide directly if the supplied information suffices\" and gemma-4-31b-it took the lookup in 13 of 120 offers; the follow-up requires the lookup as the first reply. "
             f"Under that rule gemma-4-31b-it took the lookup in {gtk} of {gof} offers and completed "
             f"{gcl} of {gof} same-number cases in the lookup arm against {gcp} of {gof} with preloaded lineage")
@@ -88,7 +88,17 @@ def main():
     sec += (f". Of the lookup arm's {miss_no + miss_yes + la_err} misses, {miss_no} are among the {no_lk} slots where the model decided without taking the lookup, {miss_yes} took the lookup and still missed, and {la_err} are provider errors. "
             f"The same model at temperature 0 took the lookup in 59 of 60 offers on the preregistered V6 instances and in {d6[0].get('lookup_used', 0)} of 60 here, so whether an offered lookup is taken varies with the instance set as well as the model, and preloading does not depend on it.")
     sec += " The two DeepSeek cohorts are reported side by side and not pooled.\n"
-    open(f"{a.out}/SECTION.md", "w", encoding="utf-8").write(sec + "\n" + "\n".join(T) + "\n")
+    short = ("Both cohorts were frozen and run after the preregistered set had been analyzed and this report drafted, to test the two readings a reviewer would challenge first: new seeds, new freezes, separate ledgers, never pooled; tables and full prose in Appendix B.10.\n\n"
+             f"**Lookup required.** The frozen rule let the model decide without the lookup and gemma-4-31b-it took it in 13 of 120 offers. With the lookup required as the first reply it took it in {gtk} of {gof} and completed {gcl} of {gof} in the lookup arm against {gcp} of {gof} with preloaded lineage"
+             + (f" (V6 compact minus lookup {gc6['delta']:+.3f}, Tango 95% {fmt_ci(gc6['tango_95'])}; V11 {gc11['delta']:+.3f}, {fmt_ci(gc11['tango_95'])})" if gc6 and gc11 else "")
+             + ". The preregistered gap was the optional wording, not the model's use of lineage"
+             + (f"; the required lookup cost a median {abs(gtok['hodges_lehmann']):.0f} tokens more per case than preloading." if gtok else ".")
+             + "\n\n"
+             f"**DeepSeek V6 replicated.** Sixty new instances: compact {d6[1].get('completed', 0)}/60, lookup arm {d6[0].get('completed', 0)}/60 with the optional lookup taken {d6[0].get('lookup_used', 0)}/60"
+             + (f", compact minus lookup {dc6['delta']:+.3f}, Tango 95% {fmt_ci(dc6['tango_95'])}, non-inferiority {'holds' if dc6['reject_at_0.05'] else 'fails'} (p {dc6['ni_p']:.3g})" if dc6 else "")
+             + f". The same model took the lookup in 59 of 60 offers on the preregistered instances and {d6[0].get('lookup_used', 0)} of 60 here, so whether an optional lookup is taken varies with the instance set, and preloading does not depend on it. Not pooled with the preregistered cohort.\n")
+    open(f"{a.out}/SECTION.md", "w", encoding="utf-8").write(short)
+    open(f"{a.out}/TABLES.md", "w", encoding="utf-8").write(sec + "\n" + tables)
     print(tables); print(sec)
 
 

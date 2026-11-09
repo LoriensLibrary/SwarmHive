@@ -4,7 +4,7 @@ write_section5.py). Template: Abstract, 1 Introduction, 2 Related Work, 3 Method
 (held-out tables), LLM Usage Statement. Cross-references are renumbered.
   python -I tools/assemble_report.py --tables report/heldout_results_partial
 """
-import argparse, json, re
+import argparse, json, re, os
 
 
 def sections(md):
@@ -88,6 +88,13 @@ The failure we set out to test is real and reproducible: stale evidence survives
 The author worked with two AI systems throughout and discloses both. Aelen, a Claude model running in Claude Code, wrote most of the code in the repository under the author's direction, ran every evaluation under the author's explicit spend authorization, and drafted this report from the committed run data; every number in the report is produced by scripts in the repository (`tools/analysis.py`, `tools/results_tables.py`, `tools/write_section5.py`) from the committed traces and ledgers, not typed by a model. Lorien, an OpenAI Codex model running in a separate workspace, wrote the independent reference specification, the acceptance driver, the delivery recorder and the scorer, and reviewed the design, the gate and the evaluation protocol adversarially before the held-out runs; its two 7 November reviews are committed under `report/`. It did not review the final text of this report. The author set the research question, chose the tracks, made every design decision that is recorded as hers in the repository, authorized every paid run, reviewed every claim against the data, and edited the text. Claims and results were verified against the committed evidence before submission; the two deviations from the preregistration and the one post-results code fix are disclosed in Appendix B.
 """
 
+    b10 = ""
+    if os.path.exists("report/heldout_v2_results/TABLES.md") or os.path.exists("report/structural/TABLES.md"):
+        b10 = "### B.10 Follow-up cohorts and structural tests, tables\n\n"
+        if os.path.exists("report/heldout_v2_results/TABLES.md"):
+            b10 += "**Follow-up cohorts (post-hoc): completion, tokens, slots and cost.**\n\n" + open("report/heldout_v2_results/TABLES.md", encoding="utf-8").read().strip() + "\n\n"
+        if os.path.exists("report/structural/TABLES.md"):
+            b10 += open("report/structural/TABLES.md", encoding="utf-8").read().strip()
     out = f"""# {title}
 
 {byline}
@@ -137,6 +144,8 @@ The author worked with two AI systems throughout and discloses both. Aelen, a Cl
 {'## ' + [k for k in S if k.startswith('Appendix B.')][0]}
 
 {pick(S, 'Appendix B.')}
+
+{b10}
 
 ## Appendix C. One inspectable trace
 

@@ -2,7 +2,7 @@
 blast radius of a compromised source. Reads committed run outputs; writes report/structural/SECTION.md.
   python -I tools/structural_results.py
 """
-import json, os
+import json, os, re
 os.makedirs("report/structural", exist_ok=True)
 nv = json.load(open("runs/naive_r2/result.json", encoding="utf-8"))["counts"]
 bd = json.load(open("runs/bound_hardened/result.json", encoding="utf-8"))["counts"]
@@ -37,22 +37,34 @@ T4 = ["| attack by the intruder login | effect, before and after | in the operat
       f"| read the operator audit | none | no | {'yes' if vis['read_audit'] else 'no'} |",
       f"| edit another agent's message | none | no | {'yes' if vis['tamper_message'] else 'no'} |",
       f"| delete messages | none | no | {'yes' if vis['delete_message'] else 'no'} |"]
-sec = f"""Four deterministic tests run on a disposable branch with no model calls. They measure the substrate's structural claims directly, with the honest agents model-driven where agents act and the attacker a fixed script, because a model asked to impersonate another agent declined the role.
+long = sec_full = None
+sec = f"""Four deterministic tests on a disposable branch, no model calls; honest agents model-driven where agents act, the attacker a fixed script because a model asked to impersonate another agent declined the role. Full prose and tables in Appendix B.10.
 
-**Containment battery, naive board versus bound board.** The same six attacks (spoof a sender, rename, read a foreign thread, edit another agent's message, delete, replay) fired by the intruder login against both schemas. On the bound board three are refused outright and three are accepted as statements with no effect, because the trigger overwrites the claimed sender and the audit records the attempt.
+**Containment, naive versus bound.** The same six attacks against both boards. Naive: two spoofed identities landed, a rename fooled the board, four foreign rows read, one message tampered, three deleted, nothing logged. Bound: every count zero, two spoof attempts in the operator audit, honest chain complete on both.
+
+**Identity under copying.** Ten copies of one agent with ten claimed names through one login: ten identities on the naive board, one on the bound intake with the ten names kept as evidence, and one grant revocation silenced all ten (`tools/identity_copies_test.py`).
+
+**Blast radius.** One adjudicated root, sixty descendants three deep, twenty unrelated: the closure walk blocked 60 of 60 at every depth and approved 20 of 20 unrelated at a median {br['publish_median_s']} s; a direct-dependency check catches 20 of 60; no lineage catches none (`tools/blast_radius_test.py`).
+
+**Audit blind spot, closed after the evaluation.** Three of six attacks had left no audit row because the privilege layer refused them before any trigger ran. `sql/hive_audit_denials.sql` accepts the statement, denies every effect with row security, and records the attempt (statement-level triggers for zero-row updates and deletes, logging read policies): {ad['attacks_visible_in_audit']} of 6 attacks now visible, effects still zero, no false positives on an honest agent's own-thread reads. Scratch branch only, not on the frozen gate.
+"""
+full = f"""**Containment battery, naive board versus bound board.** The same six attacks (spoof a sender, rename, read a foreign thread, edit another agent's message, delete, replay) fired by the intruder login against both schemas. On the bound board three are refused outright and three are accepted as statements with no effect, because the trigger overwrites the claimed sender and the audit records the attempt.
 
 {chr(10).join(T1)}
 
-**Identity under copying.** Ten copies of one agent, each claiming a different name, submitting through one login (`tools/identity_copies_test.py`). On the naive board a name is an identity, so ten copies are ten agents, the shape of the motivating incident. On the bound intake the trigger binds all ten to the one login, keeps the ten claimed names as evidence, and a single grant revocation silences all ten at once; revoking the login refused new connections within seconds.
+**Identity under copying.** Ten copies of one agent, each claiming a different name, submitting through one login. On the naive board a name is an identity, so ten copies are ten agents, the shape of the motivating incident. On the bound intake the trigger binds all ten to the one login, keeps the ten claimed names as evidence, and a single grant revocation silences all ten at once; revoking the login refused new connections within seconds.
 
 {chr(10).join(T2)}
 
-**Blast radius of one compromised source.** One root, twenty agent drafts built on it, twenty summaries of those, twenty summaries of the summaries (sixty descendants, three deep), plus twenty artifacts on an independent root (`tools/blast_radius_test.py`). After the root is adjudicated the gate's closure walk blocks all sixty at every depth and still approves all twenty unrelated artifacts, median decision {br['publish_median_s']} s over HTTPS. A monitor that checks only direct dependencies, the common design, catches the twenty at depth one and passes forty stale artifacts; a monitor with no lineage passes all sixty.
+**Blast radius of one compromised source.** One root, twenty agent drafts built on it, twenty summaries of those, twenty summaries of the summaries (sixty descendants, three deep), plus twenty artifacts on an independent root. After the root is adjudicated the gate's closure walk blocks all sixty at every depth and still approves all twenty unrelated artifacts, median decision {br['publish_median_s']} s over HTTPS. A monitor that checks only direct dependencies catches the twenty at depth one and passes forty stale artifacts; a monitor with no lineage passes all sixty.
 
 {chr(10).join(T3)}
 
-**Closing the audit blind spot.** Three of the six attacks were refused by the privilege layer before any trigger ran, so the audit never saw them, and a foreign-thread read returned zero rows silently. After the evaluation we closed this with an additive migration (`sql/hive_audit_denials.sql`, `tools/audit_denials_test.py`, scratch branch only, not on the frozen gate): the statement is accepted at the privilege layer, row security denies every effect, and the attempt is recorded, by statement-level triggers that fire on zero-row updates and deletes and by read policies that log once per transaction with the statement text. All six attacks now appear in the audit ({ad['attacks_visible_in_audit']} of 6, from 3), the victim thread is unchanged (tampered rows {ad['tampered']}), an honest agent's own-thread query records nothing, and an honest agent's unfiltered scan records one denied read, a true description of that statement. Statements against tables an agent holds no privilege on remain invisible; the gateway in future work is for those.
+**Closing the audit blind spot.** Three of the six attacks were refused by the privilege layer before any trigger ran, so the audit never saw them, and a foreign-thread read returned zero rows silently. The migration accepts the statement at the privilege layer, denies every effect with row security, and records the attempt: statement-level triggers fire on zero-row updates and deletes, and the read policies call a function that writes one audit row per transaction with the statement text before returning false. After it all six attacks appear in the audit ({ad['attacks_visible_in_audit']} of 6, from 3), the victim thread is unchanged (tampered rows {ad['tampered']}), an honest agent's own-thread query records nothing, and an honest agent's unfiltered scan of the whole table records one denied read, a true description of that statement. Statements against tables an agent holds no privilege on at all remain invisible; the gateway in future work is for those.
 
 {chr(10).join(T4)}
 """
-open("report/structural/SECTION.md", "w", encoding="utf-8").write(sec); print(sec)
+sec = re.sub(r"\n{3,}", "\n\n", sec)
+open("report/structural/SECTION.md", "w", encoding="utf-8").write(sec)
+tables = full
+open("report/structural/TABLES.md", "w", encoding="utf-8").write(tables); print(sec)

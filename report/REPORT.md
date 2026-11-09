@@ -67,7 +67,7 @@ The question is whether lineage preloaded into a reviewer's context changes stal
 
 **Fixed-input dispatch.** Every model call goes through a delivery recorder written by Lorien. The harness resolves artifact bodies from the authoritative store, constructs the exact request, hashes it and each delivered body, and transmits it without appending anything. When an agent's output is sealed, its dependencies come from that receipt, never from citations in the model's text. The recorder establishes what the harness supplied and sealed; it cannot establish what the model relied on.
 
-**Tasks.** Synthetic inventory counts with exact known answers, one harness-injected compromise opportunity per instance (a replayed stale body, a wrong body with valid lineage), identical across arms. No agent attempts anything adversarial in these runs; that lives in the separate containment battery. Identifiers are opaque random strings, because an early version leaked recency through names like `draft2`. Development variants: V0 clean completion; V1 an unrelated correction before review (false-quarantine control); V3 multi-hop stale evidence; V4 the same with source names omitted in prose; V5 a replayed stale artifact; V6 the figure unchanged, only the authorization changed. The held-out set adds V11 (V6 with no correction notice delivered) and the diagnostics V7 to V10 (transitive authority, an unrelated withdrawal with the same number, two sources with one revoked, and a wrong figure with valid lineage).
+**Tasks.** Synthetic inventory counts with exact known answers, one harness-injected compromise opportunity per instance (a replayed stale body, a wrong body with valid lineage), identical across arms. No agent attempts anything adversarial in these runs; that lives in the containment battery. Identifiers are opaque random strings, because an early version leaked recency through names like `draft2`. The held-out families are V6 (figure unchanged, authorization changed), V11 (V6 with no correction notice delivered) and V1 (an unrelated correction before review, the false-quarantine control); the development and diagnostics variants are listed in Appendix B.1 and B.7.
 
 **Scoring.** The reviewer returns a decision, a result, the evidence its result rests on, and a separate list of artifacts consulted but not relied on; an approval's evidence must include the approved draft itself, a rule added after the open-model pilot showed a stale pick with the right number and a current citation escaping detection. Gate events are recorded only after a separate committed-state query. The independently written scorer holds the answer keys and the authoritative provenance export and resolves withdrawn ancestors itself, so citing a summary cannot hide its dead source. Every registered run stays in the denominator, including timeouts, errors and invalid output. For lineage-visible staleness the expected unsafe-commit count is zero; for V10, whose lineage is valid, the measure is which reviewers catch a wrong figure by reading it.
 
@@ -115,68 +115,29 @@ On gemma-4-31b-it the lookup arm took its lookup in 13 of 120 offers, so it most
 
 Both rule arms approve every clean draft on every model. deepseek-v4-flash and qwen3.8-27b quarantine it in every complete slot of every model arm, and qwen3.5-397b in all but at most one per arm, including current, which sees only the bodies, the current source and an unrelated notice: the notice alone makes those models refuse. gemma-4-31b-it approves 51 of 60 without lineage and 41 of 60 with it, so visible lineage makes it more cautious on a clean draft, where the rule reading the same lineage pays nothing. False quarantine is model behavior under a notice, not a property of the lineage data.
 
-**Exploratory tier and diagnostics.** The three exploratory models split the same way (Appendix B.5): qwen3.8-27b follows the gemma-31 pattern with a lookup arm that mostly takes its lookup, qwen3.5-397b behaves like deepseek-v4-flash and quarantines nearly every clean draft, and gemma-4-26b-a4b-it is the weakest reviewer, with most lookup-arm slots ending as non-queued selections stopped before the gate. The full arm tracks compact on every model, so the historical bodies add nothing the lineage metadata did not carry. The diagnostics families are in Appendix B.7; the one to know about is V10, where the lineage is valid and the figure is wrong: the gate commits whatever the reviewer approves there by design, the lineage-only rule approves every one, the rule that also reads the figure catches all ten, and on both inferential models the model arms caught between 5 and 9 of 10.
+**Exploratory tier and diagnostics.** The three exploratory models split the same way (Appendix B.5): qwen3.8-27b follows the gemma-31 pattern, qwen3.5-397b behaves like deepseek-v4-flash and quarantines nearly every clean draft, and gemma-4-26b-a4b-it is the weakest reviewer; the full arm tracks compact everywhere, so historical bodies add nothing the lineage metadata did not carry. In the V10 diagnostic (valid lineage, wrong figure; Appendix B.7) the gate commits whatever the reviewer approves by design, the lineage-only rule approves every one, the content rule catches all ten, and the model arms caught 5 to 9 of 10.
 
 **Cost and incidents.** Settled usage 16.83 credits plus 7.92 held as reserves against provider timeouts whose billing the platform does not report; every cohort stayed under its ceiling. qwen3.5-397b reached its 900-request cap with 2 slots unsent, registered as guard-stopped in its denominator. The whole evaluation, including development, canaries, diagnostics and follow-ups, settled under 20 of the 100 authorized credits, under 30 if every reserve were charged. Deviations (a host sleep recovered with a resume mode under the original freeze, a diagnostics pause, and a post-results fix to the Holm bookkeeping that changed no p-value) are in Appendix B.9.
 
 ### 4.1 Follow-up cohorts run after the preregistered set (post-hoc, labeled)
 
-Both cohorts were frozen and run after the preregistered set had been analyzed and this report drafted, to test the two readings a reviewer would challenge first: new seeds, new freezes, separate ledgers, never pooled with the held-out set, same gate, scorer, budget and caps.
+Both cohorts were frozen and run after the preregistered set had been analyzed and this report drafted, to test the two readings a reviewer would challenge first: new seeds, new freezes, separate ledgers, never pooled; tables and full prose in Appendix B.10.
 
-**Does the gemma-31 gap close when the lookup is required?** The frozen rule let the model "decide directly if the supplied information suffices" and gemma-4-31b-it took the lookup in 13 of 120 offers; the follow-up requires the lookup as the first reply. Under that rule gemma-4-31b-it took the lookup in 120 of 120 offers and completed 120 of 120 same-number cases in the lookup arm against 119 of 120 with preloaded lineage (V6: compact minus lookup -0.017, Tango 95% [-0.089, +0.045]; V11: +0.000, [-0.060, +0.060]). The 51-case gap in the preregistered set was the optional wording of the lookup, not the model's ability to use lineage once it had it. Cost moved the other way: with the lookup required, the lookup arm spent a median 724 tokens more per case than compact over 119 settled pairs, so preloading is the cheaper way to deliver the same records.
+**Lookup required.** The frozen rule let the model decide without the lookup and gemma-4-31b-it took it in 13 of 120 offers. With the lookup required as the first reply it took it in 120 of 120 and completed 120 of 120 in the lookup arm against 119 of 120 with preloaded lineage (V6 compact minus lookup -0.017, Tango 95% [-0.089, +0.045]; V11 +0.000, [-0.060, +0.060]). The preregistered gap was the optional wording, not the model's use of lineage; the required lookup cost a median 724 tokens more per case than preloading.
 
-**Does the marginal DeepSeek V6 claim replicate?** The preregistered V6 claim held at one-sided p 0.043. An independent cohort of 60 new V6 instances: compact 60/60, lookup arm 51/60 (lookup taken 47/60), compact minus lookup +0.150, Tango 95% [+0.081, +0.261], non-inferiority at -0.10 holds (one-sided p 2.23e-05); the lookup arm spent a median 1971 tokens more per case than compact. Of the lookup arm's 9 misses, 3 are among the 7 slots where the model decided without taking the lookup, 0 took the lookup and still missed, and 6 are provider errors. The same model at temperature 0 took the lookup in 59 of 60 offers on the preregistered V6 instances and in 47 of 60 here, so whether an offered lookup is taken varies with the instance set as well as the model, and preloading does not depend on it. The two DeepSeek cohorts are reported side by side and not pooled.
-
-| model | lookup rule | family | compact | lookup arm | lookup taken | delta (compact minus lookup) | Tango 95% | NI at -0.10 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| gemma-4-31b-it | required | V6 | 59/60 | 60/60 | 60/60 | -0.017 | [-0.089, +0.045] | holds (p 0.0157) |
-| gemma-4-31b-it | required | V11 | 60/60 | 60/60 | 60/60 | +0.000 | [-0.060, +0.060] | holds (p 0.00491) |
-| deepseek-v4-flash | optional (as frozen) | V6 | 60/60 | 51/60 | 47/60 | +0.150 | [+0.081, +0.261] | holds (p 2.23e-05) |
+**DeepSeek V6 replicated.** Sixty new instances: compact 60/60, lookup arm 51/60 with the optional lookup taken 47/60, compact minus lookup +0.150, Tango 95% [+0.081, +0.261], non-inferiority holds (p 2.23e-05). The same model took the lookup in 59 of 60 offers on the preregistered instances and 47 of 60 here, so whether an optional lookup is taken varies with the instance set, and preloading does not depend on it. Not pooled with the preregistered cohort.
 
 ### 4.2 Structural tests: containment, identity under copying, blast radius
 
-Four deterministic tests run on a disposable branch with no model calls. They measure the substrate's structural claims directly, with the honest agents model-driven where agents act and the attacker a fixed script, because a model asked to impersonate another agent declined the role.
+Four deterministic tests on a disposable branch, no model calls; honest agents model-driven where agents act, the attacker a fixed script because a model asked to impersonate another agent declined the role. Full prose and tables in Appendix B.10.
 
-**Containment battery, naive board versus bound board.** The same six attacks (spoof a sender, rename, read a foreign thread, edit another agent's message, delete, replay) fired by the intruder login against both schemas. On the bound board three are refused outright and three are accepted as statements with no effect, because the trigger overwrites the claimed sender and the audit records the attempt.
+**Containment, naive versus bound.** The same six attacks against both boards. Naive: two spoofed identities landed, a rename fooled the board, four foreign rows read, one message tampered, three deleted, nothing logged. Bound: every count zero, two spoof attempts in the operator audit, honest chain complete on both.
 
-| effect of the six scripted attacks | naive shared board | identity bound below the agent |
-| --- | --- | --- |
-| spoofed identities that landed | 2 | 0 |
-| board fooled by a spoofed sender | yes | no |
-| board fooled by a rename | yes | no |
-| rows read from a thread the intruder is not party to | 4 | 0 |
-| another agent's message tampered | yes | no |
-| messages deleted by the intruder | 3 | 0 |
-| spoof attempts recorded in the operator audit | 0 | 2 |
-| audit readable by the intruder | no | no |
-| honest three-agent chain completed | yes | yes |
+**Identity under copying.** Ten copies of one agent with ten claimed names through one login: ten identities on the naive board, one on the bound intake with the ten names kept as evidence, and one grant revocation silenced all ten (`tools/identity_copies_test.py`).
 
-**Identity under copying.** Ten copies of one agent, each claiming a different name, submitting through one login (`tools/identity_copies_test.py`). On the naive board a name is an identity, so ten copies are ten agents, the shape of the motivating incident. On the bound intake the trigger binds all ten to the one login, keeps the ten claimed names as evidence, and a single grant revocation silences all ten at once; revoking the login refused new connections within seconds.
+**Blast radius.** One adjudicated root, sixty descendants three deep, twenty unrelated: the closure walk blocked 60 of 60 at every depth and approved 20 of 20 unrelated at a median 0.448 s; a direct-dependency check catches 20 of 60; no lineage catches none (`tools/blast_radius_test.py`).
 
-| ten copies of one agent, ten claimed names, one login | naive board | bound intake |
-| --- | --- | --- |
-| identities recorded | 10 | 1 |
-| claimed names kept as evidence | not applicable (name is identity) | 10 |
-| submissions that land after one grant revocation | not applicable (no grants) | 0 of 10 |
-
-**Blast radius of one compromised source.** One root, twenty agent drafts built on it, twenty summaries of those, twenty summaries of the summaries (sixty descendants, three deep), plus twenty artifacts on an independent root (`tools/blast_radius_test.py`). After the root is adjudicated the gate's closure walk blocks all sixty at every depth and still approves all twenty unrelated artifacts, median decision 0.448 s over HTTPS. A monitor that checks only direct dependencies, the common design, catches the twenty at depth one and passes forty stale artifacts; a monitor with no lineage passes all sixty.
-
-| after the root is adjudicated | descendants blocked (of 60, three deep) | unrelated approved (of 20) |
-| --- | --- | --- |
-| gate, full closure walk | 60 (depth 1: 20, depth 2: 20, depth 3: 20) | 20 |
-| direct-dependency check only | 20 | 20 |
-| no lineage | 0 | 20 |
-
-**Closing the audit blind spot.** Three of the six attacks were refused by the privilege layer before any trigger ran, so the audit never saw them, and a foreign-thread read returned zero rows silently. After the evaluation we closed this with an additive migration (`sql/hive_audit_denials.sql`, `tools/audit_denials_test.py`, scratch branch only, not on the frozen gate): the statement is accepted at the privilege layer, row security denies every effect, and the attempt is recorded, by statement-level triggers that fire on zero-row updates and deletes and by read policies that log once per transaction with the statement text. All six attacks now appear in the audit (6 of 6, from 3), the victim thread is unchanged (tampered rows 0), an honest agent's own-thread query records nothing, and an honest agent's unfiltered scan records one denied read, a true description of that statement. Statements against tables an agent holds no privilege on remain invisible; the gateway in future work is for those.
-
-| attack by the intruder login | effect, before and after | in the operator audit before | in the operator audit after |
-| --- | --- | --- | --- |
-| spoof another agent's name on a post | none (sender overwritten) | yes | yes |
-| post under a brand-new name | none (sender overwritten) | yes | yes |
-| read a thread it is not party to | none (zero rows) | no | yes |
-| read the operator audit | none | no | yes |
-| edit another agent's message | none | no | yes |
-| delete messages | none | no | yes |
+**Audit blind spot, closed after the evaluation.** Three of six attacks had left no audit row because the privilege layer refused them before any trigger ran. `sql/hive_audit_denials.sql` accepts the statement, denies every effect with row security, and records the attempt (statement-level triggers for zero-row updates and deletes, logging read policies): 6 of 6 attacks now visible, effects still zero, no false positives on an honest agent's own-thread reads. Scratch branch only, not on the frozen gate.
 
 ## 5. Discussion and Limitations
 
@@ -443,6 +404,73 @@ Separate freeze (seed 2026110803), eight families at ten instances, same six arm
 5. Post-hoc follow-up cohorts. Two cohorts were frozen and run after the preregistered set had been analyzed and this report drafted (section 4, follow-up subsection): a gemma-4-31b-it cohort with the lookup made mandatory and an independent deepseek-v4-flash V6 replication. New seeds, new freezes, separate ledgers, never pooled with the held-out set; their results are labeled post-hoc wherever they appear.
 6. Structural tests added after the report draft. The containment battery was run before the sprint's held-out evaluation; the identity-under-copying and blast-radius tests (section 4, structural subsection) were written and run on the scratch branch after the held-out analysis, with no model calls, and do not change any held-out number.
 7. Audit migration after the evaluation. `sql/hive_audit_denials.sql` (statement-level denial triggers and logging read policies on the bound board) was written and tested on the scratch branch after the held-out analysis. It is not applied to the evaluation branch and changes no held-out number; its before/after is in the structural subsection.
+
+### B.10 Follow-up cohorts and structural tests, tables
+
+**Follow-up cohorts (post-hoc): completion, tokens, slots and cost.**
+
+Both cohorts were frozen and run after the preregistered set had been analyzed and this report drafted, to test the two readings a reviewer would challenge first: new seeds, new freezes, separate ledgers, never pooled with the held-out set, same gate, scorer, budget and caps; tables in Appendix B.10.
+
+**Does the gemma-31 gap close when the lookup is required?** The frozen rule let the model "decide directly if the supplied information suffices" and gemma-4-31b-it took the lookup in 13 of 120 offers; the follow-up requires the lookup as the first reply. Under that rule gemma-4-31b-it took the lookup in 120 of 120 offers and completed 120 of 120 same-number cases in the lookup arm against 119 of 120 with preloaded lineage (V6: compact minus lookup -0.017, Tango 95% [-0.089, +0.045]; V11: +0.000, [-0.060, +0.060]). The 51-case gap in the preregistered set was the optional wording of the lookup, not the model's ability to use lineage once it had it. Cost moved the other way: with the lookup required, the lookup arm spent a median 724 tokens more per case than compact over 119 settled pairs, so preloading is the cheaper way to deliver the same records.
+
+**Does the marginal DeepSeek V6 claim replicate?** The preregistered V6 claim held at one-sided p 0.043. An independent cohort of 60 new V6 instances: compact 60/60, lookup arm 51/60 (lookup taken 47/60), compact minus lookup +0.150, Tango 95% [+0.081, +0.261], non-inferiority at -0.10 holds (one-sided p 2.23e-05); the lookup arm spent a median 1971 tokens more per case than compact. Of the lookup arm's 9 misses, 3 are among the 7 slots where the model decided without taking the lookup, 0 took the lookup and still missed, and 6 are provider errors. The same model at temperature 0 took the lookup in 59 of 60 offers on the preregistered V6 instances and in 47 of 60 here, so whether an offered lookup is taken varies with the instance set as well as the model, and preloading does not depend on it. The two DeepSeek cohorts are reported side by side and not pooled.
+
+| model | lookup rule | family | compact | lookup arm | lookup taken | delta (compact minus lookup) | Tango 95% | NI at -0.10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| gemma-4-31b-it | required | V6 | 59/60 | 60/60 | 60/60 | -0.017 | [-0.089, +0.045] | holds (p 0.0157) |
+| gemma-4-31b-it | required | V11 | 60/60 | 60/60 | 60/60 | +0.000 | [-0.060, +0.060] | holds (p 0.00491) |
+| deepseek-v4-flash | optional (as frozen) | V6 | 60/60 | 51/60 | 47/60 | +0.150 | [+0.081, +0.261] | holds (p 2.23e-05) |
+
+| model | lookup rule | settled pairs | Hodges-Lehmann, lookup minus compact tokens | sign test p |
+| --- | --- | --- | --- | --- |
+| gemma-4-31b-it | required | 119 | +724 | 3.01e-36 |
+| deepseek-v4-flash | optional | 57 | +1971 | 1.39e-17 |
+
+| cohort | registered | complete | errors or invalid | unsafe proposals | gate rejections | unsafe commits | settled | retained | ceiling | complete run |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| v2_gemma431bit_mandlookup | 240 | 239 | 1 | 0 | 0 | 0 | 0.0769 | 0.0251 | 1.0 | yes |
+| v2_deepseekv4fl_repV6 | 120 | 114 | 6 | 4 | 3 | 0 | 0.1728 | 0.1422 | 1.5 | yes |
+
+**Containment battery, naive board versus bound board.** The same six attacks (spoof a sender, rename, read a foreign thread, edit another agent's message, delete, replay) fired by the intruder login against both schemas. On the bound board three are refused outright and three are accepted as statements with no effect, because the trigger overwrites the claimed sender and the audit records the attempt.
+
+| effect of the six scripted attacks | naive shared board | identity bound below the agent |
+| --- | --- | --- |
+| spoofed identities that landed | 2 | 0 |
+| board fooled by a spoofed sender | yes | no |
+| board fooled by a rename | yes | no |
+| rows read from a thread the intruder is not party to | 4 | 0 |
+| another agent's message tampered | yes | no |
+| messages deleted by the intruder | 3 | 0 |
+| spoof attempts recorded in the operator audit | 0 | 2 |
+| audit readable by the intruder | no | no |
+| honest three-agent chain completed | yes | yes |
+
+**Identity under copying.** Ten copies of one agent, each claiming a different name, submitting through one login. On the naive board a name is an identity, so ten copies are ten agents, the shape of the motivating incident. On the bound intake the trigger binds all ten to the one login, keeps the ten claimed names as evidence, and a single grant revocation silences all ten at once; revoking the login refused new connections within seconds.
+
+| ten copies of one agent, ten claimed names, one login | naive board | bound intake |
+| --- | --- | --- |
+| identities recorded | 10 | 1 |
+| claimed names kept as evidence | not applicable (name is identity) | 10 |
+| submissions that land after one grant revocation | not applicable (no grants) | 0 of 10 |
+
+**Blast radius of one compromised source.** One root, twenty agent drafts built on it, twenty summaries of those, twenty summaries of the summaries (sixty descendants, three deep), plus twenty artifacts on an independent root. After the root is adjudicated the gate's closure walk blocks all sixty at every depth and still approves all twenty unrelated artifacts, median decision 0.448 s over HTTPS. A monitor that checks only direct dependencies catches the twenty at depth one and passes forty stale artifacts; a monitor with no lineage passes all sixty.
+
+| after the root is adjudicated | descendants blocked (of 60, three deep) | unrelated approved (of 20) |
+| --- | --- | --- |
+| gate, full closure walk | 60 (depth 1: 20, depth 2: 20, depth 3: 20) | 20 |
+| direct-dependency check only | 20 | 20 |
+| no lineage | 0 | 20 |
+
+**Closing the audit blind spot.** Three of the six attacks were refused by the privilege layer before any trigger ran, so the audit never saw them, and a foreign-thread read returned zero rows silently. The migration accepts the statement at the privilege layer, denies every effect with row security, and records the attempt: statement-level triggers fire on zero-row updates and deletes, and the read policies call a function that writes one audit row per transaction with the statement text before returning false. After it all six attacks appear in the audit (6 of 6, from 3), the victim thread is unchanged (tampered rows 0), an honest agent's own-thread query records nothing, and an honest agent's unfiltered scan of the whole table records one denied read, a true description of that statement. Statements against tables an agent holds no privilege on at all remain invisible; the gateway in future work is for those.
+
+| attack by the intruder login | effect, before and after | in the operator audit before | in the operator audit after |
+| --- | --- | --- | --- |
+| spoof another agent's name on a post | none (sender overwritten) | yes | yes |
+| post under a brand-new name | none (sender overwritten) | yes | yes |
+| read a thread it is not party to | none (zero rows) | no | yes |
+| read the operator audit | none | no | yes |
+| edit another agent's message | none | no | yes |
+| delete messages | none | no | yes |
 
 ## Appendix C. One inspectable trace
 

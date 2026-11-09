@@ -6,7 +6,7 @@ import markdown, subprocess, os, re, sys
 EDGE = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 CSS = """
 @page { size: Letter; margin: 0.75in 0.8in; }
-body { font-family: 'Times New Roman', Georgia, serif; font-size: 10pt; line-height: 1.28; color: #111; }
+body { font-family: 'Times New Roman', Georgia, serif; font-size: 10.5pt; line-height: 1.3; color: #111; }
 h1 { font-size: 17pt; margin: 0 0 6pt 0; line-height: 1.2; }
 h2 { font-size: 12.5pt; margin: 14pt 0 5pt 0; page-break-after: avoid; }
 h3 { font-size: 11pt; margin: 10pt 0 4pt 0; page-break-after: avoid; }
