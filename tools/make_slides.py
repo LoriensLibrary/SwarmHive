@@ -71,7 +71,7 @@ bullets(s, ["Five models; 5,400 registered slots: 3,600 model-reviewed and 1,800
 # 5 preloading vs optional vs required retrieval
 s = prs.slides.add_slide(blank); title(s, "Preloading vs optional vs required retrieval (post-hoc follow-ups)")
 bullets(s, ["Required lookup: 120/120 correct completions on new gemma-4-31b instances versus 119/120 with preloading, supporting the retrieval-uptake explanation, at an estimated 724 additional tokens per settled pair (Hodges-Lehmann).",
-            "Fresh DeepSeek cohort: preloading 60/60 versus 51/60 with optional lookup. Three misses followed decisions without retrieval; six were provider errors. Optional retrieval adds both skipped acquisition and execution-failure exposure.",
+            "Fresh DeepSeek cohort: preloading 60/60 versus 51/60 with optional lookup. Three misses followed decisions without retrieval; six were provider errors. In this cohort, optional retrieval failures included both skipped acquisition and provider errors.",
             "A second synthetic surface template (service-desk tickets) showed the same broad completion ordering, with zero lineage-invalid commits.",
             "Reading: in these tasks, preloading and required retrieval largely removed the acquisition failure, at different token costs."],
         0.6, 1.5, 12.1, 5.0, size=18)
@@ -83,5 +83,5 @@ bullets(s, ["Lineage is not truth: with valid lineage and a wrong figure (V10), 
             "A controlled reviewer-protocol evaluation over synthetic matched artifacts, not an adaptive swarm: two templates, four agents, one operator, no throughput measurements.",
             f"Supporting structural tests: copies sharing one login are attributed to one principal and revoked together; one adjudicated source blocks {br['gate_blocked']}/60 descendants where a direct-dependency check catches {br['direct_check_catches']}. The audit extension recorded all six tested attacks in committed statements; attacker-controlled rollback remains a blind spot."],
         0.6, 1.4, 12.1, 5.0, size=16)
-note(s, "Reproducibility: every number regenerates from committed traces (github.com/LoriensLibrary/SwarmHive). Whole evaluation: 7.92 credits metered, worst case 16.87 with timeout reserves, of 100 authorized. Deviations and post-hoc additions: report Appendix B.9.", color=NAVY, size=10)
+note(s, "Reproducibility: every number regenerates from committed traces (github.com/LoriensLibrary/SwarmHive). All paid runs: 8.75 credits metered, worst case 22.23 with timeout reserves, of 100 authorized. Deviations and post-hoc additions: report Appendix B.9.", color=NAVY, size=10)
 prs.save("report/SLIDES.pptx"); print("slides written")

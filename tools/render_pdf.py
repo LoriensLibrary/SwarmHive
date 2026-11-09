@@ -19,9 +19,11 @@ th { background: #eee; }
 code { font-family: Consolas, 'Courier New', monospace; font-size: 8.8pt; }
 .byline { color: #333; font-size: 10pt; margin-bottom: 10pt; }
 .appendix-break { page-break-before: always; }
+figure.fig { margin: 4pt 0 8pt 0; break-inside: avoid; page-break-inside: avoid; }
+figcaption { font-size: 9.5pt; margin-top: 2pt; text-align: justify; }
 img { width: 100%; display: block; margin: 4pt auto 2pt auto; page-break-inside: avoid; }
-img[alt="Figure 0"] { width: 78%; }
-img[alt="Figure 1"] { width: 94%; }
+img[alt="Figure 0"] { width: 86%; }
+img[alt="Figure 1"] { width: 86%; }
 em { color: #222; }
 """
 
@@ -33,6 +35,7 @@ def main():
     src = src.replace("\n## Appendix A.", "\n<div class=\"appendix-break\"></div>\n\n## Appendix A.")
     html = markdown.markdown(src, extensions=["tables", "fenced_code", "sane_lists"])
     html = html.replace("<p>Angela Faye Reinhold", "<p class=\"byline\">Angela Faye Reinhold", 1)
+    html = re.sub(r'<p>(<img[^>]*>)</p>\s*<p><em>(Figure \d\..*?)</em></p>', r'<figure class="fig">\1<figcaption><em>\2</em></figcaption></figure>', html, flags=re.S)
     doc = f"<!doctype html><html><head><meta charset='utf-8'><title>Sealed Provenance for Agent Swarms</title><style>{CSS}</style></head><body>{html}</body></html>"
     open("report/REPORT.html", "w", encoding="utf-8").write(doc)
     out = os.path.abspath("report/REPORT.pdf"); inp = "file:///" + os.path.abspath("report/REPORT.html").replace("\\", "/")
