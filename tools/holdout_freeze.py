@@ -57,7 +57,7 @@ def main():
             has_stale = bool(base.get("hops") == 2 or base.get("replay") or base.get("stale_queued") or base.get("two_sources"))   # a stale candidate is actually queued
             # counterbalanced queue order within each stratum, fixed per instance, identical across arms in the block
             spec["queue_order"] = ("stale_first" if i % 2 == 0 else "fresh_first") if has_stale else "single"
-            spec.update(wrong=wrong, right=right, item=rng.choice(ITEMS), site=f"site-{rng.randint(1, 9)}")
+            spec.update(wrong=wrong, right=right, item=rng.choice(pilot_runner.DOM["items"]), site=pilot_runner.DOM["site"].format(n=rng.randint(1, 9)))
             nonce = "h%s" % rng.getrandbits(24).to_bytes(3, "big").hex()
             tid = f"{v}i{i:02d}"
             arm_order = rng.sample(arms, len(arms))            # randomized within the paired block
@@ -90,7 +90,7 @@ def main():
     # Everything the runner re-checks BEFORE its first paid call must be here, under these exact keys.
     freeze = {"runner_commit": commit, "seed": a.seed, "variants": a.variants.split(","), "n_per_variant": a.n,
               "arms": arms, "instances": len(instances), "runs": len(manifest), "split": a.split,
-              "model": a.model, "provider": a.provider, "max_tokens": MAX_TOKENS, "lookup_mode": LOOKUP_MODE, "lookup_policy": pilot_runner.LOOKUP_POLICY, "ceiling": a.ceiling,
+              "model": a.model, "provider": a.provider, "max_tokens": MAX_TOKENS, "lookup_mode": LOOKUP_MODE, "lookup_policy": pilot_runner.LOOKUP_POLICY, "task_domain": pilot_runner.TASK_DOMAIN, "ceiling": a.ceiling,
               "manifest_sha256": hashlib.sha256(mbytes).hexdigest(), "instances_sha256": hashlib.sha256(ibytes).hexdigest(),
               "prompts_sha256": prompts_sha, **code_hashes(),
               "max_authorized_requests": sum(requests_for(i["spec"], i["arm_order"], a.upstream) for i in instances), "retries": a.retries, "upstream_mode": a.upstream,

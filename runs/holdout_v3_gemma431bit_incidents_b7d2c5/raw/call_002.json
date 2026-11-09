@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 25, \\\"summary\\\": \\\"payments queue in region-4: 25 tickets resolved\\\"}\",\"id\":\"ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_76e6f1\",\"ver\":1},{\"body\":\"{\\\"units\\\": 25, \\\"summary\\\": \\\"payments queue in region-4: 25 tickets resolved\\\"}\",\"id\":\"ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_318599\",\"ver\":1},{\"body\":\"{\\\"units\\\": 25, \\\"note\\\": \\\"observed resolved tickets for the payments queue in region-4\\\"}\",\"id\":\"ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_0365dd\",\"ver\":2}],\"corrections\":[{\"id\":\"ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_0365dd\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_0365dd\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_0365dd\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_0365dd\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_318599\",\"inputs\":[{\"id\":\"ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_0365dd\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_76e6f1\",\"inputs\":[{\"id\":\"ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_0365dd\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_76e6f1/1, ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_318599/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 2,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 1005,
+  "output_tokens": 238,
+  "cost": 0.000171,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-31b-it",
+  "provider_response_id": "resp_vTC2fzq-Shl4qA4MaXevO8voMyRw6KrHchbRLS1-7Tf_gSvEcerkSDwVyaP3kaZdlvJ0tXEk4yQ2A_f_F12WpsfgBSDAiHUsqCv5c5-D4Rtsdrx3Lp0YOowJYla6ZWXIMtdWaTyCNOzr4I6t2rP8qTaQNg1YzdaA9r7FTfRDJDrixhJuLbtlaZkrKjWlCNwLkVg5R4x6HF7P4qdcNcLXfWup1ZmNXYv_qvNxaxi_8liwMg2iCxeNK0sFncufvzkd6DBeDz6YQJ1Ll-ot3kgeGqFs_F7FiVQrkgt85nCdjhumYRPJqX3V-V21lfFSKGKeH9YbseAEalfbpSHmnOS8U6zzCCWOt0GQ8EDAdSC904VnGFqMEJ5KzXlwHETC53BsC-wbzk1XbO32gyMKKaL7nGE3EHXxaVH1oTCHFtAMWDbBatVOH4Zvw5D9_RMl1dO75wYgQaR1mkia712PB7XJZ764R_jLl5tqOCSLM-L4tnWk6mH66z6TOsVE0mCZOkFAtg9hnnAwPi-rqB8DIt2u8438OPc=",
+  "elapsed_s": 2.857,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_318599\", \"result\": {\"units\": 25}, \"evidence\": [{\"id\": \"ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_318599\", \"ver\": 1}, {\"id\": \"ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_0365dd\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph1ac665_V6i00_v3_gemma431bit_incidents_aa34d49ea368_76e6f1\", \"ver\": 1}]}\n```"
+ }
+}
