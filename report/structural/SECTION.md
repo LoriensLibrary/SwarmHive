@@ -1,4 +1,4 @@
-Four deterministic tests on a disposable branch with no model calls; the attacker is a fixed script because a model asked to impersonate another agent declined the role. Full prose and tables in Appendix B.10.
+Four deterministic tests on a disposable branch with no model calls (the attacker is a fixed script; a model asked to impersonate another agent declined). Full prose and tables in Appendix B.10.
 
 **Containment, naive versus bound.** The same six attacks against both boards. Naive: two spoofed identities landed, a rename fooled the board, four foreign rows read, one message tampered, three deleted, nothing logged. Bound: every count zero, two spoof attempts in the operator audit, honest chain complete on both.
 

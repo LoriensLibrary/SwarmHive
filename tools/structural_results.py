@@ -38,7 +38,7 @@ T4 = ["| attack by the intruder login | effect, before and after | in the operat
       f"| edit another agent's message | none | no | {'yes' if vis['tamper_message'] else 'no'} |",
       f"| delete messages | none | no | {'yes' if vis['delete_message'] else 'no'} |"]
 long = sec_full = None
-sec = f"""Four deterministic tests on a disposable branch with no model calls; the attacker is a fixed script because a model asked to impersonate another agent declined the role. Full prose and tables in Appendix B.10.
+sec = f"""Four deterministic tests on a disposable branch with no model calls (the attacker is a fixed script; a model asked to impersonate another agent declined). Full prose and tables in Appendix B.10.
 
 **Containment, naive versus bound.** The same six attacks against both boards. Naive: two spoofed identities landed, a rename fooled the board, four foreign rows read, one message tampered, three deleted, nothing logged. Bound: every count zero, two spoof attempts in the operator audit, honest chain complete on both.
 

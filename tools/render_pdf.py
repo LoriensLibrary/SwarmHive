@@ -20,7 +20,7 @@ code { font-family: Consolas, 'Courier New', monospace; font-size: 8.8pt; }
 .byline { color: #333; font-size: 10pt; margin-bottom: 10pt; }
 .appendix-break { page-break-before: always; }
 img { width: 100%; display: block; margin: 4pt auto 2pt auto; page-break-inside: avoid; }
-img[alt="Figure 0"] { width: 84%; }
+img[alt="Figure 0"] { width: 78%; }
 img[alt="Figure 1"] { width: 94%; }
 em { color: #222; }
 """

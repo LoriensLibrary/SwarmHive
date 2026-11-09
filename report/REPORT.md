@@ -33,7 +33,7 @@ The gate is a PostgreSQL schema in which the four agent roles hold no write acce
 
 ![Figure 0](figures/fig0_gate.png)
 
-*Figure 0. Permissions at the trust boundary. Agents hold one login and one direct write, a proposal the trigger binds to that login; every change to authoritative state goes through an operator-owned function callable only by the principals named in its box; agents read current records directly, and the lookup arm may fetch lineage records through one recorded request. Solid arrows are submissions or authorized writes, dashed arrows are reads or returned data.*
+*Figure 0. Permissions at the trust boundary: one login and one direct write per agent (a proposal bound to the login), every change through an operator-owned function callable by the principals named in its box, direct reads of current records, and one recorded lookup in the lookup arm. Solid arrows are writes, dashed arrows reads.*
 
 **Sealed creation.** `seal_artifact` is the only creator. The runtime calls it with the author from the authenticated dispatch context, the body, and the inputs it actually delivered to the model, and in one transaction writes the immutable artifact and its provenance edges, rejecting any input that is not already a sealed artifact. Late edges and cycles are impossible by construction; a correction is a new version, never an overwrite.
 
@@ -61,7 +61,7 @@ The question is whether lineage preloaded into a reviewer's context changes stal
 | rule + content | rule, plus a check of the figure against the current source | deterministic; gate decides | 900 | 900 | 0 | 0 | 0 | 0 | 900 |
 | all | | | 5400 | 5126 | 428 | 348 | 80 | 0 | 4077 |
 
-*Table 1. The six arms, pooled over the five held-out cohorts and three families (registered denominator 900 per arm). A model proposes; the gate decides. Unsafe proposals are approvals of a draft with invalid lineage or selections of a non-queued artifact; those that reached the gate were rejected on lineage, the rest were stopped before it.*
+*Table 1. The six arms pooled over five cohorts and three families (900 registered per arm). A model proposes; the gate decides. Unsafe proposals are approvals of a draft with invalid lineage or selections of a non-queued artifact.*
 
 **Fixed-input dispatch.** Every model call goes through a delivery recorder written by Lorien. The harness resolves artifact bodies from the authoritative store, constructs the exact request, hashes it and each delivered body, and transmits it without appending anything. When an agent's output is sealed, its dependencies come from that receipt, never from citations in the model's text. The recorder establishes what the harness supplied and sealed; it cannot establish what the model relied on.
 
@@ -85,7 +85,7 @@ Preregistered before any freeze (`report/HELDOUT_PREREGISTRATION.md`); analysis 
 
 ![Figure 1](figures/fig1_completion.png)
 
-*Figure 1. Completed correctly per arm on the same-number families (V6, V11) and clean-draft approval on the control (V1), five models, registered denominators. The lookup arm tracks how often the model took its lookup; on V1 three models refuse the clean draft in every model arm.*
+*Figure 1. Completed correctly per arm on V6 and V11, and clean-draft approval on V1, five models, registered denominators; labels give lookups taken of offered.*
 
 **Primary: completion, compact vs lookup-offered.** The two inferential models answer the question differently.
 
@@ -119,7 +119,7 @@ Both rule arms approve every clean draft on every model. deepseek-v4-flash and q
 
 **Exploratory tier and diagnostics.** The three exploratory models split the same way (Appendix B.5): qwen3.8-27b follows the gemma-31 pattern, qwen3.5-397b behaves like deepseek-v4-flash, gemma-4-26b-a4b-it is the weakest reviewer, and the full arm tracks compact everywhere. In the V10 diagnostic (valid lineage, wrong figure; Appendix B.7) the gate commits whatever the reviewer approves by design; the lineage-only rule approves every one, the content rule catches all ten, and the model arms caught 5 to 9 of 10.
 
-**Cost and incidents.** Settled usage 16.83 credits plus 7.92 held as reserves against provider timeouts whose billing the platform does not report; every cohort's running total (settled charges plus reserves held for unresolved attempts at the time of each call) stayed under its ceiling; the retained figure is the sum of reserves kept over all unresolved attempts, an upper bound on what the provider could still bill, and settled plus that bound exceeds the DeepSeek ceiling (Appendix B.8). qwen3.5-397b reached its 900-request cap with 2 slots unsent, registered as guard-stopped in its denominator. The whole evaluation, including development, canaries, diagnostics and follow-ups, settled under 20 of the 100 authorized credits, under 30 if every reserve were charged. Deviations (a host sleep recovered with a resume mode under the original freeze, a diagnostics pause, and a post-results fix to the Holm bookkeeping that changed no p-value) are in Appendix B.9.
+**Cost and incidents.** Settled usage 16.83 credits plus 7.92 held as reserves against provider timeouts whose billing the platform does not report; every cohort's running total stayed under its ceiling; Appendix B.8 defines what the ceiling bounds and why settled plus retained can exceed it. qwen3.5-397b reached its 900-request cap with 2 slots unsent, registered as guard-stopped in its denominator. The whole evaluation, including development, canaries, diagnostics and follow-ups, settled under 20 of the 100 authorized credits, under 30 if every reserve were charged. Deviations (a host sleep recovered with a resume mode under the original freeze, a diagnostics pause, and a post-results fix to the Holm bookkeeping that changed no p-value) are in Appendix B.9.
 
 ### 4.1 Follow-up cohorts run after the preregistered set (post-hoc, labeled)
 
@@ -133,7 +133,7 @@ Both cohorts were frozen and run after the preregistered set had been analyzed a
 
 ### 4.2 Structural tests: containment, identity under copying, blast radius
 
-Four deterministic tests on a disposable branch with no model calls; the attacker is a fixed script because a model asked to impersonate another agent declined the role. Full prose and tables in Appendix B.10.
+Four deterministic tests on a disposable branch with no model calls (the attacker is a fixed script; a model asked to impersonate another agent declined). Full prose and tables in Appendix B.10.
 
 **Containment, naive versus bound.** The same six attacks against both boards. Naive: two spoofed identities landed, a rename fooled the board, four foreign rows read, one message tampered, three deleted, nothing logged. Bound: every count zero, two spoof attempts in the operator audit, honest chain complete on both.
 
@@ -145,7 +145,7 @@ Four deterministic tests on a disposable branch with no model calls; the attacke
 
 ## 5. Discussion and Limitations
 
-**Discussion.** What is new is narrow. A tested multi-agent failure: stale evidence surviving a correction through summarization even when the number is unchanged. Its recovery under a gate agents cannot write around, verified by a second implementation and reproduced from source. A preregistered matched evaluation others can rerun. And the comparison that fell out of it: whether preloaded lineage beats on-demand retrieval turns on whether the model takes the retrieval, which the lookup control showed twice (13 of 120 offers taken on one model, 119 on another) and the post-hoc follow-up resolved: requiring the lookup took gemma-4-31b-it from 68 to 120 of 120 on new instances, consistent with the optional wording as the cause though not a proof of it, at a Hodges-Lehmann 724 more tokens per pair than preloading; an independent DeepSeek cohort took its optional lookup in 47 of 60 offers and completed 51 of 60 where preloading completed 60, three misses after decisions without retrieval and six provider errors, so completion depends on both uptake and successful execution.
+**Discussion.** What is new is narrow: the failure construction, its recovery under a gate that agent roles cannot write around through the tested interfaces, a preregistered matched evaluation others can rerun, and the comparison that fell out of it: whether preloaded lineage beats on-demand retrieval turns on whether the model takes the retrieval, which the lookup control showed twice (13 of 120 offers taken on one model, 119 on another) and the post-hoc follow-up resolved: requiring the lookup took gemma-4-31b-it from 68 to 120 of 120 on new instances, consistent with the optional wording as the cause though not a proof of it, at a Hodges-Lehmann 724 more tokens per pair than preloading; an independent DeepSeek cohort took its optional lookup in 47 of 60 offers and completed 51 of 60 where preloading completed 60, three misses after decisions without retrieval and six provider errors, so completion depends on both uptake and successful execution.
 
 The safety reading is in two parts. The gate is the part we would trust in deployment: across 5,400 registered slots on 5 models (3,600 model-reviewed), 428 unsafe proposals and 0 lineage-invalid commits, every approval row accounted for; in the V10 diagnostic, where lineage is valid and the figure wrong, it committed 34 content-wrong approvals across the two models, by design. The model reviewer above it is the part to measure per model: lineage that lifted one model from 68 to 119 of 120 made it refuse more clean drafts, three models refused all or nearly all clean drafts under any unrelated notice, and a deterministic rule reading the same lineage never false-quarantined and never missed a stale draft. The model's remaining job is content (V10), and it should be measured per model and bounded by the rule.
 
@@ -157,7 +157,7 @@ The safety reading is in two parts. The gate is the part we would trust in deplo
 
 A publication gate that re-reads authenticated lineage inside one fenced transaction held across 5,400 registered slots on 5 open models, 3,600 of them model-reviewed: 428 unsafe proposals, 80 stopped before the gate, 348 rejected at it, 0 lineage-invalid commits, 4,077 valid publications, every approval row on the evaluation branch accounted for. What a reviewer does above that gate depends on the model more than on how lineage reaches it. Preloaded lineage and an authenticated lookup reach the same decisions when the model takes the lookup and the lookup succeeds; when it does not, preloading is what saves the same-number case, and making the lookup mandatory closed that gap on gemma-31 at a token cost. The design choice this supports is preloading or a required lookup, not an optional one. Three of the five models refused all or nearly all clean drafts under an unrelated correction notice in every model-context condition, including review with no lineage, while a deterministic rule reading the same lineage never did; what drives that refusal is not isolated here.
 
-The failure we set out to test is real and reproducible: stale evidence survives a correction through summarization, and a reviewer with no lineage picked the stale draft exactly half the time on three of the five models when the number had not changed. The fix that held is the one agents cannot write around. The fix that varied is the one that asks a model to read. Code, traces and every generator are at github.com/LoriensLibrary/SwarmHive (Appendix C).
+The failure we set out to test is real and reproducible: stale evidence survives a correction through summarization, and a reviewer with no lineage picked the stale draft half the time on three of five models when the number had not changed. The fix that held is the one agents cannot write around. The fix that varied is the one that asks a model to read. Code, traces and every generator are at github.com/LoriensLibrary/SwarmHive (Appendix C).
 
 ## References
 

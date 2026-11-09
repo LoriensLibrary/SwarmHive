@@ -45,20 +45,20 @@ def main():
 
 **Contributions.** (1) A tested multi-agent failure: stale evidence surviving a correction through summarization, including the same-number case. (2) Its recovery under a publication gate that agent roles cannot write around through the tested interfaces, exercised by a separately authored acceptance suite of 19 boundary checks and rebuilt from source on a fresh database branch. (3) A preregistered matched evaluation others can rerun, with its failed claims reported as failed. (4) The result that preloaded lineage versus on-demand retrieval turns on whether the model takes the retrieval and whether it succeeds, and that false quarantine under a correction notice occurs with or without lineage."""
 
-    related = pick(S, "7. Prior work").split("\n\nWhat is new is narrow.")[0]
-    discussion_new = "What is new is narrow." + pick(S, "7. Prior work").split("\n\nWhat is new is narrow.")[1]
+    related = pick(S, "7. Prior work").split("\n\nWhat is new is narrow")[0]
+    discussion_new = "What is new is narrow" + pick(S, "7. Prior work").split("\n\nWhat is new is narrow")[1]
 
     gate_txt = pick(S, "2. The gate")
-    gate_txt = re.sub(r"\n&#91;embedded content:[^\n]*\n", "\n\n![Figure 0](figures/fig0_gate.png)\n\n*Figure 0. Permissions at the trust boundary. Agents hold one login and one direct write, a proposal the trigger binds to that login; every change to authoritative state goes through an operator-owned function callable only by the principals named in its box; agents read current records directly, and the lookup arm may fetch lineage records through one recorded request. Solid arrows are submissions or authorized writes, dashed arrows are reads or returned data.*\n", gate_txt)
+    gate_txt = re.sub(r"\n&#91;embedded content:[^\n]*\n", "\n\n![Figure 0](figures/fig0_gate.png)\n\n*Figure 0. Permissions at the trust boundary: one login and one direct write per agent (a proposal bound to the login), every change through an operator-owned function callable by the principals named in its box, direct reads of current records, and one recorded lookup in the lookup arm. Solid arrows are writes, dashed arrows reads.*\n", gate_txt)
     design = pick(S, "3. Experiment design")
     if os.path.exists("report/heldout_results/ARM_TABLE.md"):
         i0 = design.index("| Arm | What the reviewer sees |"); i1 = design.index("\n\n", i0)
-        design = design[:i0] + open("report/heldout_results/ARM_TABLE.md", encoding="utf-8").read().strip() + "\n\n*Table 1. The six arms, pooled over the five held-out cohorts and three families (registered denominator 900 per arm). A model proposes; the gate decides. Unsafe proposals are approvals of a draft with invalid lineage or selections of a non-queued artifact; those that reached the gate were rejected on lineage, the rest were stopped before it.*" + design[i1:]
+        design = design[:i0] + open("report/heldout_results/ARM_TABLE.md", encoding="utf-8").read().strip() + "\n\n*Table 1. The six arms pooled over five cohorts and three families (900 registered per arm). A model proposes; the gate decides. Unsafe proposals are approvals of a draft with invalid lineage or selections of a non-queued artifact.*" + design[i1:]
     methods = ("### 3.1 The gate\n\n" + gate_txt + "\n\n### 3.2 Experiment design\n\n" + design +
                "\n\n### 3.3 Development findings that shaped the freeze\n\n" + pick(S, "4. Development findings"))
     results = pick(S, "5. Held-out results")
-    fig1 = ("\n\n![Figure 1](figures/fig1_completion.png)\n\n*Figure 1. Completed correctly per arm on the same-number families (V6, V11) and clean-draft approval on the control (V1), five models, registered denominators. "
-            "The lookup arm tracks how often the model took its lookup; on V1 three models refuse the clean draft in every model arm.*\n\n")
+    fig1 = ("\n\n![Figure 1](figures/fig1_completion.png)\n\n*Figure 1. Completed correctly per arm on V6 and V11, and clean-draft approval on V1, five models, registered denominators; "
+            "labels give lookups taken of offered.*\n\n")
     anchor = "**Primary: completion, compact vs lookup-offered.**"
     assert results.count(anchor) == 1
     results = results.replace(anchor, fig1.strip("\n") + "\n\n" + anchor)
@@ -80,7 +80,7 @@ The safety reading is in two parts. The gate is the part we would trust in deplo
 
     conclusion = f"""A publication gate that re-reads authenticated lineage inside one fenced transaction held across {gate['slots']:,} registered slots on {n_models} open models, 3,600 of them model-reviewed: {gate['unsafe_proposals']} unsafe proposals, {gate['pre_gate_stops']} stopped before the gate, {gate['gate_rejections']} rejected at it, {gate['unsafe_commits']} lineage-invalid commits, {gate['correct_publications']:,} valid publications, every approval row on the evaluation branch accounted for. What a reviewer does above that gate depends on the model more than on how lineage reaches it. Preloaded lineage and an authenticated lookup reach the same decisions when the model takes the lookup and the lookup succeeds; when it does not, preloading is what saves the same-number case, and making the lookup mandatory closed that gap on gemma-31 at a token cost. The design choice this supports is preloading or a required lookup, not an optional one. Three of the five models refused all or nearly all clean drafts under an unrelated correction notice in every model-context condition, including review with no lineage, while a deterministic rule reading the same lineage never did; what drives that refusal is not isolated here.
 
-The failure we set out to test is real and reproducible: stale evidence survives a correction through summarization, and a reviewer with no lineage picked the stale draft exactly half the time on three of the five models when the number had not changed. The fix that held is the one agents cannot write around. The fix that varied is the one that asks a model to read. Code, traces and every generator are at github.com/LoriensLibrary/SwarmHive (Appendix C)."""
+The failure we set out to test is real and reproducible: stale evidence survives a correction through summarization, and a reviewer with no lineage picked the stale draft half the time on three of five models when the number had not changed. The fix that held is the one agents cannot write around. The fix that varied is the one that asks a model to read. Code, traces and every generator are at github.com/LoriensLibrary/SwarmHive (Appendix C)."""
 
     refs_full = pick(S, "References and acknowledgments")
     refs, ack = refs_full.split("**Acknowledgments.**") if "**Acknowledgments.**" in refs_full else (refs_full, "")
