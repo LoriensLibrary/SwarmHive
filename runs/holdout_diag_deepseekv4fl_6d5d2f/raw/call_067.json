@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 14, \\\"summary\\\": \\\"fuses at site-6: 14 units, per ph247006_V8i02_diag_deepseekv4fl_cb69a599fa66_e44758/1\\\"}\",\"id\":\"ph247006_V8i02_diag_deepseekv4fl_cb69a599fa66_3988be\",\"ver\":1},{\"body\":\"{\\\"units\\\": 14, \\\"note\\\": \\\"observed count of fuses at site-6\\\"}\",\"id\":\"ph247006_V8i02_diag_deepseekv4fl_cb69a599fa66_e44758\",\"ver\":1},{\"body\":\"{\\\"units\\\": 14, \\\"note\\\": \\\"observed count of fuses at site-6\\\"}\",\"id\":\"ph247006_V8i02_diag_deepseekv4fl_cb69a599fa66_0cc723\",\"ver\":2}],\"corrections\":[{\"id\":\"ph247006_V8i02_diag_deepseekv4fl_cb69a599fa66_0cc723\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"ph247006_V8i02_diag_deepseekv4fl_cb69a599fa66_0cc723\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph247006_V8i02_diag_deepseekv4fl_cb69a599fa66_0cc723\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph247006_V8i02_diag_deepseekv4fl_cb69a599fa66_3988be\",\"inputs\":[{\"id\":\"ph247006_V8i02_diag_deepseekv4fl_cb69a599fa66_e44758\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph247006_V8i02_diag_deepseekv4fl_cb69a599fa66_e44758\",\"inputs\":[],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph247006_V8i02_diag_deepseekv4fl_cb69a599fa66_3988be/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 67,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 810,
+  "output_tokens": 669,
+  "cost": 0.000125,
+  "unit": "credits",
+  "reasoning_tokens": 514,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_PEUpjA5HZjJGEe1WCKDtpFI3S0Cvvn3LQQhhbveTWEEb238zzf5aULF6Xqjh-XI6xulx-vmftjJrWBfe-8G-7P6JrKI_FIqOmjTkRuAucLZJVQNAP5Wgd6UQcM0lq4FFaD-MLAMpr_m5eB4TsL-bTFPLavWodcA3ccruWknSfm8jzjL8_p9tL3lvoqNKrU1YEYEZsMCsDmBvn0In3seSPVyD8aDX52lpjd8ukBjNvhCUsad-RWeLlCoZKKW5M5m1fcmgrA-3S6jsB6S_zGUrXaPZBYiiJ8V1gqd-nNZiAr9i5DKLODtsfjsESnZMvCde9uPp_VThAAxiwqcfyi0WWnczbvJWGOS66gQro3af0Icj8wqQ0AYFmAJ5lFiXwIM17wd2JS4OhKMw6o8OhpBpjPf5382eNPx4g3nblGcwhR0JRBUlu_bhAVr1kYwSOLXApzfXRNJQzW8PQe07rpnVoXiKXdSzVDh2Y8oLnGz26Ff-Zl80BRAzi79SHXH8wID-UiCtPVcXOBgJmRhRDlDee6SxBys=",
+  "elapsed_s": 8.587,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"ph247006_V8i02_diag_deepseekv4fl_cb69a599fa66_3988be\",\"result\":{\"units\":14},\"evidence\":[{\"id\":\"ph247006_V8i02_diag_deepseekv4fl_cb69a599fa66_3988be\",\"ver\":1},{\"id\":\"ph247006_V8i02_diag_deepseekv4fl_cb69a599fa66_e44758\",\"ver\":1}],\"consulted\":[{\"id\":\"ph247006_V8i02_diag_deepseekv4fl_cb69a599fa66_0cc723\",\"ver\":2}]}"
+ }
+}

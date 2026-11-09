@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 19, \\\"summary\\\": \\\"hinges at site-1: 19 units, per ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_a9dbc1/1, ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_b8209c/2\\\"}\",\"id\":\"ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_383608\",\"ver\":1},{\"body\":\"{\\\"units\\\": 18, \\\"summary\\\": \\\"hinges at site-1: 18 units, per ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_a9dbc1/1, ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_b8209c/1\\\"}\",\"id\":\"ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_f77a52\",\"ver\":1},{\"body\":\"{\\\"units\\\": 3, \\\"note\\\": \\\"observed count of hinges at site-1\\\"}\",\"id\":\"ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_a9dbc1\",\"ver\":1},{\"body\":\"{\\\"units\\\": 16, \\\"note\\\": \\\"observed count of hinges at site-1\\\"}\",\"id\":\"ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_b8209c\",\"ver\":2}],\"corrections\":[{\"id\":\"ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_b8209c\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_b8209c\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_383608/1, ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_f77a52/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 171,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 946,
+  "output_tokens": 953,
+  "cost": 0.000169,
+  "unit": "credits",
+  "reasoning_tokens": 713,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_6slSp--vfrf9whNYO03J2xAZ8zi8nv3j9AK-kPhSLTtdmMoHVpjj3t0RzLC5UXhnh9S9DLadCENDghPuOSROT38ZGeha9-sRuXOVY-evZ6dy0VhaAp9DX15uZZVbzkdULwDngxhNa4VDDhthHln9PoUvLHBeTgbcnCDq8Mkb1Ie8m2UkriFZXt5C5EB-2v4iJUR9_tk7pqUjdFqsavYEWkCK0TNFC9rraPE8geXdngsGKk3-ipMNX6ot4C9WR9w_CMl3lxz3KwlqfrFViH8sqcWd6DaSGY0GnJ-qOMY4umhUK7mTX4Xg89DlRVppT0f9a8U3hvXai0_bscrAKvlKVv0X8naNKZL3jqVOPgaGE6ocjAxqOBOeZD5XscbvRy1Ay_jLP2dEtPYV1jwhhBqiCUvCG_zsNrBpE6MpthHmioaWaAv0MAa4cgQ8MUaPgt3sXFYkKHKwzdDoepuKVuGq4UsJ9LpZRGgQepBYo3LvDWjTITqSXPZor2mdTjoRwqqD57owAwNGRzAQnps-vUZNQIBq3CI=",
+  "elapsed_s": 14.495,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_383608\",\"result\":{\"units\":19},\"evidence\":[{\"id\":\"ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_383608\",\"ver\":1},{\"id\":\"ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_a9dbc1\",\"ver\":1},{\"id\":\"ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_b8209c\",\"ver\":2}],\"consulted\":[{\"id\":\"ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_f77a52\",\"ver\":1},{\"id\":\"ph96fde9_V9i05_diag_deepseekv4fl_c6c308c15f36_b8209c\",\"ver\":1}]}"
+ }
+}

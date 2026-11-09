@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 13, \\\"summary\\\": \\\"rivets at site-6: 13 units, per pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_916090/2\\\"}\",\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_d60135\",\"ver\":1},{\"body\":\"{\\\"units\\\": 19, \\\"summary\\\": \\\"rivets at site-6: 19 units, per pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_916090/1\\\"}\",\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_276f0c\",\"ver\":1},{\"body\":\"{\\\"units\\\": 13, \\\"note\\\": \\\"observed count of rivets at site-6\\\"}\",\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_916090\",\"ver\":2}],\"corrections\":[{\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_916090\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_916090\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_d60135/1, pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_276f0c/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 227,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 736,
+  "output_tokens": 550,
+  "cost": 0.000106,
+  "unit": "credits",
+  "reasoning_tokens": 343,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_ibdbvCUdeHOR-dVPcCq6LFylW7u_J-EhyEqE05wsVJeB6bGACmyjFe-XTAnBUWjgLuibM-gLhthlvS22mGcy4SKO6-ejqVDzdGEpOYl0GYvJmQ25BPLw0QVldSVH8Zr5_uzxUi3-GCTeujfDk46jUbKEvl76bBG29MON3MILFtrviCPuEUus4x1lB-kua-dJMjI2Ej3Ina2EaC4fXRh5myzXI22q3T9HmA2Gyc0sB95ZQS3rBOM6JsLPm6rj-wSj2sY7So8_JwOZBaYul3uNKYQ0oN5lhIT3e6aEtsjxdKU3cpKEj7LRv_qaMfLFdoww_gGS06qcJBAynzxox6Driptija6IN9s_SN9SaX6kPjFhUG8WifjWztNtNOnd40ldT_Ypi7EQgnd10E-JTo5-VyMQwCGQkBi-zMJcpABGLrUXFHEdzwWaUmlaRAOaFmIG4dpLmfxz9OvggiiEUAoQAEP-yiuDZSCVWGYuolWHjbH7f3GFWX3NeWkrdGi-7cMshLsTg8PJpSGn5c4dmPY-WwzEGlc=",
+  "elapsed_s": 10.363,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_d60135\",\"result\":{\"units\":13},\"evidence\":[{\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_d60135\",\"ver\":1},{\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_916090\",\"ver\":2}],\"consulted\":[{\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_276f0c\",\"ver\":1},{\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_916090\",\"ver\":1}]}"
+ }
+}

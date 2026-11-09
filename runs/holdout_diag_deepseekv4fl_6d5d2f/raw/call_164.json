@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 13, \\\"summary\\\": \\\"hinges at site-7: 13 units, per phe1480f_V7i05_diag_deepseekv4fl_fab0c5afaeba_33c104/1\\\"}\",\"id\":\"phe1480f_V7i05_diag_deepseekv4fl_fab0c5afaeba_cd30f2\",\"ver\":1},{\"body\":\"{\\\"units\\\": 13, \\\"note\\\": \\\"observed count of hinges at site-7\\\"}\",\"id\":\"phe1480f_V7i05_diag_deepseekv4fl_fab0c5afaeba_70cc96\",\"ver\":2}],\"corrections\":[{\"id\":\"phe1480f_V7i05_diag_deepseekv4fl_fab0c5afaeba_70cc96\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"phe1480f_V7i05_diag_deepseekv4fl_fab0c5afaeba_70cc96\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phe1480f_V7i05_diag_deepseekv4fl_fab0c5afaeba_cd30f2/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 164,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 681,
+  "output_tokens": 926,
+  "cost": 0.000154,
+  "unit": "credits",
+  "reasoning_tokens": 901,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_d3pFhEYzfinSz9iFnUdmU0UmI8A7GsKHQm-tmbBoQFuBRm6CECyFhw6SaQtTvgwhwEMFK31EmHDqGLHxpflH0qamZX_NRJh-Yn0eO4fYJLrvmXImJjc_9YY_-Ji85ke86UaFrQCy-Uz6UOB6bJljzmXUhoOaeebL8P0pCToHZ7ophB6UCvp_sM1XhmNNAUpVdT_SbirReJ5tlwZAKnYeeH8RsSMT8X0AtD-iD4GZFMj4SJELaD2nBITQSjdVdsp6O2DK-TmDnB_7RPKxs6eySwFBAlwUu2KceSpEJ7e6KYGcQmdW5h0Zzzl67buW8rCbg5H6HaQDd75Ckk5RCKkjowIszjc6_DvRq1iMUef8EywHCHOVMf1NLVNBsi1pIwo9yJInDXczuprJ59BllBvno7TJIF1tzdGRlfDIqsyGecqRlKf5JARXeMVm_f1dVzm6cKglc5xtg7sXLDJV7gfKQPcQ1rhxtBMrVnwrXIJ6CWTSti92TGF3_45tyzaVq8eM0VMlynpTiM7swzKlK4j6Hpt-YgU=",
+  "elapsed_s": 15.202,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"lookup\",\"artifact\":null,\"result\":null,\"evidence\":[],\"consulted\":[]}"
+ }
+}

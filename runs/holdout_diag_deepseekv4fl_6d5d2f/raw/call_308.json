@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 17, \\\"summary\\\": \\\"rivets at site-1: 17 units, per ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_0719a2/1, ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_301b70/2\\\"}\",\"id\":\"ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_619dce\",\"ver\":1},{\"body\":\"{\\\"units\\\": 20, \\\"summary\\\": \\\"rivets at site-1: 20 units, per ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_0719a2/1, ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_301b70/1\\\"}\",\"id\":\"ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_a80fea\",\"ver\":1},{\"body\":\"{\\\"units\\\": 14, \\\"note\\\": \\\"observed count of rivets at site-1\\\"}\",\"id\":\"ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_0719a2\",\"ver\":1},{\"body\":\"{\\\"units\\\": 3, \\\"note\\\": \\\"observed count of rivets at site-1\\\"}\",\"id\":\"ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_301b70\",\"ver\":2}],\"corrections\":[{\"id\":\"ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_301b70\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_301b70\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_619dce/1, ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_a80fea/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 308,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 941,
+  "output_tokens": 1153,
+  "cost": 0.000196,
+  "unit": "credits",
+  "reasoning_tokens": 952,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_UGm3r_KwW6T-fau1lgKz46dm1QasbrkglbSTJkkEkiTwyP_fHy4JGoA66LYvIU5M_Xr1ufY4bCU6tYTbGGFZym84pTK1TWWSqWqnZEM2iKl69E0XVtuZgNt_2E6htizuBvpPq8IEobG1nlYMoIkl2_XiBFfnkEkXuH9xFVrI0PvKM_u080NW7I4031Oj6faFXG9tgu2_UAusSE5GijSq7eW3p4C0WAuEUsLvVzLbo5WEv4UethUXwJ0VMqE1XiLm8UW60khIY3bN3ivEESJkmN9SAQ3Lncr1996kwCTd9IWE2eMAXgjwUvTWydHftAhzDUCgg5NYpgRedK_p9ad4hOAWucFCWGiGhXB05OwDzPxhksfCSsHWUMyCAG1r2yqelvddIlAAjNQvE9M4WuAicRmE0Qf34Hw-ALZlmPV07nV0DKuPybpd185zdfu631Jq3xDF3-ZR0mJihiz7rgqu61TTsyfQqxEkBs-ev1zlrtXFB5iW-YLKZgjmC8E1BXDzfgj1PEE7rWtJykFe3tuc6e9c0YQ=",
+  "elapsed_s": 12.232,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_619dce\",\"result\":{\"units\":17},\"evidence\":[{\"id\":\"ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_619dce\",\"ver\":1},{\"id\":\"ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_0719a2\",\"ver\":1},{\"id\":\"ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_301b70\",\"ver\":2}],\"consulted\":[{\"id\":\"ph13bdc8_V9i09_diag_deepseekv4fl_c4ede34a4638_a80fea\",\"ver\":1}]}"
+ }
+}

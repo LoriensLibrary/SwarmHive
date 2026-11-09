@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 22, \\\"summary\\\": \\\"bearings at site-9: 22 units, per ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_739bf4/1\\\"}\",\"id\":\"ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_969ca1\",\"ver\":1},{\"body\":\"{\\\"units\\\": 22, \\\"note\\\": \\\"observed count of bearings at site-9\\\"}\",\"id\":\"ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_819af0\",\"ver\":2},{\"body\":\"{\\\"units\\\": 22, \\\"summary\\\": \\\"bearings at site-9: 22 units, per ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_819af0/2\\\"}\",\"id\":\"ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_739bf4\",\"ver\":1}],\"corrections\":[{\"id\":\"ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_819af0\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_819af0\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_739bf4\",\"inputs\":[{\"id\":\"ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_819af0\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_819af0\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_969ca1\",\"inputs\":[{\"id\":\"ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_739bf4\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_969ca1/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 303,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 905,
+  "output_tokens": 857,
+  "cost": 0.000154,
+  "unit": "credits",
+  "reasoning_tokens": 657,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_I57IXRFddl1yv9-4fCEiB5FTljU7PcleRBGbTqtoppWem8_9u3h4FhHhW2FWmAJuDwxN1IsnDb5Rqq66hCI6VZDWig21854rJ_OkHsTmqTmgAIXzr8XGPiE4yTPvU963pNf4td1ZulFxc02mQVCSmXnzr2cSh8zsufQyF_4_eY7px_A-fu8ijH_jaw2Tk7VJlMiQePFJrJuzPKk48rrmEJSwdaFdSdHk3_-qer_PKZnfHsig4-crgwW_XUUomqzo4ym8OhuwvURmuzRUtFQMrG6v1ZwNLOIbFeRNkiA80tn-cOC255cOwRyCTl042ndpkZwUz6daHHgKH6Jdn8JIsBfyY7wZ5tS3_8bOONSkHbJd2m5aaM0Ivzh4FUNlixw751PGgpY1VTyVHG5nu5RMVfnDAupq4OpoRmAR2W837JznX1BqtPoGV4dmh5USzZ8_0l-YbkRv9vIF0dUfCwErSvjfmArwo_haNvATBedBVzR7fM0zJfDtcHW5BPvMQM3x550RJKTA1OJpad6g_unLBi-DbAA=",
+  "elapsed_s": 8.2,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_969ca1\",\"result\":{\"units\":22},\"evidence\":[{\"id\":\"ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_969ca1\",\"ver\":1},{\"id\":\"ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_739bf4\",\"ver\":1},{\"id\":\"ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_819af0\",\"ver\":2}],\"consulted\":[{\"id\":\"ph39e89c_V7i09_diag_deepseekv4fl_e763b9daaa06_819af0\",\"ver\":1}]}"
+ }
+}

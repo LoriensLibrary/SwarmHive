@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 18, \\\"summary\\\": \\\"spools at site-3: 18 units\\\"}\",\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_746531\",\"ver\":1},{\"body\":\"{\\\"units\\\": 21, \\\"summary\\\": \\\"spools at site-3: 21 units\\\"}\",\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_6f77ee\",\"ver\":1},{\"body\":\"{\\\"units\\\": 18, \\\"note\\\": \\\"observed count of spools at site-3\\\"}\",\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_70f0d2\",\"ver\":2},{\"body\":\"{\\\"units\\\": 21, \\\"summary\\\": \\\"spools at site-3: 21 units\\\"}\",\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_45e46b\",\"ver\":1},{\"body\":\"{\\\"units\\\": 21, \\\"note\\\": \\\"observed count of spools at site-3\\\"}\",\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_70f0d2\",\"ver\":1}],\"corrections\":[{\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_70f0d2\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_70f0d2\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_45e46b\",\"inputs\":[{\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_70f0d2\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_6f77ee\",\"inputs\":[{\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_45e46b\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_70f0d2\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_70f0d2\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_746531\",\"inputs\":[{\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_70f0d2\",\"ver\":2}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_746531/1, ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_6f77ee/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 291,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 1105,
+  "output_tokens": 1149,
+  "cost": 0.000202,
+  "unit": "credits",
+  "reasoning_tokens": 921,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_hqDYCWkKUDmJg91IHu3R4aaU5YJEhw9X7LJNxM8kTNeckN-9cqwzp1tvC1B3byfnWTqHFaaSu-iQxR3fYFwYrbJZGTYJ7QgsI8lxGHkwc5b8Gg05b66juiXTffAuAwBrm7d7h-V3EEGBx09w4vX59LVS1zzvWFSHvxZSI3kvwHcvFk_lx5D2Ftvm-N5slZSvUkpFbQts6vqOQMN_kbSzMadPjnzll21IsK2epw4PlVVYHp4oO0yigo-09-dVU5cSIlbvG8iZTOGpmPCPs8cVN-okmc_wWezTmg5ajExVu_vfVzhc9-yRZNoakCD3R5SQHvs9M4AdN0Wj5SiMU7Ownhcrci_bWFbTLzCaP6uDG6tn5-78ezh2qvh15HRSqdX9unx5DRtiqPPib6f78afVkq4Ui-R61244xOnRaVjvSJS6a2eNBicbg7oEFmcgdobCtHDqyPGHHp8dnnvyCSrLuMH5Wsb4_AXRdJymdSy-saY1YNEok_K-BjELn6qJlCHXGEm2jlcf-dGsFe8qWLxqFqjzh40=",
+  "elapsed_s": 19.144,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_746531\",\"result\":{\"units\":18},\"evidence\":[{\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_746531\",\"ver\":1},{\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_70f0d2\",\"ver\":2}],\"consulted\":[{\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_6f77ee\",\"ver\":1},{\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_45e46b\",\"ver\":1},{\"id\":\"ph456658_V4i09_diag_deepseekv4fl_d89f2f344467_70f0d2\",\"ver\":1}]}"
+ }
+}

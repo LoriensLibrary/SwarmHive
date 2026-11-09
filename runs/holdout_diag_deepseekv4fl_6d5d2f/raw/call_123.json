@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 8, \\\"summary\\\": \\\"rivets at site-1: 8 units\\\"}\",\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_75cbd5\",\"ver\":1},{\"body\":\"{\\\"units\\\": 12, \\\"summary\\\": \\\"rivets at site-1: 12 units\\\"}\",\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_a656c9\",\"ver\":1},{\"body\":\"{\\\"units\\\": 12, \\\"note\\\": \\\"observed count of rivets at site-1\\\"}\",\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_eaab27\",\"ver\":2}],\"corrections\":[{\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_eaab27\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_eaab27\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_75cbd5\",\"inputs\":[{\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_a6ef9a\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_a656c9\",\"inputs\":[{\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_eaab27\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_a6ef9a\",\"inputs\":[{\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_eaab27\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_eaab27\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_eaab27\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_75cbd5/1, ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_a656c9/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 123,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 987,
+  "output_tokens": 708,
+  "cost": 0.000138,
+  "unit": "credits",
+  "reasoning_tokens": 476,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_A8xIYsBDpzzNuCO-NVVsvz9XeDKli7A0w92d4WIgrCpBueWWu1Ueqwob8BdOwywzRX3ghcI6tV8sFwK5hOWdkHi6oDj-ks8mwHtFO45VGZNbMyQ7XPUZwFjfc8t-Lftgbj_tdm1gBzg_G-cxf4nyCl0AqtYhi9M2NV-oYBFPKrTtvaG4wHJbQrIH5u-_pIgKkaquHHCGBoYX6wTqgerhfNe4F9EUfHkmWvT7HTIUB6LyYMtOKbSp_zI71F57Umd-rXf79uE9gPMWugVjJ4TiTI4AvW55YJtGT-UMq3xe79czfovrFym9elx4fA_K1fWd8QZD6SeDrfLmbTc_wz_DPpN2w35nW5fVispBoR20QxuuM9oWYYkE9LKzxPVcezAi0ydpADALXXK18huejwXwFYzQuz9YS317yiCZnOxkBvW5LsXsnGtR5WdD-P1XrOPykOqWN2v-K4rLgOBL0Nx37bzmE0M3jCiJQbfpuePx7LWQTonTsY_QhuupzYn-KsoU132S7Bf34pDNmRTkmp7Wx7CVaz4=",
+  "elapsed_s": 9.125,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_a656c9\",\"result\":{\"units\":12},\"evidence\":[{\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_a656c9\",\"ver\":1},{\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_eaab27\",\"ver\":2}],\"consulted\":[{\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_75cbd5\",\"ver\":1},{\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_a6ef9a\",\"ver\":1},{\"id\":\"ph67cf80_V4i04_diag_deepseekv4fl_b16932b9de11_eaab27\",\"ver\":1}]}"
+ }
+}

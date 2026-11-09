@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 39, \\\"summary\\\": \\\"bearings at site-5: 39 units, per phd38a35_V5i03_diag_deepseekv4fl_42afdbc99995_e5cafb/2\\\"}\",\"id\":\"phd38a35_V5i03_diag_deepseekv4fl_42afdbc99995_e4905f\",\"ver\":1},{\"body\":\"{\\\"units\\\": 42, \\\"summary\\\": \\\"bearings at site-5: 42 units, per phd38a35_V5i03_diag_deepseekv4fl_42afdbc99995_e5cafb/1\\\"}\",\"id\":\"phd38a35_V5i03_diag_deepseekv4fl_42afdbc99995_7a8a05\",\"ver\":1},{\"body\":\"{\\\"units\\\": 39, \\\"note\\\": \\\"observed count of bearings at site-5\\\"}\",\"id\":\"phd38a35_V5i03_diag_deepseekv4fl_42afdbc99995_e5cafb\",\"ver\":2}],\"corrections\":[{\"id\":\"phd38a35_V5i03_diag_deepseekv4fl_42afdbc99995_e5cafb\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"phd38a35_V5i03_diag_deepseekv4fl_42afdbc99995_e5cafb\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phd38a35_V5i03_diag_deepseekv4fl_42afdbc99995_e4905f/1, phd38a35_V5i03_diag_deepseekv4fl_42afdbc99995_7a8a05/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 92,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 812,
+  "output_tokens": 591,
+  "cost": 0.000115,
+  "unit": "credits",
+  "reasoning_tokens": 369,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_m2F96WAuh__4_Ah3etR9wQ9B5Suad-SITbbDR2cH1ijVv2BXLjPpbTDvSdD1T4-jVFEfJn7vDPyayrwOdV6tBMYahqQp4_c2EsGcUG_QSr6cxC1SLp85VeicgXYrY4RGTYw21Bu_Du8yvF5nsn--HvfNHGTiImcu4so_a3mNdQsvUwIPMxqy-yXkTPgg3vHcKiUnFSDNPaBi2eIFHGv2cIAGjZpgcat8zVQcwi-f6CxBbPnHvqlp_RMDe_nMQTghDdxLKck83e454XJMUZQKkxsCYpX79HieC65CnTyu17ThnBTXwfTEM0Ac9iWaKy9-8_m_ecdL2kQL9guuNzJC7-kCc4Dtk_rMCnNsiiitq0_GMIdU2ECpLzlB6a4fUBqx5U22X6MIt7ioakZIPdI2Hejb03_BDDRyGC0YUTrNNsuR10NwmKC_bRV_AMdxWgcH8m0CUfiaRwftgJinwbK4QkdcvqkKNvgrfbu2pzQxo__BgTngvoDvmGkSREyxFxa892vb8IKEiaFL_lHrtgVe4IDKuBQ=",
+  "elapsed_s": 8.568,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"phd38a35_V5i03_diag_deepseekv4fl_42afdbc99995_e4905f\", \"result\": {\"units\": 39}, \"evidence\": [{\"id\": \"phd38a35_V5i03_diag_deepseekv4fl_42afdbc99995_e4905f\", \"ver\": 1}, {\"id\": \"phd38a35_V5i03_diag_deepseekv4fl_42afdbc99995_e5cafb\", \"ver\": 2}], \"consulted\": [{\"id\": \"phd38a35_V5i03_diag_deepseekv4fl_42afdbc99995_7a8a05\", \"ver\": 1}, {\"id\": \"phd38a35_V5i03_diag_deepseekv4fl_42afdbc99995_e5cafb\", \"ver\": 1}]}"
+ }
+}

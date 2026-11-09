@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 25, \\\"summary\\\": \\\"hinges at site-2: 25 units\\\"}\",\"id\":\"phf66368_V10i07_diag_deepseekv4fl_e2d82dbca365_73b85c\",\"ver\":1},{\"body\":\"{\\\"units\\\": 20, \\\"note\\\": \\\"observed count of hinges at site-2\\\"}\",\"id\":\"phf66368_V10i07_diag_deepseekv4fl_e2d82dbca365_0ac042\",\"ver\":1}],\"corrections\":[],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phf66368_V10i07_diag_deepseekv4fl_e2d82dbca365_73b85c/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 244,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 552,
+  "output_tokens": 117,
+  "cost": 4e-05,
+  "unit": "credits",
+  "reasoning_tokens": 109,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_fAqTzXhU3W2u11aqKpYsbIDhm3Vgghb1GO5LYo8wzVWXTuNr4ZQ-JiQNPPRRaFEKoc5D_W9djIILnYqaQBhHIlYpeb9rQr0JAHMXSIYgkzTTbjDJ8stnbFOCC0gmy66nZ_UPfSy13YdJc3IToEgKkTuHWdh95i42XyFTUOjdA7o1uQyb2I36t795ckOXhwy6U7VffsYQotBxV8y23I_TZhloWUeZU3dhnf-tim2aiQJnb1lTq8wqK0FTIWOV7jhwwNCe2Lx9vPamnrVlP4piNEkQ8J10GWduaL1im5g_K5wLP5VnTRfz5isZ5if1L7thhmBUIHcxbr5iHR-PFlq9dzHgqwAvjhd0RNlRq8Y-vW3_uBe7ZtjvH5kqI0eLue6KdzoD8fdVriAWoDMV-grnzw9Kw4ug8GJcITojd6CxrIC3xuqe9YACj_KdEqod0539MN9zOdHCA2hlRo9WGIbScsEb7JnZydhXCeLF6b3Vv04QUpVt4kQNF_xgm5azOGoM6uj7afJnHb1VfpMHAd4OEgm7OYA=",
+  "elapsed_s": 1.715,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"lookup\"}"
+ }
+}

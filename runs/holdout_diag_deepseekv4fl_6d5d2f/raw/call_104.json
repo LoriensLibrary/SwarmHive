@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 30, \\\"summary\\\": \\\"valves at site-1: 30 units, per ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_3311dc/1, ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_c00fc7/2\\\"}\",\"id\":\"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_23ecf6\",\"ver\":1},{\"body\":\"{\\\"units\\\": 31, \\\"summary\\\": \\\"valves at site-1: 31 units, per ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_3311dc/1, ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_c00fc7/1\\\"}\",\"id\":\"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_ea2cac\",\"ver\":1},{\"body\":\"{\\\"units\\\": 11, \\\"note\\\": \\\"observed count of valves at site-1\\\"}\",\"id\":\"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_3311dc\",\"ver\":1},{\"body\":\"{\\\"units\\\": 19, \\\"note\\\": \\\"observed count of valves at site-1\\\"}\",\"id\":\"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_c00fc7\",\"ver\":2},{\"body\":\"{\\\"units\\\": 20, \\\"note\\\": \\\"observed count of valves at site-1\\\"}\",\"id\":\"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_c00fc7\",\"ver\":1}],\"corrections\":[{\"id\":\"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_c00fc7\",\"reason\":\"superseded by a re-authorized recount\",\"step\":4,\"superseded_by\":{\"id\":\"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_c00fc7\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_23ecf6\",\"inputs\":[{\"id\":\"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_3311dc\",\"ver\":1},{\"id\":\"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_c00fc7\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_3311dc\",\"inputs\":[],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_c00fc7\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_c00fc7\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_ea2cac\",\"inputs\":[{\"id\":\"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_3311dc\",\"ver\":1},{\"id\":\"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_c00fc7\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_23ecf6/1, ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_ea2cac/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 104,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 1288,
+  "output_tokens": 689,
+  "cost": 0.000149,
+  "unit": "credits",
+  "reasoning_tokens": 423,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_FPs1JCO5yGxqHfR5c5Aa61M4kFFx2F2qoFvOJBQk74gCkYNqVtMjfABcHtSW4MJ3DhIgcaI1OWYre1jZadjapRHxJY8KfqtJxWY-15Sk21y_60fJgwTYU607agONFLSmghMVuuevq0XJGzY34wlg-8rUIm3-UxECKDa4ujIDoVuqTYj_kL-EcpwzVOk-72V-hBzctLz8USec5A-yjD5l9PtRJBJ-jI0eHSANe_xSUz9g2XHK0IwYSzgkbxo3MwO99fNbZ6e5a2TwxwZzmr1HpYwMS7vFRRoEfTyE6iwb_nJ6YtLZmQqGr8tpDHRuA95IG1XQaejyjgCwwLv4Zd3Xcn2ezPpItMtD_7WMBfwZS1gzGJar1AnnqtUH-f7qEML1_Qcv3y9ImlmCofyS5oFQVMrDlNnlhhiDI8PBxnd0vhzffB-0ERT6n8IpTUlKGAOb5KJZTAFYg3aO7t-uVfRyAB_vVy_DDKoiNde9kw8kzbqpYwCeDDFS-OlslLUcp9xvn0IODJZH_nBRzgBGLi7B3dPeg4k=",
+  "elapsed_s": 10.194,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_23ecf6\", \"result\": {\"units\": 30}, \"evidence\": [{\"id\": \"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_23ecf6\", \"ver\": 1}, {\"id\": \"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_3311dc\", \"ver\": 1}, {\"id\": \"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_c00fc7\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_ea2cac\", \"ver\": 1}, {\"id\": \"ph2bd689_V9i03_diag_deepseekv4fl_b15a71cf0fd5_c00fc7\", \"ver\": 1}]}"
+ }
+}

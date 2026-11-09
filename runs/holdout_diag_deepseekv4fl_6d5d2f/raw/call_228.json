@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 13, \\\"summary\\\": \\\"rivets at site-6: 13 units, per pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_916090/2\\\"}\",\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_d60135\",\"ver\":1},{\"body\":\"{\\\"units\\\": 19, \\\"summary\\\": \\\"rivets at site-6: 19 units, per pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_916090/1\\\"}\",\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_276f0c\",\"ver\":1},{\"body\":\"{\\\"units\\\": 13, \\\"note\\\": \\\"observed count of rivets at site-6\\\"}\",\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_916090\",\"ver\":2}],\"corrections\":[{\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_916090\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_916090\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_d60135/1, pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_276f0c/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 228,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 826,
+  "output_tokens": 695,
+  "cost": 0.000129,
+  "unit": "credits",
+  "reasoning_tokens": 488,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_BDt1n_VqYfAUBU6QUSHpnYeuS1JG-5VvUKBjfkR9qSoCE-b24YT-08bXNtcWLYyon-WEDt0P05YgLJk2BvSLwVTpYR8Sw8ALdk0E1U6ddiKc3iU95PG_A77un50aXtN9BpP3EUDuX36OW3TJPXbIGkpPGkTSys4GPi29G7eignX7DUDJSaWNag0abZML1cgK1vWP5hv6RzYtr5BiFUUB2lgECfLYHPBHYwoFFyD0jWIUiKzBOQx-SCwZm_0y6MyJRkG6OXat9WMUxfiWlhKJOVJMaul29G9j5czeSlUS6MIDQvOlYuEV43YDnv5-DRqU2uzAdYLOoA4iTCMJ-n4XVOSTeJTfPbz0UlwjNveurbFxjCTEN7X_YSTR-XNFDQq1o7hX-8C7U3Jc5i5I-xYNl-ae05XDWbKY6-efIVngEekfTyP6lqJBhOwOFLD3s7u1dlviyxJWeXxYuCQfiu4Qoyn_-skMg2jy0lDcKw4xjkzxqE_eutQoSVLIic85K--v9lOBq9g9C1815l-a3ckoLZ89D8k=",
+  "elapsed_s": 13.216,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_d60135\",\"result\":{\"units\":13},\"evidence\":[{\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_d60135\",\"ver\":1},{\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_916090\",\"ver\":2}],\"consulted\":[{\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_276f0c\",\"ver\":1},{\"id\":\"pheb7590_V5i07_diag_deepseekv4fl_3c6b1ffab23f_916090\",\"ver\":1}]}"
+ }
+}
