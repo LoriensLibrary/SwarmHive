@@ -62,7 +62,11 @@ ARMS = ("current", "compact", "full")
 # Fourth arm (Lorien's lookup control, ported): current evidence plus ONE authenticated lookup of
 # each queued draft's recorded root source, delivered by a second stateless recorder-backed request.
 ARMS_ALL = ("current", "current_lookup", "compact", "full", "rule", "rule_content")   # rule = lineage-only eligibility; rule_content = eligibility + structured figure check; neither calls a model
-LOOKUP_RULE = ((" lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, "
+LOOKUP_POLICY = os.environ.get("LOOKUP_POLICY", "optional")   # optional (frozen held-out v1) | mandatory (v2 follow-up: the lookup is required before any decision)
+LOOKUP_RULE_MANDATORY = (" lookup_available=true means your FIRST reply must be {\"decision\":\"lookup\"} (other fields null or empty); a second request will then deliver "
+                         "the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies. "
+                         "Do not approve, reject or revalidate before that lookup. After it you must return a final approve, reject or revalidate.")
+LOOKUP_RULE_OPTIONAL = ((" lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, "
                 "the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, "
                 "with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. "
                 "After one lookup you must return a final approve, reject or revalidate.") if LOOKUP_MODE == "direct" else
@@ -70,6 +74,7 @@ LOOKUP_RULE = ((" lookup_available=true means you may reply {\"decision\":\"look
                 "the recorded source version and status behind each queued draft; a second request will then deliver those source "
                 "bodies and records. Decide directly if the supplied information suffices. After one lookup you must return a final "
                 "approve, reject or revalidate."))
+LOOKUP_RULE = LOOKUP_RULE_MANDATORY if LOOKUP_POLICY == "mandatory" else LOOKUP_RULE_OPTIONAL
 
 # ---------------- fixtures: synthetic inventory with exact answers ----------------
 # Each task: a wrong first source (except V0), the correct value, and an independent branch.

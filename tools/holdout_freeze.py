@@ -90,7 +90,7 @@ def main():
     # Everything the runner re-checks BEFORE its first paid call must be here, under these exact keys.
     freeze = {"runner_commit": commit, "seed": a.seed, "variants": a.variants.split(","), "n_per_variant": a.n,
               "arms": arms, "instances": len(instances), "runs": len(manifest), "split": a.split,
-              "model": a.model, "provider": a.provider, "max_tokens": MAX_TOKENS, "lookup_mode": LOOKUP_MODE, "ceiling": a.ceiling,
+              "model": a.model, "provider": a.provider, "max_tokens": MAX_TOKENS, "lookup_mode": LOOKUP_MODE, "lookup_policy": pilot_runner.LOOKUP_POLICY, "ceiling": a.ceiling,
               "manifest_sha256": hashlib.sha256(mbytes).hexdigest(), "instances_sha256": hashlib.sha256(ibytes).hexdigest(),
               "prompts_sha256": prompts_sha, **code_hashes(),
               "max_authorized_requests": sum(requests_for(i["spec"], i["arm_order"], a.upstream) for i in instances), "retries": a.retries, "upstream_mode": a.upstream,
