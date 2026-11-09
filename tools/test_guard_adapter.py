@@ -2,7 +2,7 @@
 negative or boolean usage must keep the reserve, and non-finite ceilings must be refused. No network."""
 import sys, os, tempfile, importlib.util, math
 os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-sys.path.insert(0, r"C:/Users/Angela/Documents/Codex/2026-11-06/che/outputs/swarm_reference")
+sys.path.insert(0, r"<home>/Documents/Codex/2026-11-06/che/outputs/swarm_reference")
 spec = importlib.util.spec_from_file_location("spr", "tools/pilot_runner.py"); pr = importlib.util.module_from_spec(spec); spec.loader.exec_module(pr)
 aspec = importlib.util.spec_from_file_location("ads", "tools/adaption_send.py"); ads = importlib.util.module_from_spec(aspec); aspec.loader.exec_module(ads)
 req = dict(model="gemma-4-31b-it", system="x", max_tokens=pr.MAX_TOKENS, messages=[{"role": "user", "content": "y"}])

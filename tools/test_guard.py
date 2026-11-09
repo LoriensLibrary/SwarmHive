@@ -1,7 +1,7 @@
 """Offline guard tests against a fake client. No network, no key, no DB."""
 import sys, os, tempfile, importlib.util, json
 os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-sys.path.insert(0, r"C:/Users/Angela/Documents/Codex/2026-11-06/che/outputs/swarm_reference")
+sys.path.insert(0, r"<home>/Documents/Codex/2026-11-06/che/outputs/swarm_reference")
 spec = importlib.util.spec_from_file_location("spr", "tools/pilot_runner.py"); pr = importlib.util.module_from_spec(spec); spec.loader.exec_module(pr)
 pr.time.sleep = lambda s: None
 req = dict(model="gemma-4-31b-it", system="x", max_tokens=pr.MAX_TOKENS, messages=[{"role": "user", "content": "y" * 1000}])
