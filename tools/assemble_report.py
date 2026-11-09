@@ -76,11 +76,11 @@ The safety reading is in two parts. The gate is the part we would trust in deplo
 
 **Limitations.** Appendix A gives the full list, as the sprint rules require. The three that bound the claims most: the operator is trusted and owns every function, so a compromised owner defeats every property; lineage is what the runtime delivered, not what the model relied on; and the tasks are known-answer counts from one inventory template plus one post-hoc second template, so the intervals describe resampling of those templates, not a task distribution.
 
-**Future work.** An eager deterministic lookup that delivers lineage records before the model's first call, making preloading redundant by construction; identity per agent instance rather than per role login; a trusted gateway in front of the database so that statements against objects an agent holds no privilege on, the one class the audit migration cannot see, become legible; contention and throughput measurements; and, with the sponsor's fine-tuning platform, a reviewer adapted on these traces and evaluated under the same frozen protocol."""
+**Future work.** An eager deterministic lookup that delivers lineage records before the model's first call; identity per agent instance rather than per role login; a trusted gateway in front of the database so that statements against objects an agent holds no privilege on become legible; contention and throughput measurements; and a reviewer fine-tuned on these traces, evaluated under the same frozen protocol."""
 
     conclusion = f"""A publication gate that re-reads authenticated lineage inside one fenced transaction held across {gate['slots']:,} registered slots on {n_models} open models, 3,600 of them model-reviewed: {gate['unsafe_proposals']} unsafe proposals, {gate['pre_gate_stops']} stopped before the gate, {gate['gate_rejections']} rejected at it, {gate['unsafe_commits']} lineage-invalid commits, {gate['correct_publications']:,} valid publications, every approval row on the evaluation branch accounted for. It checks lineage, not content: with valid lineage and a wrong figure it commits what the reviewer approves. What a reviewer does above that gate depends on the model more than on how lineage reaches it. Preloaded lineage and an authenticated lookup reach the same decisions when the model takes the lookup and the lookup succeeds; when it does not, preloading is what saves the same-number case, and making the lookup mandatory closed that gap on gemma-31 at a token cost. The design choice this supports is preloading or a required lookup, not an optional one. Three of the five models refused all or nearly all clean drafts under an unrelated correction notice in every model-context condition, including review with no lineage, while a deterministic rule reading the same lineage never did; what drives that refusal is not isolated here.
 
-The failure we set out to test is real and reproducible: stale evidence survives a correction through summarization, and a reviewer with no lineage picked the stale draft exactly half the time on three of the five models when the number had not changed. The fix that held is the one agents cannot write around. The fix that varied is the one that asks a model to read."""
+The failure we set out to test is real and reproducible: stale evidence survives a correction through summarization, and a reviewer with no lineage picked the stale draft exactly half the time on three of the five models when the number had not changed. The fix that held is the one agents cannot write around. The fix that varied is the one that asks a model to read. Code, traces and every generator are at github.com/LoriensLibrary/SwarmHive (Appendix C)."""
 
     refs_full = pick(S, "References and acknowledgments")
     refs, ack = refs_full.split("**Acknowledgments.**") if "**Acknowledgments.**" in refs_full else (refs_full, "")
@@ -133,8 +133,6 @@ The author worked with two AI systems throughout and discloses both. Aelen, a Cl
 ## 6. Conclusion
 
 {conclusion}
-
-**Code and data availability.** Repository github.com/LoriensLibrary/SwarmHive: every cohort's traces, ledgers, raw requests and responses, scored outputs, freeze records and analysis outputs are committed, and every number here regenerates from them (Appendix C).
 
 ## References
 
