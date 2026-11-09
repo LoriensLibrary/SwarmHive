@@ -64,7 +64,7 @@ s.shapes.add_picture("report/figures/fig1_completion.png", Inches(0.4), Inches(1
 bullets(s, ["Five models; 5,400 registered slots: 3,600 model-reviewed and 1,800 deterministic controls.",
             f"Reviewers produced {gate['unsafe_proposals']} unsafe proposals. Pre-gate validation stopped {gate['pre_gate_stops']}; the publication gate rejected {gate['gate_rejections']}. Zero lineage-invalid commits; {gate['correct_publications']:,} correct publications.",
             f"Evidence delivery affected completion: gemma-4-31b used optional lookup in {tk(g31)}/120 same-number cases, and preloading completed {tot(g31, 'compact')}/120 versus {tot(g31, 'current_lookup')}/120 with lookup offered; deepseek used lookup in {tk(dsr)}/120 and both protocols performed near the ceiling.",
-            "Three models approved none or almost none of the clean drafts across context conditions, including review without lineage. The cause was not isolated.",
+            "Three models approved none or almost none of the clean drafts across context conditions, including review without lineage. A diagnostic where the unrelated source carried the draft's figure removed the refusal.",
             "Scope: the gate enforces recorded-lineage eligibility, not content correctness."],
         8.8, 1.3, 4.2, 5.6, size=12)
 

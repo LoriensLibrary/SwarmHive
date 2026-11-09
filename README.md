@@ -26,7 +26,8 @@ evaluation recorded zero lineage-invalid commits and 4,077 correct publications.
 gemma-4-31b used optional lookup in 13/120 same-number cases, and preloading completed 119/120 versus 68/120 with lookup
 offered; deepseek-v4-flash used lookup in 119/120 cases and both protocols performed near the ceiling. Three models
 approved none or almost none of the clean drafts across context conditions, including review without lineage; the cause
-of this refusal was not isolated. Scope: the gate enforces recorded-lineage eligibility, not content correctness.
+of this refusal: a diagnostic where the unrelated source carried the draft's
+figure removed it. Scope: the gate enforces recorded-lineage eligibility, not content correctness.
 
 **Post-hoc follow-ups.** Requiring lookup produced 120/120 correct completions on new gemma instances versus 119/120 with
 preloading, supporting the retrieval-uptake explanation, at an estimated 724 additional tokens per settled pair

@@ -43,6 +43,7 @@ The deterministic checks use unique fixture IDs and retain their rows.
 ```
 python -I tools/det_tests.py                                   # deterministic gate properties
 python -I tools/race_test.py                                   # concurrent publish vs retraction, serialized commits
+python -I tools/race_schedules.py                              # overlapping schedules E-H on the scratch endpoint
 python -I tools/revocation_test.py                             # Track 3 revocation: grant revoke/restore, NOLOGIN (scratch endpoint)
 python -I tools/identity_copies_test.py                         # ten copies, one login: bound vs naive identity count, one revocation
 python -I tools/blast_radius_test.py                            # compromised root, 60 descendants three deep: gate vs direct check vs no lineage
