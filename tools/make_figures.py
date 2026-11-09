@@ -33,7 +33,7 @@ for ax, fam, title in zip(axes, ["V6", "V11", "V1"], ["V6: same number, authorit
     ax.set_xticks(list(x)); ax.set_xticklabels([labels[k] for k in order], rotation=28, ha="right", fontsize=6.5)
     ax.set_ylim(0, 1.18); ax.set_title(title, fontsize=7.5, pad=10)
     ax.axhline(1.0, color="#999", linewidth=0.4, linestyle=":")
-axes[0].set_ylabel("rate (registered denominator, 60 per cell)", fontsize=6.5)
+axes[0].set_ylabel("rate (of 60 registered)", fontsize=6.5)
 h, l = axes[0].get_legend_handles_labels(); fig.legend(h, l, loc="lower center", ncol=5, fontsize=6.5, frameon=False, bbox_to_anchor=(0.5, -0.02))
 fig.text(0.5, -0.09, "Completed correctly on V6 and V11; clean draft approved on V1. Above each V6/V11 group: lookups taken of offered in the lookup arm.", ha="center", fontsize=6.2, color="#333")
 fig.tight_layout(rect=(0, 0.06, 1, 1))

@@ -33,7 +33,7 @@ for y in (46.2, 39.2, 32.2, 25.2):
 box(37, 44, 28, 7, "seal_from_proposal, seal_artifact\ncallable by: the trusted runtime only", "#e8f0fa")
 box(37, 35, 28, 7, "invalidate\ncallable by: author (own) or adjudicator", "#e8f0fa")
 box(37, 25, 28, 8, "publish_decision (adjudicator only)\nfence; re-read lineage; validate; commit", "#e8f0fa")
-box(37, 15, 28, 8, "lookup (lookup arm only)\ncallable by the reviewer; one recorded request", "#e8f0fa")
+box(37, 15, 28, 8, "lookup (lookup arm only)\ncallable by the reviewer;\none recorded request", "#e8f0fa")
 
 box(70, 46, 29, 4.5, "exp.artifacts: sealed versions", "#f3f3f3", fs=5.5)
 box(70, 40, 29, 4.5, "exp.provenance: delivered inputs", "#f3f3f3", fs=5.5)
