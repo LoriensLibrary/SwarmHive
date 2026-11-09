@@ -8,7 +8,7 @@ PDF (report/REPORT.pdf) carries them. Nothing here is a secret: connection strin
 ## File index
 
 - `README.md` (9,729 bytes)
-- `report/REPORT.md` (74,246 bytes)
+- `report/REPORT.md` (74,120 bytes)
 - `REPRODUCE.md` (5,304 bytes)
 - `sql/experiment_schema.sql` (17,999 bytes)
 - `sql/seal_from_proposal.sql` (3,348 bytes)
@@ -182,7 +182,7 @@ The measured contribution is a Track 4 evaluation (a publication gate that re-re
 
 ## 2. Related Work
 
-None of the primitives are new: immutable versioned artifacts, a provenance graph, authority-checked invalidation and a gate that re-reads dependency state are version control, build systems and W3C PROV. Provenance-aware memory for human-AI systems is the subject of the first author's prior CAMA preprints, on which the Hive substrate was built in April 2026. AI control protocols (a trusted model overseeing an untrusted one) and Apart's earlier multi-agent sprints are the nearest neighbors on the evaluation side; the brief's references on collusion, spread and steganographic coordination frame the wider problem this entry does not attempt.
+None of the primitives are new: immutable versioned artifacts, a provenance graph, authority-checked invalidation and a gate that re-reads dependency state are version control, build systems and W3C PROV. Provenance-aware memory for human-AI systems is the subject of the first author's prior CAMA preprints, on which the Hive substrate was built in April 2026. AI control protocols (a trusted model overseeing an untrusted one) and Apart's earlier multi-agent sprints are the nearest neighbors on the evaluation side; the brief's references on collusion and steganographic coordination frame the wider problem not attempted here.
 
 ## 3. Methods
 
@@ -315,7 +315,7 @@ The safety reading is in two parts. The gate is the part we would trust in deplo
 
 ## 6. Conclusion
 
-A publication gate that re-reads authenticated lineage inside one fenced transaction held across 5,400 registered slots on 5 open models, 3,600 of them model-reviewed: 428 unsafe proposals, 80 stopped before the gate, 348 rejected at it, 0 lineage-invalid commits, 4,077 valid publications, every approval row on the evaluation branch accounted for. It checks lineage, not content: with valid lineage and a wrong figure it commits what the reviewer approves. What a reviewer does above that gate depends on the model more than on how lineage reaches it. Preloaded lineage and an authenticated lookup reach the same decisions when the model takes the lookup and the lookup succeeds; when it does not, preloading is what saves the same-number case, and making the lookup mandatory closed that gap on gemma-31 at a token cost. The design choice this supports is preloading or a required lookup, not an optional one. Three of the five models refused all or nearly all clean drafts under an unrelated correction notice in every model-context condition, including review with no lineage, while a deterministic rule reading the same lineage never did; what drives that refusal is not isolated here.
+A publication gate that re-reads authenticated lineage inside one fenced transaction held across 5,400 registered slots on 5 open models, 3,600 of them model-reviewed: 428 unsafe proposals, 80 stopped before the gate, 348 rejected at it, 0 lineage-invalid commits, 4,077 valid publications, every approval row on the evaluation branch accounted for. What a reviewer does above that gate depends on the model more than on how lineage reaches it. Preloaded lineage and an authenticated lookup reach the same decisions when the model takes the lookup and the lookup succeeds; when it does not, preloading is what saves the same-number case, and making the lookup mandatory closed that gap on gemma-31 at a token cost. The design choice this supports is preloading or a required lookup, not an optional one. Three of the five models refused all or nearly all clean drafts under an unrelated correction notice in every model-context condition, including review with no lineage, while a deterministic rule reading the same lineage never did; what drives that refusal is not isolated here.
 
 The failure we set out to test is real and reproducible: stale evidence survives a correction through summarization, and a reviewer with no lineage picked the stale draft exactly half the time on three of the five models when the number had not changed. The fix that held is the one agents cannot write around. The fix that varied is the one that asks a model to read. Code, traces and every generator are at github.com/LoriensLibrary/SwarmHive (Appendix C).
 
