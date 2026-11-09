@@ -126,7 +126,7 @@
 
 ### Gate integrity across registered slots
 
-| model | slots | gate calls | unsafe proposals | pre-gate stops | gate rejections | correct publications | unsafe commits | unknown commit outcome | db-verified approvals |
+| model | slots | gate calls | unsafe proposals | pre-gate stops | gate rejections | correct publications | lineage-invalid commits | unknown commit outcome | db-verified approvals |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | gemma-4-31b-it | 1080 | 1021 | 111 | 0 | 111 | 910 | 0 | 0 | 910 |
 | deepseek-v4-flash | 1080 | 792 | 38 | 1 | 37 | 755 | 0 | 0 | 755 |
@@ -158,7 +158,7 @@
 
 ### Diagnostics families (descriptive; V10 counts a correct abstention as completed)
 
-| model | family | current | current_lookup | compact | full | rule | rule_content | errors | invalid | unsafe proposals | unsafe commits |
+| model | family | current | current_lookup | compact | full | rule | rule_content | errors | invalid | unsafe proposals | content-wrong commits |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | gemma-4-31b-it | V0 | 10/10 | 10/10 | 10/10 | 9/10 | 10/10 | 10/10 | 1 | 0 | 0 | 0 |
 | gemma-4-31b-it | V3 | 10/10 | 10/10 | 10/10 | 9/10 | 10/10 | 10/10 | 1 | 0 | 0 | 0 |
@@ -179,7 +179,7 @@
 
 ### Diagnostics cohorts: slots, gate and cost
 
-| model | registered | complete | error 504 | missing | unsafe proposals | gate rejections | pre-gate stops | unsafe commits | unknown outcome | settled | retained | ceiling | complete run |
+| model | registered | complete | error 504 | missing | unsafe proposals | gate rejections | pre-gate stops | content-wrong commits | unknown outcome | settled | retained | ceiling | complete run |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | gemma-4-31b-it | 480 | 476 | 2 | 0 | 27 | 5 | 1 | 21 | 0 | 0.1534 | 0.0502 | 1.09 | yes |
 | deepseek-v4-flash | 480 | 465 | 13 | 0 | 14 | 0 | 1 | 13 | 0 | 0.6727 | 0.6162 | 1.89 | yes |

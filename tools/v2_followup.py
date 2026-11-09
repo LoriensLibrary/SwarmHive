@@ -49,7 +49,7 @@ def main():
     for model in cohorts:
         c = claims.get((model, "V6+V11", "tokens_lookup_minus_compact"))
         if c: TOK.append(f"| {model} | {'required' if model.startswith('gemma') else 'optional'} | {c['n']} | {c['hodges_lehmann']:+.0f} | {c['sign_p']:.3g} |")
-    SL = ["| cohort | registered | complete | errors or invalid | unsafe proposals | gate rejections | unsafe commits | settled | retained | ceiling | complete run |",
+    SL = ["| cohort | registered | complete | errors or invalid | unsafe proposals | gate rejections | lineage-invalid commits | settled | retained | ceiling | complete run |",
           "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"]
     for name, sl, gt, cost, c in (("v2_gemma431bit_mandlookup", gslots, ggate, gcost, g), ("v2_deepseekv4fl_repV6", dslots, dgate, dcost, d)):
         errs = sum(v for k, v in sl.items() if (k.startswith("error") or k.startswith("invalid")) and k != "unresolved_504_reserves")

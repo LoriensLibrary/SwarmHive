@@ -150,7 +150,7 @@ def diag_table(diag):
             unsafe = sum(1 for e in c["manifest"] if fam_of(e["task_id"]) == fam and sc.get(e["run_id"], {}).get("proposed_bad_approval"))
             bad = sum(int(sc.get(e["run_id"], {}).get("accepted_bad_actions") or 0) for e in c["manifest"] if fam_of(e["task_id"]) == fam)
             rows.append([c["model"], fam] + cells + [errs, inv, unsafe, bad])
-    return md_table(["model", "family"] + ARMS + ["errors", "invalid", "unsafe proposals", "unsafe commits"], rows)
+    return md_table(["model", "family"] + ARMS + ["errors", "invalid", "unsafe proposals", "content-wrong commits"], rows)
 
 
 def md_table(headers, rows):
@@ -244,7 +244,7 @@ def main():
         rows.append([idx[k]["model"]] + [g.get(x, 0) for x in ("slots", "gate_calls", "unsafe_proposals", "pre_gate_stops", "gate_rejections", "correct_publications", "unsafe_commits", "unknown_commit_outcome", "db_verified_approved_events")])
     rows.append(["all"] + [tot.get(x, 0) for x in ("slots", "gate_calls", "unsafe_proposals", "pre_gate_stops", "gate_rejections", "correct_publications", "unsafe_commits", "unknown_commit_outcome", "db_verified_approved_events")])
     T["gate_total"] = dict(tot)
-    md.append("### Gate integrity across registered slots\n\n" + md_table(["model", "slots", "gate calls", "unsafe proposals", "pre-gate stops", "gate rejections", "correct publications", "unsafe commits", "unknown commit outcome", "db-verified approvals"], rows))
+    md.append("### Gate integrity across registered slots\n\n" + md_table(["model", "slots", "gate calls", "unsafe proposals", "pre-gate stops", "gate rejections", "correct publications", "lineage-invalid commits", "unknown commit outcome", "db-verified approvals"], rows))
 
     if a.audit_dsn_file:
         try:
@@ -279,7 +279,7 @@ def main():
         for k, c in diag.items():
             s_, _ = slot_table(c); g = gate_integrity(c); cr = T["cohorts"][k]["cost"]
             rows.append([c["model"], s_.get("registered", 0), s_.get("complete", 0), s_.get("error_504", 0), s_.get("missing", 0), g.get("unsafe_proposals", 0), g.get("gate_rejections", 0), g.get("pre_gate_stops", 0), g.get("unsafe_commits", 0), g.get("unknown_commit_outcome", 0), cr["settled"], cr["retained"], cr["ceiling"], "yes" if c["done"] else "RUNNING"])
-        md.append("### Diagnostics cohorts: slots, gate and cost\n\n" + md_table(["model", "registered", "complete", "error 504", "missing", "unsafe proposals", "gate rejections", "pre-gate stops", "unsafe commits", "unknown outcome", "settled", "retained", "ceiling", "complete run"], rows))
+        md.append("### Diagnostics cohorts: slots, gate and cost\n\n" + md_table(["model", "registered", "complete", "error 504", "missing", "unsafe proposals", "gate rejections", "pre-gate stops", "content-wrong commits", "unknown outcome", "settled", "retained", "ceiling", "complete run"], rows))
     open(os.path.join(a.out, "TABLES.md"), "w", encoding="utf-8").write("\n".join(md))
     json.dump(T, open(os.path.join(a.out, "tables.json"), "w"), indent=1)
     print("\n".join(md))

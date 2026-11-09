@@ -15,7 +15,7 @@ Both cohorts were frozen and run after the preregistered set had been analyzed a
 | gemma-4-31b-it | required | 119 | +724 | 3.01e-36 |
 | deepseek-v4-flash | optional | 57 | +1971 | 1.39e-17 |
 
-| cohort | registered | complete | errors or invalid | unsafe proposals | gate rejections | unsafe commits | settled | retained | ceiling | complete run |
+| cohort | registered | complete | errors or invalid | unsafe proposals | gate rejections | lineage-invalid commits | settled | retained | ceiling | complete run |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | v2_gemma431bit_mandlookup | 240 | 239 | 1 | 0 | 0 | 0 | 0.0769 | 0.0251 | 1.0 | yes |
 | v2_deepseekv4fl_repV6 | 120 | 114 | 6 | 4 | 3 | 0 | 0.1728 | 0.1422 | 1.5 | yes |

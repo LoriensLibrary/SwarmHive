@@ -5,8 +5,9 @@ Report: `report/REPORT.pdf` (source `report/REPORT.md`, assembled by `tools/asse
 
 ## The question
 
-Can an enforced publication boundary stop agents from committing findings whose supporting provenance has become
-invalid, even when a model reviewer approves them? And does a reviewer that can see authenticated lineage behave
+We evaluate reviewer protocols above a trusted, provenance-validating publication boundary, on cases where factual
+agreement does not imply lineage eligibility. Can that boundary stop agents from committing findings whose supporting
+authorization has been withdrawn, even when a model reviewer approves them? And does a reviewer that can see authenticated lineage behave
 differently from one that must fetch it, or cannot?
 
 **What goes wrong without it.** One agent reports a figure, a second summarizes it, a third summarizes the summary; the
@@ -88,8 +89,10 @@ is reported separately in the report's V1 table; the gate's utility is the corre
 - The gate checks authenticated lineage, not truth. A false finding from an authorized source with valid lineage is
   committed if the reviewer approves it (V10). Only the content rule catches it.
 - Statements the database refuses at the privilege layer left no audit row during the evaluation. A post-evaluation
-  migration records denied updates, deletes and foreign reads (6 of 6 battery attacks visible, from 2); raw statements
-  against objects an agent holds no privilege on remain invisible.
+  migration records denied updates, deletes and foreign reads for committed statements (6 of 6 battery attacks visible,
+  from 2). The audit row is written by the attempt's own transaction, so an attacker who controls transaction boundaries
+  and rolls back leaves no row (tested); the HTTP path, one transaction per statement, is covered. Raw statements against
+  objects an agent holds no privilege on remain invisible. A trusted gateway that owns transaction boundaries is the fix.
 
 ## Reproduce
 

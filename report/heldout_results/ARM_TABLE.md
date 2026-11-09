@@ -1,4 +1,4 @@
-| arm | what the reviewer sees | enforcement | registered | complete | unsafe proposals | rejected at the gate | stopped before the gate | unsafe commits | correct publications |
+| arm | what the reviewer sees | enforcement | registered | complete | unsafe proposals | rejected at the gate | stopped before the gate | lineage-invalid commits | correct publications |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | current | queued drafts, current source, correction notice; no lineage | model proposes; gate decides | 900 | 784 | 264 | 258 | 6 | 0 | 372 |
 | current + lookup | current, plus one optional authenticated lookup of the lineage records | model proposes; gate decides | 900 | 784 | 151 | 82 | 69 | 0 | 532 |

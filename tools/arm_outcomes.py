@@ -34,7 +34,7 @@ for arm in order:
     rows.append(dict(arm=arm, registered=a["registered"], complete=a["complete"], unsafe_proposals=a["unsafe_proposals"], rejected_at_gate=a["gate_rejections"],
                      stopped_before_gate=stopped, unsafe_commits=a["unsafe_commits"], correct_publications=a["correct_publications"]))
 json.dump({"cohorts": dirs, "rows": rows}, open("report/heldout_results/arm_outcomes.json", "w"), indent=1)
-hdr = "| arm | what the reviewer sees | enforcement | registered | complete | unsafe proposals | rejected at the gate | stopped before the gate | unsafe commits | correct publications |"
+hdr = "| arm | what the reviewer sees | enforcement | registered | complete | unsafe proposals | rejected at the gate | stopped before the gate | lineage-invalid commits | correct publications |"
 sep = "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |"
 lines = [hdr, sep] + [f"| {r['arm'].replace('_', ' + ') if r['arm'] != 'rule_content' else 'rule + content'} | {sees[r['arm']]} | {enf[r['arm']]} | {r['registered']} | {r['complete']} | {r['unsafe_proposals']} | {r['rejected_at_gate']} | {r['stopped_before_gate']} | {r['unsafe_commits']} | {r['correct_publications']} |" for r in rows]
 tot = {k: sum(r[k] for r in rows) for k in ("registered", "complete", "unsafe_proposals", "rejected_at_gate", "stopped_before_gate", "unsafe_commits", "correct_publications")}
