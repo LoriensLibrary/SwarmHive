@@ -56,12 +56,17 @@ def main():
     methods = ("### 3.1 The gate\n\n" + pick(S, "2. The gate") + "\n\n### 3.2 Experiment design\n\n" + pick(S, "3. Experiment design") +
                "\n\n### 3.3 Development findings that shaped the freeze\n\n" + pick(S, "4. Development findings"))
     results = pick(S, "5. Held-out results")
+    fig1 = ("\n\n![Figure 1](figures/fig1_completion.png)\n\n*Figure 1. Completed correctly per arm on the same-number families (V6, V11) and clean-draft approval on the control (V1), five models, registered denominators. "
+            "Lineage preloaded (dark) and the deterministic rule (green) complete nearly every same-number case; the lookup arm (light blue) tracks how often the model took its lookup. On V1 three models refuse the clean draft in every model arm.*\n\n")
+    anchor = "**Primary: completion, compact vs lookup-offered.**"
+    assert results.count(anchor) == 1
+    results = results.replace(anchor, fig1.strip("\n") + "\n\n" + anchor)
     trace = pick(S, "6. One inspectable trace")
     import os
     if os.path.exists("report/heldout_v2_results/SECTION.md"):
         results += "\n\n### 4.1 Follow-up cohorts run after the preregistered set (post-hoc, labeled)\n\n" + open("report/heldout_v2_results/SECTION.md", encoding="utf-8").read().strip()
     if os.path.exists("report/structural/SECTION.md"):
-        results += "\n\n### 4.2 Structural tests: containment, identity under copying, blast radius\n\n" + open("report/structural/SECTION.md", encoding="utf-8").read().strip()
+        results += "\n\n### 4.2 Structural tests: containment, identity under copying, blast radius\n\n" + open("report/structural/SECTION.md", encoding="utf-8").read().strip() + ("\n\n![Figure 2](figures/fig2_structural.png)\n\n*Figure 2. Structural tests on the scratch branch, no model calls. Left: stale descendants blocked after one source is adjudicated, sixty descendants three deep. Middle: identities recorded for ten copies of one agent on one login. Right: attacks visible in the operator audit before and after the denial-logging migration.*")
 
     discussion = f"""**Discussion.** {discussion_new}
 

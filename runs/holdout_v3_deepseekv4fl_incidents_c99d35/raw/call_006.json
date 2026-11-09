@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 16, \\\"summary\\\": \\\"notifications queue in region-5: 16 tickets resolved\\\"}\",\"id\":\"ph4b1e35_V11i00_v3_deepseekv4fl_incidents_ff47dcaea74d_9c7051\",\"ver\":1},{\"body\":\"{\\\"units\\\": 16, \\\"summary\\\": \\\"notifications queue in region-5: 16 tickets resolved\\\"}\",\"id\":\"ph4b1e35_V11i00_v3_deepseekv4fl_incidents_ff47dcaea74d_f49931\",\"ver\":1},{\"body\":\"{\\\"units\\\": 16, \\\"note\\\": \\\"observed resolved tickets for the notifications queue in region-5\\\"}\",\"id\":\"ph4b1e35_V11i00_v3_deepseekv4fl_incidents_ff47dcaea74d_07d42b\",\"ver\":2}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph4b1e35_V11i00_v3_deepseekv4fl_incidents_ff47dcaea74d_07d42b\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph4b1e35_V11i00_v3_deepseekv4fl_incidents_ff47dcaea74d_07d42b\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph4b1e35_V11i00_v3_deepseekv4fl_incidents_ff47dcaea74d_9c7051\",\"inputs\":[{\"id\":\"ph4b1e35_V11i00_v3_deepseekv4fl_incidents_ff47dcaea74d_07d42b\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph4b1e35_V11i00_v3_deepseekv4fl_incidents_ff47dcaea74d_f49931\",\"inputs\":[{\"id\":\"ph4b1e35_V11i00_v3_deepseekv4fl_incidents_ff47dcaea74d_07d42b\",\"ver\":2}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph4b1e35_V11i00_v3_deepseekv4fl_incidents_ff47dcaea74d_9c7051/1, ph4b1e35_V11i00_v3_deepseekv4fl_incidents_ff47dcaea74d_f49931/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 6,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 862,
+  "output_tokens": 1010,
+  "cost": 0.000173,
+  "unit": "credits",
+  "reasoning_tokens": 771,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_rynZs1qxN95UgfeDspmzyHWBFNpH8-69TpfE5hiaF6LUCjQkvj2K2SwfGHpjt-q0RheLZK3SCHkv9Mbn9V-EZ2hf0d4HTG-uzQUpBEtq0YBdVZQLTOHlUUe64sW3RJWOyvGYxvH3QN_-MecftDdqLyu_fCHNzBYe7Dn1vc74KmVu7d9GaRHoSgMTdJ0sovlCqxdgW_W2kHxFO3AEDXYxRIbKs54ETt6_zN4dTVzgT9G1_Ec0geOFNS7d0grIhVv2KdTKpXFod1adin5eqgkr1D9LJdxGxWxeIpQ4nlTEwzvVR6Oidapn0V0zuDHSQcfQ1bYYvn-nJm2Yumkby4NttKGN_p3zwb99uz1re94hQPNhOFpwDUS07qS9gSsvElums2100u-OKFLBLezWvxmoWlJAqSbzNeOeSFEsv2ZfENs7OcoFiwWH5LkHLMa91FCDjuCgunRsr7CxNhq9ODJbudtewNu9nHrSOtG_nlvhL5iq5EsMV8lgABTe_BthvDi0LvPmPDczbOb2O1-vX1qz7za_b5I=",
+  "elapsed_s": 12.435,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"ph4b1e35_V11i00_v3_deepseekv4fl_incidents_ff47dcaea74d_f49931\", \"result\": {\"units\": 16}, \"evidence\": [{\"id\": \"ph4b1e35_V11i00_v3_deepseekv4fl_incidents_ff47dcaea74d_f49931\", \"ver\": 1}, {\"id\": \"ph4b1e35_V11i00_v3_deepseekv4fl_incidents_ff47dcaea74d_07d42b\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph4b1e35_V11i00_v3_deepseekv4fl_incidents_ff47dcaea74d_9c7051\", \"ver\": 1}, {\"id\": \"ph4b1e35_V11i00_v3_deepseekv4fl_incidents_ff47dcaea74d_07d42b\", \"ver\": 1}]}"
+ }
+}

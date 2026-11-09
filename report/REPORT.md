@@ -85,6 +85,10 @@ Preregistered before any freeze (`report/HELDOUT_PREREGISTRATION.md`); analysis 
 
 **What the gate did.** Across 5,400 registered slots the models made 428 unsafe proposals, an approval of a draft with invalid lineage or a selection of an artifact that was not a queued candidate. 348 were rejected by the fenced gate on lineage and 80 were stopped before the gate; 4,077 correct publications committed; unsafe commits: 0. One slot has an unknown commit outcome, the request in flight when the host slept and the database socket died; the branch holds its approval row and the scorer counts it as an error, not a publication. A read-only count of approvals on the evaluation branch matches the traces, with 4 extra rows from instances re-run whole after the resume and 1 from the unknown-outcome slot, every one accounted for (Appendix B).
 
+![Figure 1](figures/fig1_completion.png)
+
+*Figure 1. Completed correctly per arm on the same-number families (V6, V11) and clean-draft approval on the control (V1), five models, registered denominators. Lineage preloaded (dark) and the deterministic rule (green) complete nearly every same-number case; the lookup arm (light blue) tracks how often the model took its lookup. On V1 three models refuse the clean draft in every model arm.*
+
 **Primary: completion, compact vs lookup-offered.** The two inferential models answer the question differently.
 
 | model | family | compact | lookup-offered | lookup taken | delta | Tango 95% | Holm p | NI at -0.10 |
@@ -138,6 +142,10 @@ Four deterministic tests on a disposable branch, no model calls; honest agents m
 **Blast radius.** One adjudicated root, sixty descendants three deep, twenty unrelated: the closure walk blocked 60 of 60 at every depth and approved 20 of 20 unrelated at a median 0.448 s; a direct-dependency check catches 20 of 60; no lineage catches none (`tools/blast_radius_test.py`).
 
 **Audit blind spot, closed after the evaluation.** Three of six attacks had left no audit row because the privilege layer refused them before any trigger ran. `sql/hive_audit_denials.sql` accepts the statement, denies every effect with row security, and records the attempt (statement-level triggers for zero-row updates and deletes, logging read policies): 6 of 6 attacks now visible, effects still zero, no false positives on an honest agent's own-thread reads. Scratch branch only, not on the frozen gate.
+
+![Figure 2](figures/fig2_structural.png)
+
+*Figure 2. Structural tests on the scratch branch, no model calls. Left: stale descendants blocked after one source is adjudicated, sixty descendants three deep. Middle: identities recorded for ten copies of one agent on one login. Right: attacks visible in the operator audit before and after the denial-logging migration.*
 
 ## 5. Discussion and Limitations
 

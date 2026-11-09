@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 38, \\\"summary\\\": \\\"payments queue in region-8: 38 tickets resolved\\\"}\",\"id\":\"phdd2623_V11i02_v3_gemma431bit_incidents_aeca64c99e37_2eaecc\",\"ver\":1},{\"body\":\"{\\\"units\\\": 38, \\\"summary\\\": \\\"payments queue in region-8: 38 tickets resolved\\\"}\",\"id\":\"phdd2623_V11i02_v3_gemma431bit_incidents_aeca64c99e37_a3311e\",\"ver\":1},{\"body\":\"{\\\"units\\\": 38, \\\"note\\\": \\\"observed resolved tickets for the payments queue in region-8\\\"}\",\"id\":\"phdd2623_V11i02_v3_gemma431bit_incidents_aeca64c99e37_8fba1b\",\"ver\":2}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"phdd2623_V11i02_v3_gemma431bit_incidents_aeca64c99e37_2eaecc\",\"inputs\":[{\"id\":\"phdd2623_V11i02_v3_gemma431bit_incidents_aeca64c99e37_8fba1b\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phdd2623_V11i02_v3_gemma431bit_incidents_aeca64c99e37_8fba1b\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"phdd2623_V11i02_v3_gemma431bit_incidents_aeca64c99e37_8fba1b\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"phdd2623_V11i02_v3_gemma431bit_incidents_aeca64c99e37_a3311e\",\"inputs\":[{\"id\":\"phdd2623_V11i02_v3_gemma431bit_incidents_aeca64c99e37_8fba1b\",\"ver\":2}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phdd2623_V11i02_v3_gemma431bit_incidents_aeca64c99e37_2eaecc/1, phdd2623_V11i02_v3_gemma431bit_incidents_aeca64c99e37_a3311e/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 12,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 885,
+  "output_tokens": 292,
+  "cost": 0.000179,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-31b-it",
+  "provider_response_id": "resp_aTk5F5pBnYNbZZTv85Mcb5Nw-pPL2_q3JsTWKoaSf0BETT7HSBAruISGogXXquoVy0lN-5GtCqi8-bXME59CvrRJkH3CnMHZK_ABG1xYxbsmlvBlawd9J1FOj2QetLOGCRMdq5OV57p3ghNrO8A7TP2ECk5-oNYYRzlummO_vfZR7Ps62VY1MuD7LjRKAzQozZafRnLy90LY-EBetBIxl_aBKHH2cdSCzir1FLq6KGrluYBYh7ac-LdpCZzOTqpP_B4XuiN33vmVblpseCN8CxcYTINIvIIhtMafnm-3T86Q_Bt9sFwnxw9p2U_2vfzkEBPBFlNTcuizq4a5HynvQG-mdJsScncXeRMbrI3zZFk3BMJhxIX52YQXvjxc-2NTHLNpCYMyQaOKggKZlQpO1886e_1QJ8XNHrTfBL--bIEWqUmjlQ64LOCTbTuJZ0Oft-B-XV2raig_YpHr_kNX6f1wGx1SyRhewQjoRrg4hghsVZ9G5U7_3GOoXz8ggnizX6dl6pNEZUx29cgCM_5frjE1pJ0=",
+  "elapsed_s": 3.315,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\n  \"decision\": \"approve\",\n  \"artifact\": \"phdd2623_V11i02_v3_gemma431bit_incidents_aeca64c99e37_a3311e\",\n  \"result\": {\n    \"units\": 38\n  },\n  \"evidence\": [\n    {\n      \"id\": \"phdd2623_V11i02_v3_gemma431bit_incidents_aeca64c99e37_a3311e\",\n      \"ver\": 1\n    },\n    {\n      \"id\": \"phdd2623_V11i02_v3_gemma431bit_incidents_aeca64c99e37_8fba1b\",\n      \"ver\": 2\n    }\n  ],\n  \"consulted\": [\n    {\n      \"id\": \"phdd2623_V11i02_v3_gemma431bit_incidents_aeca64c99e37_2eaecc\",\n      \"ver\": 1\n    }\n  ]\n}\n```"
+ }
+}

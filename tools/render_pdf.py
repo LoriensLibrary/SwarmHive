@@ -18,6 +18,8 @@ th { background: #eee; }
 code { font-family: Consolas, 'Courier New', monospace; font-size: 8.8pt; }
 .byline { color: #333; font-size: 10pt; margin-bottom: 10pt; }
 .appendix-break { page-break-before: always; }
+img { width: 100%; display: block; margin: 6pt 0 2pt 0; page-break-inside: avoid; }
+em { color: #222; }
 """
 
 
