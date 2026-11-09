@@ -5,14 +5,14 @@ import markdown, subprocess, os, re, sys
 
 EDGE = r"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
 CSS = """
-@page { size: Letter; margin: 0.8in 0.85in; }
-body { font-family: 'Times New Roman', Georgia, serif; font-size: 10.5pt; line-height: 1.32; color: #111; }
+@page { size: Letter; margin: 0.75in 0.8in; }
+body { font-family: 'Times New Roman', Georgia, serif; font-size: 10pt; line-height: 1.28; color: #111; }
 h1 { font-size: 17pt; margin: 0 0 6pt 0; line-height: 1.2; }
 h2 { font-size: 12.5pt; margin: 14pt 0 5pt 0; page-break-after: avoid; }
 h3 { font-size: 11pt; margin: 10pt 0 4pt 0; page-break-after: avoid; }
 p { margin: 0 0 6pt 0; text-align: justify; }
 li { margin-bottom: 2pt; }
-table { border-collapse: collapse; width: 100%; font-size: 8.2pt; margin: 6pt 0 8pt 0; page-break-inside: avoid; }
+table { border-collapse: collapse; width: 100%; font-size: 8pt; margin: 6pt 0 8pt 0; page-break-inside: avoid; }
 th, td { border: 0.5pt solid #777; padding: 2pt 3.5pt; vertical-align: top; text-align: left; }
 th { background: #eee; }
 code { font-family: Consolas, 'Courier New', monospace; font-size: 8.8pt; }
@@ -38,8 +38,8 @@ def main():
     rd = PdfReader(out); n = len(rd.pages); body_end = None
     for i, pg in enumerate(rd.pages):
         t = pg.extract_text() or ""
-        if "Code and Data" in t and body_end is None and i > 0: body_end = i  # 0-based page where appendices start
-    print(f"pages {n}; body (before Code and Data) ends on page {body_end} (1-based: {body_end}); appendix pages {n - body_end if body_end else '?'}")
+        if "Built before the sprint" in t and body_end is None: body_end = i  # 0-based index of the page where Code and Data starts; body pages = this index
+    print(f"pages {n}; body pages (through Conclusion) {body_end}; Code and Data starts on page {body_end + 1 if body_end is not None else '?'}")
 
 
 if __name__ == "__main__":
