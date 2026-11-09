@@ -45,45 +45,43 @@ p = tf.add_paragraph(); p.text = "Preloaded lineage vs on-demand retrieval under
 p = tf.add_paragraph(); p.text = "Angela Faye Reinhold, Lorien's Library LLC. Swarm Alignment Hackathon, November 2026. Tracks 3 and 4."; p.font.size = Pt(16); p.font.color.rgb = GREY; p.font.name = "Georgia"
 p = tf.add_paragraph(); p.text = "github.com/LoriensLibrary/SwarmHive"; p.font.size = Pt(14); p.font.color.rgb = NAVY; p.font.name = "Georgia"
 
-# 2 question
-s = prs.slides.add_slide(blank); title(s, "The question", "Can an enforced publication boundary stop agents from committing findings whose provenance has become invalid, even when a model reviewer approves them?")
-bullets(s, ["What goes wrong: a figure is reported, summarized, summarized again, then withdrawn and replaced. The summaries still read as current.",
-            "The hard case: two drafts with the identical number, one descending from the withdrawn source. A reviewer with no lineage picked the stale one exactly half the time on three of five models.",
-            "The sprint's third and fourth questions, treated as one: put identity and the record one layer below the agents, where no agent can write. A lock rather than a camera.",
-            "Trust boundary stated up front: one operator seals, adjudicates and publishes. If that operator is compromised, every property below fails."],
-        0.6, 1.6, 12.1, 5.0, size=18)
+# 2 the concrete case
+s = prs.slides.add_slide(blank); title(s, "One concrete case: same number, withdrawn authorization")
+bullets(s, ["A researcher reports 12 units. A writer drafts \"12 units\" from that report. The report's authorization is then withdrawn and a re-authorized recount also says 12; a fresh draft from it says \"12 units\" too.",
+            "Two drafts sit in the review queue with the identical number. One descends from a withdrawn authorization; one does not. Nothing in the text tells them apart.",
+            "A reviewer with no lineage picked the stale draft half the time on three of five models. Factual agreement is not publication eligibility.",
+            "Question: can a trusted publication boundary stop the stale one from committing even when a model reviewer approves it? And how does the way the reviewer receives lineage change what it does?"],
+        0.6, 1.5, 12.1, 5.2, size=18)
 
-# 3 gate
-s = prs.slides.add_slide(blank); title(s, "The gate: permissions at the trust boundary")
-s.shapes.add_picture("report/figures/fig0_gate.png", Inches(0.8), Inches(1.35), width=Inches(11.7))
-note(s, "Agents hold one login and one direct write (a proposal the trigger binds to that login). Every change to authoritative state goes through an operator-owned function; publication re-reads the full upstream closure inside a fence. Verified by an independently written acceptance suite (19 live checks) and rebuilt from source on a fresh branch.")
+# 3 invariant and trust boundary
+s = prs.slides.add_slide(blank); title(s, "The invariant and the trust boundary")
+s.shapes.add_picture("report/figures/fig0_gate.png", Inches(1.3), Inches(1.25), width=Inches(10.7))
+note(s, "Invariant: at the publication transaction's serialization point an approval commits only if the selected artifact exists, is sealed, and neither it nor any recorded ancestor carries a blocking invalidation. Authorship is bound to authenticated principals; authoritative lineage changes are reserved for trusted functions. Assumes the trusted runtime and operator are uncompromised. Exercised by a separately authored suite of 19 boundary checks.", top=6.45, size=11)
 
-# 4 results
-s = prs.slides.add_slide(blank); title(s, "Held-out results: five open models, 5,400 registered slots, preregistered")
-s.shapes.add_picture("report/figures/fig1_completion.png", Inches(0.5), Inches(1.3), width=Inches(8.3))
-bullets(s, [f"{gate['unsafe_proposals']} unsafe proposals, {gate['unsafe_commits']} unsafe commits, {gate['correct_publications']:,} correct publications; every approval row on the evaluation branch accounted for.",
-            f"Preloaded lineage vs optional lookup turns on whether the model takes the lookup: gemma-4-31b took it {tk(g31)} of 120 times ({tot(g31, 'compact')} vs {tot(g31, 'current_lookup')} of 120 completed); deepseek took it {tk(dsr)} of 120 and the arms performed similarly near the ceiling.",
-            "False quarantine is model behavior: three of five models refused every clean draft under an unrelated notice, in every model arm. The deterministic rule never did.",
-            "Failed claims reported as failed: compact did not save tokens on gemma-31."],
-        9.0, 1.3, 3.9, 5.4, size=13)
+# 4 safety accounting and evidence delivery
+s = prs.slides.add_slide(blank); title(s, "Held-out evaluation (preregistered)")
+s.shapes.add_picture("report/figures/fig1_completion.png", Inches(0.4), Inches(1.3), width=Inches(8.2))
+bullets(s, ["Five models; 5,400 registered slots: 3,600 model-reviewed and 1,800 deterministic controls.",
+            f"Reviewers produced {gate['unsafe_proposals']} unsafe proposals. Pre-gate validation stopped {gate['pre_gate_stops']}; the publication gate rejected {gate['gate_rejections']}. Zero lineage-invalid commits; {gate['correct_publications']:,} correct publications.",
+            f"Evidence delivery affected completion: gemma-4-31b used optional lookup in {tk(g31)}/120 same-number cases, and preloading completed {tot(g31, 'compact')}/120 versus {tot(g31, 'current_lookup')}/120 with lookup offered; deepseek used lookup in {tk(dsr)}/120 and both protocols performed near the ceiling.",
+            "Three models approved none or almost none of the clean drafts across context conditions, including review without lineage. The cause was not isolated.",
+            "Scope: the gate enforces recorded-lineage eligibility, not content correctness."],
+        8.8, 1.3, 4.2, 5.6, size=12)
 
-# 5 follow-ups and structural
-s = prs.slides.add_slide(blank); title(s, "Follow-ups and structural tests (post-hoc, labeled)")
-s.shapes.add_picture("report/figures/fig2_structural.png", Inches(0.5), Inches(4.3), width=Inches(8.0))
-gl = v2c.get(("gemma-4-31b-it", "V6", "completion_NI")); dl = v2c.get(("deepseek-v4-flash", "V6", "completion_NI"))
-bullets(s, ["Lookup made mandatory: gemma-4-31b took it 120 of 120 and completed 120 of 120, against 119 with preloading. The gap was the optional wording, at a median 724 more tokens per case than preloading.",
-            "Independent DeepSeek V6 cohort: preloaded 60 of 60, optional lookup taken 47 of 60, lookup arm 51 of 60. Whether an optional lookup is taken varies with the instance set; preloading does not depend on it.",
-            "Second surface template (service-desk tickets instead of inventory): same ordering, zero unsafe commits.",
-            f"Structural: ten copies of one agent are {idc['bound_identities']} identity on the bound intake ({idc['naive_identities']} on a naive board), silenced by one revocation; one adjudicated source blocks {br['gate_blocked']} of 60 descendants three deep where a direct-dependency check catches {br['direct_check_catches']}; the audit blind spot closed, {ad['attacks_visible_in_audit']} of 6 attacks now visible with zero effect."],
-        0.6, 1.3, 12.1, 3.0, size=14)
+# 5 preloading vs optional vs required retrieval
+s = prs.slides.add_slide(blank); title(s, "Preloading vs optional vs required retrieval (post-hoc follow-ups)")
+bullets(s, ["Required lookup: 120/120 correct completions on new gemma-4-31b instances versus 119/120 with preloading, supporting the retrieval-uptake explanation, at an estimated 724 additional tokens per settled pair (Hodges-Lehmann).",
+            "Fresh DeepSeek cohort: preloading 60/60 versus 51/60 with optional lookup. Three misses followed decisions without retrieval; six were provider errors. Optional retrieval adds both skipped acquisition and execution-failure exposure.",
+            "A second synthetic surface template (service-desk tickets) showed the same broad completion ordering, with zero lineage-invalid commits.",
+            "Reading: in these tasks, preloading and required retrieval largely removed the acquisition failure, at different token costs."],
+        0.6, 1.5, 12.1, 5.0, size=18)
 
-# 6 limitations
-s = prs.slides.add_slide(blank); title(s, "What this does not establish")
-bullets(s, ["The operator is trusted and owns every function. A compromised owner defeats every property, including the audit.",
-            "Lineage is what the runtime delivered, not what the model relied on. A false claim with no verifiable contradiction stays undetectable; a wrong figure with valid lineage passes the gate (V10), and only the content rule catches it.",
-            "Two synthetic templates, 60 (and 30) instances per cell, no throughput or contention measurements, four agents and one operator, not the thousand-agent regime of the incident.",
-            "Statements against objects an agent holds no privilege on leave no audit row; a trusted gateway is future work.",
-            "Everything regenerates from committed traces: tools/analysis.py, results_tables.py, write_section5.py, v2_followup.py, v3_domain.py, structural_results.py, arm_outcomes.py, make_figures.py."],
-        0.6, 1.5, 12.1, 5.2, size=17)
-note(s, "Spend for the whole evaluation: under 20 of 100 authorized credits. Deviations and post-hoc additions are listed in Appendix B.9 of the report.", color=NAVY)
+# 6 content blind spot and limits
+s = prs.slides.add_slide(blank); title(s, "Content blind spot and deployment limits")
+bullets(s, ["Lineage is not truth: with valid lineage and a wrong figure (V10), the gate commits what the reviewer approves. The content rule caught every tested wrong figure; model reviewers caught some but not all.",
+            "The operator is trusted and owns every function. Lineage is what the runtime delivered, not what the model relied on.",
+            "A controlled reviewer-protocol evaluation over synthetic matched artifacts, not an adaptive swarm: two templates, four agents, one operator, no throughput measurements.",
+            f"Supporting structural tests: copies sharing one login are attributed to one principal and revoked together; one adjudicated source blocks {br['gate_blocked']}/60 descendants where a direct-dependency check catches {br['direct_check_catches']}. The audit extension recorded all six tested attacks in committed statements; attacker-controlled rollback remains a blind spot."],
+        0.6, 1.4, 12.1, 5.0, size=16)
+note(s, "Reproducibility: every number regenerates from committed traces (github.com/LoriensLibrary/SwarmHive). Whole evaluation under 20 of 100 authorized credits. Deviations and post-hoc additions: report Appendix B.9.", color=NAVY, size=10)
 prs.save("report/SLIDES.pptx"); print("slides written")

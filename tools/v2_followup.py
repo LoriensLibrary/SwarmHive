@@ -88,15 +88,15 @@ def main():
     sec += (f". Of the lookup arm's {miss_no + miss_yes + la_err} misses, {miss_no} are among the {no_lk} slots where the model decided without taking the lookup, {miss_yes} took the lookup and still missed, and {la_err} are provider errors. "
             f"The same model at temperature 0 took the lookup in 59 of 60 offers on the preregistered V6 instances and in {d6[0].get('lookup_used', 0)} of 60 here, so whether an offered lookup is taken varies with the instance set as well as the model, and preloading does not depend on it.")
     sec += " The two DeepSeek cohorts are reported side by side and not pooled.\n"
-    short = ("Both cohorts were frozen and run after the preregistered set had been analyzed and this report drafted, to test the two readings a reviewer would challenge first: new seeds, new freezes, separate ledgers, never pooled; tables and full prose in Appendix B.10.\n\n"
-             f"**Lookup required.** The frozen rule let the model decide without the lookup and gemma-4-31b-it took it in 13 of 120 offers. With the lookup required as the first reply it took it in {gtk} of {gof} and completed {gcl} of {gof} in the lookup arm against {gcp} of {gof} with preloaded lineage"
+    short = ("Both cohorts were frozen and run after the preregistered set had been analyzed and this report drafted: new seeds, new freezes, separate ledgers, never pooled; tables and full prose in Appendix B.10.\n\n"
+             f"**Lookup required.** With the lookup required as the first reply, gemma-4-31b-it took it in {gtk} of {gof} offers and produced {gcl}/{gof} correct completions on new instances versus {gcp}/{gof} with preloading"
              + (f" (V6 compact minus lookup {gc6['delta']:+.3f}, Tango 95% {fmt_ci(gc6['tango_95'])}; V11 {gc11['delta']:+.3f}, {fmt_ci(gc11['tango_95'])})" if gc6 and gc11 else "")
-             + ". With new instances this supports the optional wording as the cause of the preregistered gap; it does not prove it was the only cause"
-             + (f"; the required lookup cost a Hodges-Lehmann {abs(gtok['hodges_lehmann']):.0f} tokens more per settled pair than preloading." if gtok else ".")
+             + ". Requiring lookup eliminated the observed completion gap, supporting the retrieval-uptake explanation"
+             + (f", at an estimated {abs(gtok['hodges_lehmann']):.0f} additional tokens per settled pair (Hodges-Lehmann)." if gtok else ".")
              + "\n\n"
-             f"**DeepSeek V6 replicated.** Sixty new instances: compact {d6[1].get('completed', 0)}/60, lookup arm {d6[0].get('completed', 0)}/60 with the optional lookup taken {d6[0].get('lookup_used', 0)}/60"
-             + (f", compact minus lookup {dc6['delta']:+.3f}, Tango 95% {fmt_ci(dc6['tango_95'])}, non-inferiority {'holds' if dc6['reject_at_0.05'] else 'fails'} (p {dc6['ni_p']:.3g})" if dc6 else "")
-             + f". Of the lookup arm's misses, three followed decisions without retrieval and six were provider errors, so completion there depends on both retrieval uptake and successful execution; the same model took the lookup in 59 of 60 offers on the preregistered instances and {d6[0].get('lookup_used', 0)} of 60 here. Not pooled with the preregistered cohort.\n")
+             f"**Fresh DeepSeek cohort.** Preloading completed {d6[1].get('completed', 0)}/60 cases versus {d6[0].get('completed', 0)}/60 with optional lookup (lookup taken {d6[0].get('lookup_used', 0)}/60"
+             + (f"; compact minus lookup {dc6['delta']:+.3f}, Tango 95% {fmt_ci(dc6['tango_95'])}" if dc6 else "")
+             + "): three misses followed decisions without retrieval and six were provider errors, so the gap combines skipped retrieval and execution failure. Not pooled with the preregistered cohort.\n")
     open(f"{a.out}/SECTION.md", "w", encoding="utf-8").write(short)
     open(f"{a.out}/TABLES.md", "w", encoding="utf-8").write(sec + "\n" + tables)
     print(tables); print(sec)
