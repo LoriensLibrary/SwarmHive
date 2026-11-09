@@ -25,7 +25,7 @@ def main():
     src = open("report/REPORT.md", encoding="utf-8").read()
     # the gate diagram lives in the live doc as a widget; the PDF carries its caption as a sentence
     src = re.sub(r"\n&#91;embedded content:[^\n]*\n", "\n", src)
-    src = src.replace("\n## Code and Data\n", "\n<div class=\"appendix-break\"></div>\n\n## Code and Data\n")
+    src = src.replace("\n## Appendix A.", "\n<div class=\"appendix-break\"></div>\n\n## Appendix A.")
     html = markdown.markdown(src, extensions=["tables", "fenced_code", "sane_lists"])
     html = html.replace("<p>Angela Faye Reinhold", "<p class=\"byline\">Angela Faye Reinhold", 1)
     doc = f"<!doctype html><html><head><meta charset='utf-8'><title>Sealed Provenance for Agent Swarms</title><style>{CSS}</style></head><body>{html}</body></html>"
