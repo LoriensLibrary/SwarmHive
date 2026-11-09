@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 31, \\\"summary\\\": \\\"payments queue in region-5: 31 tickets resolved\\\"}\",\"id\":\"ph8a6248_V11i12_v3_deepseekv4fl_incidents_a625c0be569b_014c8d\",\"ver\":1},{\"body\":\"{\\\"units\\\": 31, \\\"summary\\\": \\\"payments queue in region-5: 31 tickets resolved\\\"}\",\"id\":\"ph8a6248_V11i12_v3_deepseekv4fl_incidents_a625c0be569b_6f2320\",\"ver\":1},{\"body\":\"{\\\"units\\\": 31, \\\"note\\\": \\\"observed resolved tickets for the payments queue in region-5\\\"}\",\"id\":\"ph8a6248_V11i12_v3_deepseekv4fl_incidents_a625c0be569b_e86c81\",\"ver\":2}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph8a6248_V11i12_v3_deepseekv4fl_incidents_a625c0be569b_014c8d\",\"inputs\":[{\"id\":\"ph8a6248_V11i12_v3_deepseekv4fl_incidents_a625c0be569b_e86c81\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph8a6248_V11i12_v3_deepseekv4fl_incidents_a625c0be569b_6f2320\",\"inputs\":[{\"id\":\"ph8a6248_V11i12_v3_deepseekv4fl_incidents_a625c0be569b_e86c81\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph8a6248_V11i12_v3_deepseekv4fl_incidents_a625c0be569b_e86c81\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph8a6248_V11i12_v3_deepseekv4fl_incidents_a625c0be569b_e86c81\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph8a6248_V11i12_v3_deepseekv4fl_incidents_a625c0be569b_014c8d/1, ph8a6248_V11i12_v3_deepseekv4fl_incidents_a625c0be569b_6f2320/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 74,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 852,
+  "output_tokens": 624,
+  "cost": 0.000121,
+  "unit": "credits",
+  "reasoning_tokens": 388,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_Ezl2znqKJKr0IBTP8tXkDUck6yCfA72cI0OgnXRM4uFlGj9iuMNSVNaGIg8s4Of2nMsIKYcWqhAgAi1AlBGj3yi0VzQYBiZZp9lMXtIRHPGumQM9qzLVlI4GVTc97pUduu7Ki5E9nosNc4auR_1Vb_ymRzwllWtylYEBqS9ps3SM4cd2yaW_CbeVUTHSIkE5amnj93awcGvnNMeZf2iCEYYWSkfa-LTugci6t9AxQdYI4m3eWrHhqBmR7byR95hL13Dr3aLfF-WHtjAcQAQtyD6Zg38BM8xjOOFfvgozy2Y8-KVLGosQNaY-cb_jNToCYT1KlR2RLSSCQaUfzEiOEc3UHJfRZXdlwZ0dQVl46TK3hodyURpEjtbD5GZe9iX4UzYQns8p8t0r1z6xdnAbsR61oclXMgbe8mb-moJQ9g20RLCzTh4zDJ3tJ77mnSOuTaIZ25KaU3aIDWYXDcNcTt3cQ4pXPvOZcQA2u-eNVpTRyZ-IzA9tErdGq6oNp_whNPS49Erqk63fF0bSZH_yQG1UyZc=",
+  "elapsed_s": 7.099,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"ph8a6248_V11i12_v3_deepseekv4fl_incidents_a625c0be569b_6f2320\", \"result\": {\"units\": 31}, \"evidence\": [{\"id\": \"ph8a6248_V11i12_v3_deepseekv4fl_incidents_a625c0be569b_6f2320\", \"ver\": 1}, {\"id\": \"ph8a6248_V11i12_v3_deepseekv4fl_incidents_a625c0be569b_e86c81\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph8a6248_V11i12_v3_deepseekv4fl_incidents_a625c0be569b_014c8d\", \"ver\": 1}, {\"id\": \"ph8a6248_V11i12_v3_deepseekv4fl_incidents_a625c0be569b_e86c81\", \"ver\": 1}]}"
+ }
+}

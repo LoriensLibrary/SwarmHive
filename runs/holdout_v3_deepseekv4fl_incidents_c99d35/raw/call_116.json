@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 11, \\\"summary\\\": \\\"notifications queue in region-1: 11 tickets resolved\\\"}\",\"id\":\"ph435892_V6i20_v3_deepseekv4fl_incidents_2552fd7141ab_4e158b\",\"ver\":1},{\"body\":\"{\\\"units\\\": 11, \\\"summary\\\": \\\"notifications queue in region-1: 11 tickets resolved\\\"}\",\"id\":\"ph435892_V6i20_v3_deepseekv4fl_incidents_2552fd7141ab_d0ef71\",\"ver\":1},{\"body\":\"{\\\"units\\\": 11, \\\"note\\\": \\\"observed resolved tickets for the notifications queue in region-1\\\"}\",\"id\":\"ph435892_V6i20_v3_deepseekv4fl_incidents_2552fd7141ab_c0b924\",\"ver\":2}],\"corrections\":[{\"id\":\"ph435892_V6i20_v3_deepseekv4fl_incidents_2552fd7141ab_c0b924\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph435892_V6i20_v3_deepseekv4fl_incidents_2552fd7141ab_c0b924\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph435892_V6i20_v3_deepseekv4fl_incidents_2552fd7141ab_4e158b/1, ph435892_V6i20_v3_deepseekv4fl_incidents_2552fd7141ab_d0ef71/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 116,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 755,
+  "output_tokens": 885,
+  "cost": 0.000152,
+  "unit": "credits",
+  "reasoning_tokens": 683,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_EItvaQIViE50ZKWHoUEdMX00YuoA93drj8X51pSqEmHoQJ5HydcIK5DiTec2lcsmKL7KIcIxLHlAwmVxfJz5l3RwgkXHhokwfTtOiUmEXHp0AuPTVXdPKD54U3vIkmpuarrRJ9B1d66YMhi878Ub8yrIuFiE_W55sxnnUMpgoSmAQOsCTzxtNAPp4qG2SNv1QLkd4Cgx3tJU8gEjX0v61pZMv0mNzHR6EP283a_y41NPqf7mLVvtLcPTsRFdZDYbFlFj6Q3sqWkO9NKgkH-1TlXaOIK8TapEGBMj_UMmTNXjzAxH2ihIkYfqU6oDYURfUDqS7nS5Fglmw_UhplJWpWpSJGzec2mUykhmHPWPimPb37pK1aG9j5BY99q0QfdalOQrurSQi18CtyqF4bDAS5BEKQwsk-NKgp1jpL0x5Z8-a1HplN4qbHQtlYrFU6gNIV2cvWqENZaofjhuVfo_UvT4oF_89iw5KrEDTYGzvmpx0zvKLagl9M2qCvDOvBSnVAPUEbA3mPMM_4e3DJcqap13awA=",
+  "elapsed_s": 10.531,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"ph435892_V6i20_v3_deepseekv4fl_incidents_2552fd7141ab_4e158b\",\"result\":{\"units\":11},\"evidence\":[{\"id\":\"ph435892_V6i20_v3_deepseekv4fl_incidents_2552fd7141ab_4e158b\",\"ver\":1},{\"id\":\"ph435892_V6i20_v3_deepseekv4fl_incidents_2552fd7141ab_c0b924\",\"ver\":2}],\"consulted\":[{\"id\":\"ph435892_V6i20_v3_deepseekv4fl_incidents_2552fd7141ab_d0ef71\",\"ver\":1},{\"id\":\"ph435892_V6i20_v3_deepseekv4fl_incidents_2552fd7141ab_c0b924\",\"ver\":1}]}"
+ }
+}

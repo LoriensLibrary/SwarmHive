@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 16, \\\"summary\\\": \\\"api queue in region-3: 16 tickets resolved\\\"}\",\"id\":\"phadcf10_V11i17_v3_deepseekv4fl_incidents_690d4a004442_d2ac20\",\"ver\":1},{\"body\":\"{\\\"units\\\": 16, \\\"summary\\\": \\\"api queue in region-3: 16 tickets resolved\\\"}\",\"id\":\"phadcf10_V11i17_v3_deepseekv4fl_incidents_690d4a004442_fcbf8f\",\"ver\":1},{\"body\":\"{\\\"units\\\": 16, \\\"note\\\": \\\"observed resolved tickets for the api queue in region-3\\\"}\",\"id\":\"phadcf10_V11i17_v3_deepseekv4fl_incidents_690d4a004442_92700b\",\"ver\":2}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"phadcf10_V11i17_v3_deepseekv4fl_incidents_690d4a004442_92700b\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"phadcf10_V11i17_v3_deepseekv4fl_incidents_690d4a004442_92700b\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"phadcf10_V11i17_v3_deepseekv4fl_incidents_690d4a004442_d2ac20\",\"inputs\":[{\"id\":\"phadcf10_V11i17_v3_deepseekv4fl_incidents_690d4a004442_92700b\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phadcf10_V11i17_v3_deepseekv4fl_incidents_690d4a004442_fcbf8f\",\"inputs\":[{\"id\":\"phadcf10_V11i17_v3_deepseekv4fl_incidents_690d4a004442_92700b\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phadcf10_V11i17_v3_deepseekv4fl_incidents_690d4a004442_d2ac20/1, phadcf10_V11i17_v3_deepseekv4fl_incidents_690d4a004442_fcbf8f/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 103,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 836,
+  "output_tokens": 936,
+  "cost": 0.000162,
+  "unit": "credits",
+  "reasoning_tokens": 707,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_bwWxggdKtRwzn0JFEDVGR5QCCZWEpn7bEljOCWHX4pPqxLG7_G1sRjNuTmj0xJhlwCW_lHTLV1XcsAQ9U7fcOw4pMhPRNUyhj2R9Vb9QsPdVzxMh-LG2gtnawFGvONik73Ra432nmT8PD_oyyVSN2XaXvOOxIKJ_7f5Mjbq6iTsg-457zqQx4ql8T27BItf3oayaFyAQWtLO9xlsG2AijS1nZI8YJRBbgkT0CekCvMZiTNpZ3jVJR0Opkl1uxNNxXbbPxy6tDnj1A3hH0SJmAEuSpNFuMSYGfCsKuxnCUBf1W1FlaLc2RMaoLbr0D_q5Xm-ghamZZEJg8kRvUjJeeRtxR6awmO8f0l44XzuWubTzmWXaW6g5m_wYcNuPMYymPwLJpFOUJDPPpvl_Oug1im3BbFscHs2Nn1Lo6Am9gcKndqP1QoRxSaeFbCpXanFy5Dmi0pqoAQhjcmESi7Q7X9OaZpqmUPdRtU7fQoYNpputSRIr2KqBdOb9QQqHk54fW8AvkO21A2pMZ_uhK9gysK0x1-A=",
+  "elapsed_s": 10.192,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"phadcf10_V11i17_v3_deepseekv4fl_incidents_690d4a004442_d2ac20\", \"result\": {\"units\": 16}, \"evidence\": [{\"id\": \"phadcf10_V11i17_v3_deepseekv4fl_incidents_690d4a004442_d2ac20\", \"ver\": 1}, {\"id\": \"phadcf10_V11i17_v3_deepseekv4fl_incidents_690d4a004442_92700b\", \"ver\": 2}], \"consulted\": [{\"id\": \"phadcf10_V11i17_v3_deepseekv4fl_incidents_690d4a004442_fcbf8f\", \"ver\": 1}, {\"id\": \"phadcf10_V11i17_v3_deepseekv4fl_incidents_690d4a004442_92700b\", \"ver\": 1}]}"
+ }
+}

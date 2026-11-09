@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 14, \\\"summary\\\": \\\"checkout queue in region-9: 14 tickets resolved\\\"}\",\"id\":\"ph3cff56_V11i18_v3_deepseekv4fl_incidents_918d51f991e1_8a82ff\",\"ver\":1},{\"body\":\"{\\\"units\\\": 14, \\\"summary\\\": \\\"checkout queue in region-9: 14 tickets resolved\\\"}\",\"id\":\"ph3cff56_V11i18_v3_deepseekv4fl_incidents_918d51f991e1_d9b6f2\",\"ver\":1},{\"body\":\"{\\\"units\\\": 14, \\\"note\\\": \\\"observed resolved tickets for the checkout queue in region-9\\\"}\",\"id\":\"ph3cff56_V11i18_v3_deepseekv4fl_incidents_918d51f991e1_035dc5\",\"ver\":2}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph3cff56_V11i18_v3_deepseekv4fl_incidents_918d51f991e1_035dc5\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph3cff56_V11i18_v3_deepseekv4fl_incidents_918d51f991e1_035dc5\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph3cff56_V11i18_v3_deepseekv4fl_incidents_918d51f991e1_8a82ff\",\"inputs\":[{\"id\":\"ph3cff56_V11i18_v3_deepseekv4fl_incidents_918d51f991e1_035dc5\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph3cff56_V11i18_v3_deepseekv4fl_incidents_918d51f991e1_d9b6f2\",\"inputs\":[{\"id\":\"ph3cff56_V11i18_v3_deepseekv4fl_incidents_918d51f991e1_035dc5\",\"ver\":2}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph3cff56_V11i18_v3_deepseekv4fl_incidents_918d51f991e1_8a82ff/1, ph3cff56_V11i18_v3_deepseekv4fl_incidents_918d51f991e1_d9b6f2/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 109,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 866,
+  "output_tokens": 427,
+  "cost": 9.5e-05,
+  "unit": "credits",
+  "reasoning_tokens": 207,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_Kg4q9_EfACUG3ITH9iBX5ZY-x9VuYM87f1oQ0FiX-i-CzQ6Gtnm9C2inh1H17hHoISlHcVUg12kTC5QTH1cvLvAkyGvNObgRl77nJotTapVdVLgA4YMxGUy2R2OPScS3hbAGMPSSvDEDgkbO9mU-ruycSuK33GGg-HFUBDPnDfOJH_7BSjz0ZonF68ckTZ_E0H-KT1qY8Ku1lBzaCXE9m0pTDy54f7cPqT6P6UUb_IX4eFNitG1SVp03adVxc0ZntLRsERNcHDw7vIQYZPLItOwO2eSoElc7ZWELxy3yuZu0KaUvoHi_WdpN29xHRtESU7eZ0GKZiJnK0K3GOFJxjcvglD9csO46N6f_ucmsG7tHzGO_Jpz-Es7hsQb99c5IoAHOlfJMO9LWqE_9s7SUxiPwNxGU_s37QuctBhyK_-NEKsPWWi3U1G0b6Uwl5Z5eK1H1f1rcbBlqLLOCFaBLiGAe28fzIYg9p5yG5uCe_el4AEaAl3SLkCr1c3ZkKF286xSz2iEXoc3zYk5zPJ1VSZcfShc=",
+  "elapsed_s": 5.047,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"ph3cff56_V11i18_v3_deepseekv4fl_incidents_918d51f991e1_d9b6f2\",\"result\":{\"units\":14},\"evidence\":[{\"id\":\"ph3cff56_V11i18_v3_deepseekv4fl_incidents_918d51f991e1_d9b6f2\",\"ver\":1},{\"id\":\"ph3cff56_V11i18_v3_deepseekv4fl_incidents_918d51f991e1_035dc5\",\"ver\":2}],\"consulted\":[{\"id\":\"ph3cff56_V11i18_v3_deepseekv4fl_incidents_918d51f991e1_8a82ff\",\"ver\":1},{\"id\":\"ph3cff56_V11i18_v3_deepseekv4fl_incidents_918d51f991e1_035dc5\",\"ver\":1}]}"
+ }
+}

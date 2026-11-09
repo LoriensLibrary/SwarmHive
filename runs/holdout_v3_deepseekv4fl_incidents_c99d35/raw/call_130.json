@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 16, \\\"summary\\\": \\\"search queue in region-2: 16 tickets resolved\\\"}\",\"id\":\"phbb7c1c_V11i22_v3_deepseekv4fl_incidents_a7b6696aba65_5ddc16\",\"ver\":1},{\"body\":\"{\\\"units\\\": 16, \\\"summary\\\": \\\"search queue in region-2: 16 tickets resolved\\\"}\",\"id\":\"phbb7c1c_V11i22_v3_deepseekv4fl_incidents_a7b6696aba65_5294e4\",\"ver\":1},{\"body\":\"{\\\"units\\\": 16, \\\"note\\\": \\\"observed resolved tickets for the search queue in region-2\\\"}\",\"id\":\"phbb7c1c_V11i22_v3_deepseekv4fl_incidents_a7b6696aba65_b253d2\",\"ver\":2}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"phbb7c1c_V11i22_v3_deepseekv4fl_incidents_a7b6696aba65_5294e4\",\"inputs\":[{\"id\":\"phbb7c1c_V11i22_v3_deepseekv4fl_incidents_a7b6696aba65_b253d2\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phbb7c1c_V11i22_v3_deepseekv4fl_incidents_a7b6696aba65_5ddc16\",\"inputs\":[{\"id\":\"phbb7c1c_V11i22_v3_deepseekv4fl_incidents_a7b6696aba65_b253d2\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phbb7c1c_V11i22_v3_deepseekv4fl_incidents_a7b6696aba65_b253d2\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"phbb7c1c_V11i22_v3_deepseekv4fl_incidents_a7b6696aba65_b253d2\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phbb7c1c_V11i22_v3_deepseekv4fl_incidents_a7b6696aba65_5ddc16/1, phbb7c1c_V11i22_v3_deepseekv4fl_incidents_a7b6696aba65_5294e4/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 130,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 861,
+  "output_tokens": 523,
+  "cost": 0.000108,
+  "unit": "credits",
+  "reasoning_tokens": 282,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_84LtJmrcdmgY5ytVvof7Qh-fvWA8qgc0TMKRrdlzDzaKdnx0ehZo6v_mm98Q0L721t6I78oRNwv9_5EMmqbKq-qDItUI-hUW60P1L9XodJV3DwCxYU--yfPUtQ82k3QqAAexvDr-rl_99NncaZVIgezmJrXZyADN4EkiAgGl2Bla6BPl2tI7fYr08J-gD83_FzkALtDbT6hBpUFDufnJ6zUKX3o5_O7cnY-SABQPLK1Zh1Qx3jpHa73ia9yTZpTzkfQFZFeArn60Pvx0kiKwjQGFAHmcsmXel_ZpMGyEwbIcKUp8F409cizZXYVv50uA217P7mnL-IjRqznvUiTy8jaD1ylem2nK70pXHW6VrGZO8xBkH4qjvnOgWW2lih7uz-er1-NBSS6y9xV5pAJIYQCeCAfnqegRrJ7dGZXyAVzU8ALYNnsPHP39UugQClXU1ugNJx40wAIvXETPB3P5D9EeAGTYyr1cjsjKFyDIKl47DGaeYGaLKNDXUoBT3ObkeRZ-PQ8GaQl2Rn962JJreN0giJY=",
+  "elapsed_s": 5.514,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"phbb7c1c_V11i22_v3_deepseekv4fl_incidents_a7b6696aba65_5294e4\", \"result\": {\"units\": 16}, \"evidence\": [{\"id\": \"phbb7c1c_V11i22_v3_deepseekv4fl_incidents_a7b6696aba65_5294e4\", \"ver\": 1}, {\"id\": \"phbb7c1c_V11i22_v3_deepseekv4fl_incidents_a7b6696aba65_b253d2\", \"ver\": 2}], \"consulted\": [{\"id\": \"phbb7c1c_V11i22_v3_deepseekv4fl_incidents_a7b6696aba65_5ddc16\", \"ver\": 1}, {\"id\": \"phbb7c1c_V11i22_v3_deepseekv4fl_incidents_a7b6696aba65_b253d2\", \"ver\": 1}]}"
+ }
+}
