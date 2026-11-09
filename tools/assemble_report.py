@@ -92,7 +92,7 @@ The author worked with two AI systems throughout and discloses both. Aelen, a Cl
     if os.path.exists("report/heldout_v2_results/TABLES.md") or os.path.exists("report/structural/TABLES.md"):
         b10 = "### B.10 Follow-up cohorts and structural tests, tables\n\n"
         if os.path.exists("report/heldout_v2_results/TABLES.md"):
-            b10 += "**Follow-up cohorts (post-hoc): completion, tokens, slots and cost.**\n\n" + open("report/heldout_v2_results/TABLES.md", encoding="utf-8").read().strip() + "\n\n"
+            b10 += "**Follow-up cohorts (post-hoc): completion, tokens, slots and cost.**\n\n" + open("report/heldout_v2_results/TABLES.md", encoding="utf-8").read().strip().replace("; tables in Appendix B.10.", ".") + "\n\n"
         if os.path.exists("report/structural/TABLES.md"):
             b10 += open("report/structural/TABLES.md", encoding="utf-8").read().strip()
     out = f"""# {title}

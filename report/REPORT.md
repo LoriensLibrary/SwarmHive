@@ -409,7 +409,7 @@ Separate freeze (seed 2026110803), eight families at ten instances, same six arm
 
 **Follow-up cohorts (post-hoc): completion, tokens, slots and cost.**
 
-Both cohorts were frozen and run after the preregistered set had been analyzed and this report drafted, to test the two readings a reviewer would challenge first: new seeds, new freezes, separate ledgers, never pooled with the held-out set, same gate, scorer, budget and caps; tables in Appendix B.10.
+Both cohorts were frozen and run after the preregistered set had been analyzed and this report drafted, to test the two readings a reviewer would challenge first: new seeds, new freezes, separate ledgers, never pooled with the held-out set, same gate, scorer, budget and caps.
 
 **Does the gemma-31 gap close when the lookup is required?** The frozen rule let the model "decide directly if the supplied information suffices" and gemma-4-31b-it took the lookup in 13 of 120 offers; the follow-up requires the lookup as the first reply. Under that rule gemma-4-31b-it took the lookup in 120 of 120 offers and completed 120 of 120 same-number cases in the lookup arm against 119 of 120 with preloaded lineage (V6: compact minus lookup -0.017, Tango 95% [-0.089, +0.045]; V11: +0.000, [-0.060, +0.060]). The 51-case gap in the preregistered set was the optional wording of the lookup, not the model's ability to use lineage once it had it. Cost moved the other way: with the lookup required, the lookup arm spent a median 724 tokens more per case than compact over 119 settled pairs, so preloading is the cheaper way to deliver the same records.
 
