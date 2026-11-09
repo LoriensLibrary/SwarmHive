@@ -8,7 +8,7 @@ PDF (report/REPORT.pdf) carries them. Nothing here is a secret: connection strin
 ## File index
 
 - `README.md` (10,176 bytes)
-- `report/REPORT.md` (75,897 bytes)
+- `report/REPORT.md` (75,795 bytes)
 - `REPRODUCE.md` (5,304 bytes)
 - `sql/experiment_schema.sql` (17,999 bytes)
 - `sql/seal_from_proposal.sql` (3,348 bytes)
@@ -343,7 +343,7 @@ The safety reading is in two parts, and the primary evidence is a controlled rev
 
 A publication gate that re-reads authenticated lineage inside one fenced transaction held across 5,400 registered slots on 5 open models, 3,600 of them model-reviewed: 428 unsafe proposals, 80 stopped before the gate, 348 rejected at it, 0 lineage-invalid commits, 4,077 valid publications, every approval row on the evaluation branch accounted for. What a reviewer does above that gate depends on the model more than on how lineage reaches it. In these tasks optional retrieval introduced both evidence-acquisition failures and additional execution-failure exposure; preloading and required retrieval largely removed the acquisition failure, at different token costs. Three of the five models refused all or nearly all clean drafts under an unrelated correction notice in every model-context condition, including review with no lineage, while a deterministic rule reading the same lineage never did; what drives that refusal is not isolated here.
 
-The failure we set out to test is real and reproducible: stale evidence survives a correction through summarization, and a reviewer with no lineage picked the stale draft half the time on three of five models when the number had not changed. The boundary that held is the one enforced below the agents; what varied is the reviewer above it. Model reviewers can confuse factual agreement with publication eligibility, and a trusted lineage boundary enforces that distinction independently of their decisions. Code and data: Appendix C.
+The failure we set out to test is real and reproducible: stale evidence survives a correction through summarization, and a reviewer with no lineage picked the stale draft half the time on three of five models when the number had not changed. Model reviewers can confuse factual agreement with publication eligibility; a trusted lineage boundary enforces that distinction independently of their decisions (code and data: Appendix C).
 
 ## References
 
