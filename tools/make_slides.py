@@ -62,7 +62,7 @@ note(s, "Agents hold one login and one direct write (a proposal the trigger bind
 s = prs.slides.add_slide(blank); title(s, "Held-out results: five open models, 5,400 registered slots, preregistered")
 s.shapes.add_picture("report/figures/fig1_completion.png", Inches(0.5), Inches(1.3), width=Inches(8.3))
 bullets(s, [f"{gate['unsafe_proposals']} unsafe proposals, {gate['unsafe_commits']} unsafe commits, {gate['correct_publications']:,} correct publications; every approval row on the evaluation branch accounted for.",
-            f"Preloaded lineage vs optional lookup turns on whether the model takes the lookup: gemma-4-31b took it {tk(g31)} of 120 times ({tot(g31, 'compact')} vs {tot(g31, 'current_lookup')} of 120 completed); deepseek took it {tk(dsr)} of 120 and the arms tied.",
+            f"Preloaded lineage vs optional lookup turns on whether the model takes the lookup: gemma-4-31b took it {tk(g31)} of 120 times ({tot(g31, 'compact')} vs {tot(g31, 'current_lookup')} of 120 completed); deepseek took it {tk(dsr)} of 120 and the arms performed similarly near the ceiling.",
             "False quarantine is model behavior: three of five models refused every clean draft under an unrelated notice, in every model arm. The deterministic rule never did.",
             "Failed claims reported as failed: compact did not save tokens on gemma-31."],
         9.0, 1.3, 3.9, 5.4, size=13)

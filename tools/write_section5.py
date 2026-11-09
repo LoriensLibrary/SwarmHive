@@ -164,7 +164,7 @@ Separate freeze (seed 2026110803), eight families at ten instances, same six arm
     def tk(rt): return sum(rt[f"{f}/current_lookup"]["lookup_used"] for f in ("V6", "V11") if f"{f}/current_lookup" in rt)
     ds_tok = next((abs(cl["hodges_lehmann"]) for cl in R["claims"] if cl["type"] != "completion_NI" and cl["model"] == "deepseek-v4-flash"), None)
     n_models = len([k for k in C if k.startswith("heldout_")]); slots = gate["slots"]
-    abstract2 = (f"On that gate, a preregistered matched comparison on {n_models} open models: {slots:,} registered slots (3,600 model-reviewed, 1,800 deterministic controls), six arms, only the reviewer's context varying. "
+    abstract2 = (f"On that gate, a preregistered matched comparison on {n_models} open models: {slots:,} registered slots (3,600 model-reviewed, 1,800 deterministic controls), six arms. "
                  f"Reviewers made {gate['unsafe_proposals']} unsafe proposals; pre-gate validation stopped {gate['pre_gate_stops']}, the gate rejected {gate['gate_rejections']}, no lineage-invalid publication occurred, and {gate['correct_publications']:,} valid publications committed. "
                  f"Whether preloading beats an authenticated lookup turns on whether the model takes it: gemma-4-31b-it took it in {tk(g31)} of 120 offers and completed {tot(g31, 'compact')} of 120 same-number cases with preloaded lineage against {tot(g31, 'current_lookup')} with the lookup offered; "
                  f"deepseek-v4-flash took it in {tk(dsr)} of 120 and the arms performed similarly near the ceiling. Three models refused all or nearly all clean drafts under an unrelated correction notice in every model-context condition, including review without lineage. "
