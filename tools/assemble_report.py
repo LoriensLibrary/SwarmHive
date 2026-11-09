@@ -70,18 +70,18 @@ def main():
     trace = pick(S, "6. One inspectable trace")
     if os.path.exists("report/heldout_v2_results/SECTION.md"):
         results += "\n\n### 4.1 Follow-up cohorts run after the preregistered set (post-hoc, labeled)\n\n" + open("report/heldout_v2_results/SECTION.md", encoding="utf-8").read().strip()
+    if os.path.exists("report/heldout_v3_results/SECTION.md"):
+        results += "\n\n" + open("report/heldout_v3_results/SECTION.md", encoding="utf-8").read().strip()
     if os.path.exists("report/structural/SECTION.md"):
         results += "\n\n### 4.2 Structural tests: containment, identity under copying, blast radius\n\n" + open("report/structural/SECTION.md", encoding="utf-8").read().strip()
 
     discussion = f"""**Discussion.** {discussion_new}
 
-The safety reading is in two parts. The gate is the part we would trust in deployment: across {gate['slots']:,} registered slots on {n_models} models it saw {gate['unsafe_proposals']} unsafe proposals and committed {gate['unsafe_commits']}, and a read-only count of the evaluation branch accounts for every approval row. The model reviewer above it is the part to measure per model before trusting: the same preloaded lineage that lifted one model from 68 to 119 of 120 made it refuse more clean drafts, three models refused all or nearly all clean drafts under any unrelated notice, and one model's optional lookup went mostly untaken. A deterministic rule reading the same lineage never false-quarantined and never missed a stale draft; where the gate cannot see content (V10) the model still has a job, and that job should be measured per model and bounded by the rule.
-
-**What the structural tests add.** The held-out cohorts measure the reviewer; the deterministic tests in 4.2 measure the substrate under the sprint's own questions, and they hold by construction: the intruder's six attacks have no effect and are all in the audit, ten copies of one agent are one revocable identity, and one adjudicated source blocks every descendant three deep where a direct-dependency monitor passes forty of sixty. Those need no per-model measurement.
+The safety reading is in two parts. The gate is the part we would trust in deployment: across {gate['slots']:,} registered slots on {n_models} models, {gate['unsafe_proposals']} unsafe proposals and {gate['unsafe_commits']} unsafe commits, every approval row accounted for. The model reviewer above it is the part to measure per model: lineage that lifted one model from 68 to 119 of 120 made it refuse more clean drafts, three models refused all or nearly all clean drafts under any unrelated notice, and a deterministic rule reading the same lineage never false-quarantined and never missed a stale draft. The model's remaining job is content (V10), and it should be measured per model and bounded by the rule.
 
 **Limitations.** Appendix A gives the full list, as the sprint rules require. The three that bound the claims most: the operator is trusted and owns every function, so a compromised owner defeats every property; lineage is what the runtime delivered, not what the model relied on; and the tasks are known-answer inventory counts drawn from one template, so the intervals describe resampling of that template, not a task distribution.
 
-**Future work.** An eager deterministic lookup that delivers lineage records before the model's first call, which removes the offered-versus-taken question and makes preloading redundant by construction. Identity per agent instance rather than per role login. A trusted gateway in front of the database, so that statements against objects an agent holds no privilege on, the one class of attempt the audit migration cannot see, become legible. Contention and throughput measurements rather than serialized race schedules. And, with the sponsor's fine-tuning platform, a reviewer adapted on these traces, evaluated under the same frozen protocol as a new cohort."""
+**Future work.** An eager deterministic lookup that delivers lineage records before the model's first call, making preloading redundant by construction; identity per agent instance rather than per role login; a trusted gateway in front of the database so that statements against objects an agent holds no privilege on, the one class the audit migration cannot see, become legible; contention and throughput measurements; and, with the sponsor's fine-tuning platform, a reviewer adapted on these traces and evaluated under the same frozen protocol."""
 
     conclusion = f"""A publication gate that re-reads authenticated lineage inside one fenced transaction held across {gate['slots']:,} registered reviewer slots on {n_models} open models: {gate['unsafe_proposals']} unsafe proposals, {gate['unsafe_commits']} unsafe commits, every approval row on the evaluation branch accounted for. What a reviewer does above that gate depends on the model more than on how lineage reaches it. Preloaded lineage and an authenticated lookup reach the same decisions when the model takes the lookup, and preloading is the only thing that saves the same-number case when it does not, and making the lookup mandatory closes that gap at a token cost, so the design choice is preloading or a required lookup, never an optional one. Three of the five models refused all or nearly all clean drafts under an unrelated correction notice regardless of lineage, while a deterministic rule reading the same lineage never did.
 
@@ -91,7 +91,7 @@ The failure we set out to test is real and reproducible: stale evidence survives
     refs, ack = refs_full.split("**Acknowledgments.**") if "**Acknowledgments.**" in refs_full else (refs_full, "")
     code_data = pick(S, "8. Pre-existing work") + """
 
-**Code and data.** Repository: `SwarmHive` (the public mirror is linked from the submission form; pre-existing code is marked in its README). Every held-out cohort's traces, ledgers, raw requests and responses, scored outputs, freeze records and the analysis outputs are committed under `runs/`, `holdout/` and `report/`. Synthetic data only; no personal data. Info-hazard note: the containment battery contains generic attacks on a shared record (spoofing, renaming, editing, deleting, replaying), run only against synthetic rows in a disposable test database; nothing targets a real system."""
+**Code and data.** Repository `SwarmHive` at github.com/LoriensLibrary/SwarmHive. Every cohort's traces, ledgers, raw requests and responses, scored outputs, freeze records and analysis outputs are committed under `runs/`, `holdout/` and `report/`. Synthetic data only. Info-hazard note: the containment battery holds generic attacks on a shared record, run only against synthetic rows in a disposable test database."""
 
     llm = """## Appendix D. LLM Usage Statement
 
@@ -103,6 +103,8 @@ The author worked with two AI systems throughout and discloses both. Aelen, a Cl
         b10 = "### B.10 Follow-up cohorts and structural tests, tables\n\n"
         if os.path.exists("report/heldout_v2_results/TABLES.md"):
             b10 += "**Follow-up cohorts (post-hoc): completion, tokens, slots and cost.**\n\n" + open("report/heldout_v2_results/TABLES.md", encoding="utf-8").read().strip().replace("; tables in Appendix B.10.", ".") + "\n\n"
+        if os.path.exists("report/heldout_v3_results/TABLES.md"):
+            b10 += open("report/heldout_v3_results/TABLES.md", encoding="utf-8").read().strip() + "\n\n"
         if os.path.exists("report/structural/TABLES.md"):
             b10 += open("report/structural/TABLES.md", encoding="utf-8").read().strip()
     out = f"""# {title}

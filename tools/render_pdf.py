@@ -12,13 +12,16 @@ h2 { font-size: 12.5pt; margin: 14pt 0 5pt 0; page-break-after: avoid; }
 h3 { font-size: 11pt; margin: 10pt 0 4pt 0; page-break-after: avoid; }
 p { margin: 0 0 6pt 0; text-align: justify; }
 li { margin-bottom: 2pt; }
-table { border-collapse: collapse; width: 100%; font-size: 8pt; margin: 6pt 0 8pt 0; page-break-inside: avoid; }
+table { border-collapse: collapse; width: 100%; font-size: 8pt; margin: 6pt 0 8pt 0; }
+tr { page-break-inside: avoid; }
 th, td { border: 0.5pt solid #777; padding: 2pt 3.5pt; vertical-align: top; text-align: left; }
 th { background: #eee; }
 code { font-family: Consolas, 'Courier New', monospace; font-size: 8.8pt; }
 .byline { color: #333; font-size: 10pt; margin-bottom: 10pt; }
 .appendix-break { page-break-before: always; }
-img { width: 100%; display: block; margin: 6pt 0 2pt 0; page-break-inside: avoid; }
+img { width: 100%; display: block; margin: 4pt auto 2pt auto; page-break-inside: avoid; }
+img[alt="Figure 0"] { width: 84%; }
+img[alt="Figure 1"] { width: 94%; }
 em { color: #222; }
 """
 

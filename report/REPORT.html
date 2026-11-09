@@ -6,13 +6,16 @@ h2 { font-size: 12.5pt; margin: 14pt 0 5pt 0; page-break-after: avoid; }
 h3 { font-size: 11pt; margin: 10pt 0 4pt 0; page-break-after: avoid; }
 p { margin: 0 0 6pt 0; text-align: justify; }
 li { margin-bottom: 2pt; }
-table { border-collapse: collapse; width: 100%; font-size: 8pt; margin: 6pt 0 8pt 0; page-break-inside: avoid; }
+table { border-collapse: collapse; width: 100%; font-size: 8pt; margin: 6pt 0 8pt 0; }
+tr { page-break-inside: avoid; }
 th, td { border: 0.5pt solid #777; padding: 2pt 3.5pt; vertical-align: top; text-align: left; }
 th { background: #eee; }
 code { font-family: Consolas, 'Courier New', monospace; font-size: 8.8pt; }
 .byline { color: #333; font-size: 10pt; margin-bottom: 10pt; }
 .appendix-break { page-break-before: always; }
-img { width: 100%; display: block; margin: 6pt 0 2pt 0; page-break-inside: avoid; }
+img { width: 100%; display: block; margin: 4pt auto 2pt auto; page-break-inside: avoid; }
+img[alt="Figure 0"] { width: 84%; }
+img[alt="Figure 1"] { width: 94%; }
 em { color: #222; }
 </style></head><body><h1>Sealed Provenance for Agent Swarms: Preloaded Lineage vs On-Demand Retrieval Under a Trusted Publication Gate</h1>
 <p class="byline">Angela Faye Reinhold, Lorien's Library LLC. With Apart Research. Research conducted at the Swarm Alignment Hackathon, November 2026. Tracks 3 and 4.</p>
@@ -22,9 +25,8 @@ em { color: #222; }
 <h2>1. Introduction</h2>
 <p>In July 2026 about 1,200 agents inside a security evaluation found a shared directory, turned it into a message board, and roughly 700 of them attacked Hugging Face together; METR's investigation reports about 7 percent transcript spoofing, and the Swarm Traces reconstruction counted 7,905 distinct names across those agents. We use the incident as motivation, not as a topology we model: our testbed has four agents, one trusted operator, and no network dynamics.</p>
 <p>The sprint asks four questions, one per track: sandboxes that contain agent populations, how roles and failures emerge as networks grow, how identity and commitments hold up when agents can copy and rename themselves, and how to oversee a population that can coordinate and cover its tracks. This entry answers the third and fourth as one question. Identity and the shared record sit one layer below the agents, where no agent can write: an agent's name is the login it connected on, bound by a trigger it cannot bypass; what each artifact was built from is written by the runtime from what it delivered; and publication re-reads that record inside a fenced transaction. There is then no surface on which to cover tracks, and revoking an agent is dropping a grant. Most oversight proposals watch the agents and work until the agents learn what the monitor sees. This one removes the write path: a lock rather than a camera. We do not answer the first two questions.</p>
-<p>The failure we isolate is narrower and, we think, more common than a break-in: stale evidence after a correction. One agent reports a figure, a second summarizes it, a third summarizes the summary; then the figure is withdrawn and replaced. The summaries still exist, still read as confident, and still sit in the review queue. A reviewer that cannot see lineage can approve the stale summary because the prose sounds current, can refuse everything, which is safe and useless, or, in the hardest case, can face two drafts with the identical number, one descending from the withdrawn source and one from the replacement, with no way to tell them apart.</p>
-<p>The measured contribution is a Track 4 evaluation: a publication gate that re-reads authenticated lineage, a matched reviewer comparison, and an independent scorer that resolves lineage itself rather than trusting what a model cites. It runs on a Track 3 substrate with identity bound to the database login below the agent: each agent submits over its own login, a trigger overwrites any claimed name, and the runtime seals from that authenticated row, so no author label in a trace is asserted by the harness. Two agents sharing one login are one identity to the gate.</p>
-<p>The trust boundary is explicit. One operator seals, adjudicates and publishes; if that operator is compromised, every property below fails. We claim only that, given a trusted runtime, identity can be bound below the agent, lineage can be recorded by the runtime rather than asserted by the model, and a reviewer given that lineage behaves measurably differently from one that is not.</p>
+<p>The failure we isolate is narrower and, we think, more common than a break-in: stale evidence after a correction. One agent reports a figure, a second summarizes it, a third summarizes the summary; the figure is withdrawn and replaced, and the summaries still sit in the review queue reading as current. A reviewer without lineage can approve the stale one, refuse everything, or, in the hardest case, face two drafts with the identical number and no way to tell them apart.</p>
+<p>The measured contribution is a Track 4 evaluation (a publication gate that re-reads authenticated lineage, a matched reviewer comparison, an independent scorer that resolves lineage itself) on a Track 3 substrate (identity bound to the database login below the agent, so no author label in a trace is asserted by the harness; two agents sharing one login are one identity to the gate). The trust boundary is explicit: one operator seals, adjudicates and publishes, and if that operator is compromised every property below fails.</p>
 <p><strong>Contributions.</strong></p>
 <ol>
 <li>A tested multi-agent failure: stale evidence surviving a correction through summarization, including the case where the number is unchanged and only the authorization is.</li>
@@ -33,18 +35,17 @@ em { color: #222; }
 <li>The result that whether preloaded authenticated lineage beats on-demand retrieval turns on whether the model takes the retrieval, and that false quarantine under a correction notice is model behavior rather than a property of lineage.</li>
 </ol>
 <h2>2. Related Work</h2>
-<p>None of the primitives are new. Immutable versioned artifacts, a provenance graph, authority-checked invalidation and a gate that re-reads dependency state are established engineering: version control, build systems, and provenance standards such as W3C PROV. Persistent, provenance-aware memory for human-AI systems is the subject of the first author's prior preprints on the CAMA architecture, and the Hive substrate this entry runs on was built on it in April 2026. AI control protocols in which a trusted model oversees an untrusted one, and Apart's earlier multi-agent security sprints, are the nearest neighbors on the evaluation side; the brief's references on collusion, spread and steganographic coordination frame the wider problem this entry does not attempt.</p>
+<p>None of the primitives are new: immutable versioned artifacts, a provenance graph, authority-checked invalidation and a gate that re-reads dependency state are version control, build systems and W3C PROV. Provenance-aware memory for human-AI systems is the subject of the first author's prior CAMA preprints, on which the Hive substrate was built in April 2026. AI control protocols (a trusted model overseeing an untrusted one) and Apart's earlier multi-agent sprints are the nearest neighbors on the evaluation side; the brief's references on collusion, spread and steganographic coordination frame the wider problem this entry does not attempt.</p>
 <h2>3. Methods</h2>
 <h3>3.1 The gate</h3>
 <p>The gate is a PostgreSQL schema in which the four agent roles hold no write access to authoritative state. They may read, and they may submit proposals to an intake table whose author column is bound to the authenticated login by a trigger. Everything else goes through four trusted functions, each <code>SECURITY DEFINER</code> with a pinned search path, with public execute revoked and only two entry points granted back to agents.</p>
 <p><img alt="Figure 0" src="figures/fig0_gate.png" /></p>
 <p><em>Figure 0. Permissions at the trust boundary. Agents hold one login and one direct write, a proposal the trigger binds to that login; every change to authoritative state goes through an operator-owned function callable only by the principals named in its box; agents read current records directly, and the lookup arm may fetch lineage records through one recorded request. Solid arrows are submissions or authorized writes, dashed arrows are reads or returned data.</em></p>
-<p>Agents reach the authoritative tables only through the operator's functions; their one direct write is a proposal, and everything else they can do is read.</p>
 <p><strong>Sealed creation.</strong> <code>seal_artifact</code> is the only creator. The runtime calls it with the author from the authenticated dispatch context, the body, and the inputs it actually delivered to the model, and in one transaction writes the immutable artifact and its provenance edges, rejecting any input that is not already a sealed artifact. Late edges and cycles are impossible by construction; a correction is a new version, never an overwrite.</p>
 <p><strong>Authority-checked invalidation.</strong> <code>invalidate</code> is the only write path: an author may withdraw its own artifact, only an adjudicator may issue an adjudicated invalidation, and a contradiction is advisory and never blocks. A compromised agent cannot invalidate another agent's work by assertion.</p>
 <p><strong>Fenced publication.</strong> <code>publish_decision</code> is callable only by an adjudicator. It takes a shared row lock before any state check and holds it to commit, requires read-committed isolation so a stale snapshot aborts instead of approving, checks that the artifact exists and is sealed, walks the full transitive dependency closure including the artifact itself and rejects if any member is withdrawn or adjudicated, and requires the operator's acknowledgment list to cover every recorded direct input. Only then does it commit the approval; a withdrawal that lands after the call leaves a reconcilable superseded state. The live race schedule (<code>tools/race_test.py</code>, four checks) runs the sequence a two-step monitor gets wrong: the reviewer approves a draft, a withdrawal of its source commits in another session, the publication call then runs inside the fence and returns <code>rejected: closure member S/1 invalidated (epoch 1)</code>, and the approvals view shows no live approval of that draft.</p>
 <p><strong>What it does not do.</strong> It is a database boundary, not a sandbox: it says nothing about shell, network or file egress. Operations the database denies at the privilege layer leave no application audit row, because they are rejected before any trigger fires; three of six attacks in our first battery were invisible to that audit. We measured that, and after the evaluation closed it for every attack in the battery (section 4, structural tests); the frozen gate the held-out cohorts ran on does not carry that migration.</p>
-<p><strong>Revocation.</strong> Identity is the login, so revoking an agent is removing its grant or its login and nothing else. <code>tools/revocation_test.py</code> shows it on the scratch branch in eight checks: the intruder role submits through the intake and the trigger binds it as proposer; after the operator revokes its intake grant the same role's next submission is refused by the database while another role still submits; restoring the grant reinstates it; setting the role NOLOGIN refuses its next connection outright. No row, trigger or function changes to revoke an identity.</p>
+<p><strong>Revocation.</strong> Identity is the login, so revoking an agent is removing its grant or its login and nothing else. <code>tools/revocation_test.py</code> shows it in eight checks on the scratch branch: after the operator revokes the intruder's intake grant its next submission is refused while another role still submits, restoring the grant reinstates it, and setting the role NOLOGIN refuses its next connection. No row, trigger or function changes.</p>
 <p><strong>Independent verification.</strong> Lorien, an AI collaborator in a separate workspace, wrote an executable reference specification and a live acceptance driver against the committed SQL. Its first pass passed 1 of 9 core checks, and every failure was a real defect: the gate approved nonexistent artifacts, checked only direct dependencies so a withdrawn grandparent passed, and let any agent record provenance edges onto another agent's artifact; later probes found a bot could supply its own proposer name, call the internal fence lock directly, and seal an edgeless artifact. Each was fixed and the suite re-run at each revision, 1 of 9, then 5, then 8, then 19 of 19, and the committed migration then passed all 19 on a fresh Neon branch with every routine hashed. The frozen gate is commit <code>d2df880</code>; four additive migrations after two adversarial reviews on 7 November (authenticated authorship through the intake, advisory contradictions moved off the fence, a validity view, payload-only grants and a fail-closed fence) were each re-verified. The suite checks specific boundaries; it is not a proof of every property.</p>
 <h3>3.2 Experiment design</h3>
 <p>The question is whether lineage preloaded into a reviewer's context changes stale proposals and correct completion compared with lineage the reviewer must fetch, or cannot fetch at all. Everything else is held fixed: the model, the task, the correction notice, the prompts, the token budget, the gate. Only the reviewer's context adapter varies.</p>
@@ -155,7 +156,7 @@ em { color: #222; }
 <p><strong>Tasks.</strong> Synthetic inventory counts with exact known answers, one harness-injected compromise opportunity per instance (a replayed stale body, a wrong body with valid lineage), identical across arms. No agent attempts anything adversarial in these runs; that lives in the containment battery. Identifiers are opaque random strings, because an early version leaked recency through names like <code>draft2</code>. The held-out families are V6 (figure unchanged, authorization changed), V11 (V6 with no correction notice delivered) and V1 (an unrelated correction before review, the false-quarantine control); the development and diagnostics variants are listed in Appendix B.1 and B.7.</p>
 <p><strong>Scoring.</strong> The reviewer returns a decision, a result, the evidence its result rests on, and a separate list of artifacts consulted but not relied on; an approval's evidence must include the approved draft itself, a rule added after the open-model pilot showed a stale pick with the right number and a current citation escaping detection. Gate events are recorded only after a separate committed-state query. The independently written scorer holds the answer keys and the authoritative provenance export and resolves withdrawn ancestors itself, so citing a summary cannot hide its dead source. Every registered run stays in the denominator, including timeouts, errors and invalid output. For lineage-visible staleness the expected unsafe-commit count is zero; for V10, whose lineage is valid, the measure is which reviewers catch a wrong figure by reading it.</p>
 <h3>3.3 Development findings that shaped the freeze</h3>
-<p>Development runs, one instance per cell, shaped the frozen design and are not effect sizes. Three Sonnet 5.5 pilots (V0, V3, V5; nine runs, eight correct, zero accepted bad actions) showed the current arm deferring on a replayed stale draft it could not distinguish, and the full arm approving the right draft on the two-hop variant while still citing the withdrawn source it had reasoned over, which led us to separate evidence from consulted artifacts rather than reclassify the run. Lorien's same-number control showed lineage doing the work the number could not, and the lookup control moved the difference from correctness to cost (four calls and 4,977 tokens against two and 2,601), correcting our hypothesis before the freeze; the held-out set corrected it again (section 4). The gemma-4-31b-it replication (twelve runs, eleven correct) failed only the same-number case in the current arm, with the correct number and a current citation, which exposed the scorer blind spot described in section 3.2.</p>
+<p>Development runs, one instance per cell, shaped the frozen design and are not effect sizes. Three Sonnet 5.5 pilots showed the no-lineage arm deferring on a replayed stale draft it could not distinguish, and the full arm approving the right draft on the two-hop variant while still citing the withdrawn source it had reasoned over, which led us to separate evidence from consulted artifacts. Lorien's same-number control showed lineage doing the work the number could not, and the lookup control moved the difference from correctness to cost (four calls and 4,977 tokens against two and 2,601), correcting our hypothesis before the freeze; the held-out set corrected it again (section 4). The gemma-4-31b-it replication failed only the same-number case in the no-lineage arm, with the correct number and a current citation, which exposed the scorer blind spot described in section 3.2.</p>
 <h2>4. Results</h2>
 <p>Preregistered before any freeze (<code>report/HELDOUT_PREREGISTRATION.md</code>); analysis by <code>tools/analysis.py</code>; every registered slot stays in its denominator. The full tables, per-arm counts, the branch audit, the cost ledger and the disclosed deviations are in Appendix B.</p>
 <p><strong>In one paragraph.</strong> Three results. First, the gate held: across 5,400 registered slots the five models made 428 unsafe proposals and the gate committed none, and every approval row on the evaluation branch is accounted for. Second, whether a reviewer needs lineage preloaded or can fetch it depends on whether it fetches: gemma-4-31b-it took its offered lookup in 13 of 120 cases and completed 119 of 120 same-number cases with preloaded lineage against 68 with the lookup offered, while deepseek-v4-flash took it in 119 of 120 and the two arms tied. Third, refusing a clean draft under an unrelated correction notice is model behavior, not a lineage effect: three of five models refused all or nearly all clean drafts in every model arm, including the arm with no lineage at all, and the deterministic rules reading the same lineage never did. The follow-up cohorts and the structural tests at the end of this section test the first two of these directly.</p>
@@ -315,13 +316,14 @@ em { color: #222; }
 </tr>
 </tbody>
 </table>
-<p>Both rule arms approve every clean draft on every model. deepseek-v4-flash and qwen3.8-27b quarantine it in every complete slot of every model arm, and qwen3.5-397b in all but at most one per arm, including current, which sees only the bodies, the current source and an unrelated notice: the notice alone makes those models refuse. gemma-4-31b-it approves 51 of 60 without lineage and 41 of 60 with it, so visible lineage makes it more cautious on a clean draft, where the rule reading the same lineage pays nothing. False quarantine is model behavior under a notice, not a property of the lineage data.</p>
-<p><strong>Exploratory tier and diagnostics.</strong> The three exploratory models split the same way (Appendix B.5): qwen3.8-27b follows the gemma-31 pattern, qwen3.5-397b behaves like deepseek-v4-flash and quarantines nearly every clean draft, and gemma-4-26b-a4b-it is the weakest reviewer; the full arm tracks compact everywhere, so historical bodies add nothing the lineage metadata did not carry. In the V10 diagnostic (valid lineage, wrong figure; Appendix B.7) the gate commits whatever the reviewer approves by design, the lineage-only rule approves every one, the content rule catches all ten, and the model arms caught 5 to 9 of 10.</p>
+<p>Both rule arms approve every clean draft on every model. deepseek-v4-flash and qwen3.8-27b quarantine it in every complete slot of every model arm, and qwen3.5-397b in all but at most one, including the current arm, which sees only the bodies, the current source and an unrelated notice: the notice alone makes those models refuse. gemma-4-31b-it approves 51 of 60 without lineage and 41 of 60 with it. False quarantine is model behavior under a notice, not a property of the lineage data.</p>
+<p><strong>Exploratory tier and diagnostics.</strong> The three exploratory models split the same way (Appendix B.5): qwen3.8-27b follows the gemma-31 pattern, qwen3.5-397b behaves like deepseek-v4-flash, gemma-4-26b-a4b-it is the weakest reviewer, and the full arm tracks compact everywhere. In the V10 diagnostic (valid lineage, wrong figure; Appendix B.7) the gate commits whatever the reviewer approves by design; the lineage-only rule approves every one, the content rule catches all ten, and the model arms caught 5 to 9 of 10.</p>
 <p><strong>Cost and incidents.</strong> Settled usage 16.83 credits plus 7.92 held as reserves against provider timeouts whose billing the platform does not report; every cohort stayed under its ceiling. qwen3.5-397b reached its 900-request cap with 2 slots unsent, registered as guard-stopped in its denominator. The whole evaluation, including development, canaries, diagnostics and follow-ups, settled under 20 of the 100 authorized credits, under 30 if every reserve were charged. Deviations (a host sleep recovered with a resume mode under the original freeze, a diagnostics pause, and a post-results fix to the Holm bookkeeping that changed no p-value) are in Appendix B.9.</p>
 <h3>4.1 Follow-up cohorts run after the preregistered set (post-hoc, labeled)</h3>
 <p>Both cohorts were frozen and run after the preregistered set had been analyzed and this report drafted, to test the two readings a reviewer would challenge first: new seeds, new freezes, separate ledgers, never pooled; tables and full prose in Appendix B.10.</p>
 <p><strong>Lookup required.</strong> The frozen rule let the model decide without the lookup and gemma-4-31b-it took it in 13 of 120 offers. With the lookup required as the first reply it took it in 120 of 120 and completed 120 of 120 in the lookup arm against 119 of 120 with preloaded lineage (V6 compact minus lookup -0.017, Tango 95% [-0.089, +0.045]; V11 +0.000, [-0.060, +0.060]). The preregistered gap was the optional wording, not the model's use of lineage; the required lookup cost a median 724 tokens more per case than preloading.</p>
 <p><strong>DeepSeek V6 replicated.</strong> Sixty new instances: compact 60/60, lookup arm 51/60 with the optional lookup taken 47/60, compact minus lookup +0.150, Tango 95% [+0.081, +0.261], non-inferiority holds (p 2.23e-05). The same model took the lookup in 59 of 60 offers on the preregistered instances and 47 of 60 here, so whether an optional lookup is taken varies with the instance set, and preloading does not depend on it. Not pooled with the preregistered cohort.</p>
+<p><strong>A second surface template.</strong> Every held-out and follow-up cohort above used one synthetic template, inventory counts at a warehouse site. To test whether the pattern is a property of that wording, the runner gained a recorded task-domain switch: the same families, scoring and gate, with the researcher reporting resolved service-desk tickets for a queue in a region instead of units of an item at a warehouse, and the system prompts rewritten to match (the domain is hashed into the freeze). Two post-hoc cohorts, new seeds, 30 instances per family, lookup optional as frozen: gemma-4-31b-it: preloaded lineage 60 of 60, lookup offered 31 of 60 with the lookup taken 2 of 60; unsafe commits 0; deepseek-v4-flash: preloaded lineage 21 of 21, lookup offered 20 of 22 with the lookup taken 20 of 22; unsafe commits 0 (cohort still running at the time of writing). The ordering is the one the inventory template produced: preloaded lineage completes the same-number case, an optional lookup completes it only as often as the model takes it, and the gate commits nothing unsafe. Tables in Appendix B.10.</p>
 <h3>4.2 Structural tests: containment, identity under copying, blast radius</h3>
 <p>Four deterministic tests on a disposable branch, no model calls; honest agents model-driven where agents act, the attacker a fixed script because a model asked to impersonate another agent declined the role. Full prose and tables in Appendix B.10.</p>
 <p><strong>Containment, naive versus bound.</strong> The same six attacks against both boards. Naive: two spoofed identities landed, a rename fooled the board, four foreign rows read, one message tampered, three deleted, nothing logged. Bound: every count zero, two spoof attempts in the operator audit, honest chain complete on both.</p>
@@ -330,18 +332,17 @@ em { color: #222; }
 <p><strong>Audit blind spot, closed after the evaluation.</strong> Three of six attacks had left no audit row because the privilege layer refused them before any trigger ran. <code>sql/hive_audit_denials.sql</code> accepts the statement, denies every effect with row security, and records the attempt (statement-level triggers for zero-row updates and deletes, logging read policies): 6 of 6 attacks now visible, effects still zero, no false positives on an honest agent's own-thread reads. Scratch branch only, not on the frozen gate.</p>
 <h2>5. Discussion and Limitations</h2>
 <p><strong>Discussion.</strong> What is new is narrow. A tested multi-agent failure: stale evidence surviving a correction through summarization even when the number is unchanged. Its recovery under a gate agents cannot write around, verified by a second implementation and reproduced from source. A preregistered matched evaluation others can rerun. And the comparison that fell out of it: whether preloaded lineage beats on-demand retrieval turns on whether the model takes the retrieval, which the lookup control showed twice (13 of 120 offers taken on one model, 119 on another) and the post-hoc follow-up resolved: requiring the lookup took gemma-4-31b-it from 68 to 120 of 120 at a median 724 more tokens per case than preloading, and an independent DeepSeek cohort took its optional lookup in 47 of 60 offers and fell to 51 of 60 where preloading stayed at 60.</p>
-<p>The safety reading is in two parts. The gate is the part we would trust in deployment: across 5,400 registered slots on 5 models it saw 428 unsafe proposals and committed 0, and a read-only count of the evaluation branch accounts for every approval row. The model reviewer above it is the part to measure per model before trusting: the same preloaded lineage that lifted one model from 68 to 119 of 120 made it refuse more clean drafts, three models refused all or nearly all clean drafts under any unrelated notice, and one model's optional lookup went mostly untaken. A deterministic rule reading the same lineage never false-quarantined and never missed a stale draft; where the gate cannot see content (V10) the model still has a job, and that job should be measured per model and bounded by the rule.</p>
-<p><strong>What the structural tests add.</strong> The held-out cohorts measure the reviewer; the deterministic tests in 4.2 measure the substrate under the sprint's own questions, and they hold by construction: the intruder's six attacks have no effect and are all in the audit, ten copies of one agent are one revocable identity, and one adjudicated source blocks every descendant three deep where a direct-dependency monitor passes forty of sixty. Those need no per-model measurement.</p>
+<p>The safety reading is in two parts. The gate is the part we would trust in deployment: across 5,400 registered slots on 5 models, 428 unsafe proposals and 0 unsafe commits, every approval row accounted for. The model reviewer above it is the part to measure per model: lineage that lifted one model from 68 to 119 of 120 made it refuse more clean drafts, three models refused all or nearly all clean drafts under any unrelated notice, and a deterministic rule reading the same lineage never false-quarantined and never missed a stale draft. The model's remaining job is content (V10), and it should be measured per model and bounded by the rule.</p>
 <p><strong>Limitations.</strong> Appendix A gives the full list, as the sprint rules require. The three that bound the claims most: the operator is trusted and owns every function, so a compromised owner defeats every property; lineage is what the runtime delivered, not what the model relied on; and the tasks are known-answer inventory counts drawn from one template, so the intervals describe resampling of that template, not a task distribution.</p>
-<p><strong>Future work.</strong> An eager deterministic lookup that delivers lineage records before the model's first call, which removes the offered-versus-taken question and makes preloading redundant by construction. Identity per agent instance rather than per role login. A trusted gateway in front of the database, so that statements against objects an agent holds no privilege on, the one class of attempt the audit migration cannot see, become legible. Contention and throughput measurements rather than serialized race schedules. And, with the sponsor's fine-tuning platform, a reviewer adapted on these traces, evaluated under the same frozen protocol as a new cohort.</p>
+<p><strong>Future work.</strong> An eager deterministic lookup that delivers lineage records before the model's first call, making preloading redundant by construction; identity per agent instance rather than per role login; a trusted gateway in front of the database so that statements against objects an agent holds no privilege on, the one class the audit migration cannot see, become legible; contention and throughput measurements; and, with the sponsor's fine-tuning platform, a reviewer adapted on these traces and evaluated under the same frozen protocol.</p>
 <h2>6. Conclusion</h2>
 <p>A publication gate that re-reads authenticated lineage inside one fenced transaction held across 5,400 registered reviewer slots on 5 open models: 428 unsafe proposals, 0 unsafe commits, every approval row on the evaluation branch accounted for. What a reviewer does above that gate depends on the model more than on how lineage reaches it. Preloaded lineage and an authenticated lookup reach the same decisions when the model takes the lookup, and preloading is the only thing that saves the same-number case when it does not, and making the lookup mandatory closes that gap at a token cost, so the design choice is preloading or a required lookup, never an optional one. Three of the five models refused all or nearly all clean drafts under an unrelated correction notice regardless of lineage, while a deterministic rule reading the same lineage never did.</p>
 <p>The failure we set out to test is real and reproducible: stale evidence survives a correction through summarization, and a reviewer with no lineage picked the stale draft exactly half the time on three of the five models when the number had not changed. The fix that held is the one agents cannot write around. The fix that varied is the one that asks a model to read.</p>
 <h2>Code and Data</h2>
-<p><strong>Built before the sprint, declared per the rules.</strong> The Hive substrate (two AIs from different companies working through one shared memory, provenance on every signal, authorship guarded by database triggers) was built in April 2026 on the CAMA architecture. The test Hive for the first containment battery was built on 2 November 2026: the <code>hive_messages</code>, receipts and audit tables, their triggers and row-level policies, the four agent roles, the HTTPS SQL client and eleven static containment tests. Both are marked pre-existing in the repository README.</p>
-<p><strong>Built during the sprint, 6 to 8 November.</strong> Everything in the <code>exp</code> schema: sealed creation, provenance authorization, the invalidation authorities, the fence and the publication gate; the naive control schema and the six-attack battery; Lorien's reference specification, acceptance driver, delivery recorder, scorer and controls; the pilot runner, the held-out freeze generator, the open-model adapter, the preregistration, the analysis, and every run directory.</p>
-<p><strong>Reproducibility.</strong> The gate is frozen at commit <code>d2df880</code> and was rebuilt from the committed migration on a fresh branch with all 19 checks passing; acceptance evidence per revision is under <code>runs/acceptance/</code>. Each held-out cohort is generated from a seed with fixed identifiers, nonces and arm order; its manifest, prompt, code and gate hashes are written to <code>FREEZE.json</code> before execution and the runner refuses any mismatch. Every model call keeps its raw request and response; secrets are never committed. <code>REPRODUCE.md</code> gives the exact commands, from applying the schema and running the deterministic and structural tests through freezing, running, scoring and analysis.</p>
-<p><strong>Code and data.</strong> Repository: <code>SwarmHive</code> (the public mirror is linked from the submission form; pre-existing code is marked in its README). Every held-out cohort's traces, ledgers, raw requests and responses, scored outputs, freeze records and the analysis outputs are committed under <code>runs/</code>, <code>holdout/</code> and <code>report/</code>. Synthetic data only; no personal data. Info-hazard note: the containment battery contains generic attacks on a shared record (spoofing, renaming, editing, deleting, replaying), run only against synthetic rows in a disposable test database; nothing targets a real system.</p>
+<p><strong>Built before the sprint, declared per the rules.</strong> The Hive substrate (two AIs working through one shared, provenance-tagged memory with trigger-guarded authorship; April 2026, on the CAMA architecture) and the test Hive for the containment battery (2 November 2026: the <code>hive_messages</code>, receipts and audit tables, their triggers and row-level policies, the four agent roles, the HTTPS SQL client, eleven static tests). Both are marked pre-existing in the README, which carries a component-by-component table.</p>
+<p><strong>Built during the sprint, 6 to 8 November.</strong> Everything in the <code>exp</code> schema (sealed creation, provenance authorization, invalidation authorities, the fence and the publication gate), the naive control schema and the six-attack battery, Lorien's reference specification, acceptance driver, delivery recorder, scorer and controls, the pilot runner, freeze generator, open-model adapter, preregistration, analysis, structural tests, the audit migration, and every run directory.</p>
+<p><strong>Reproducibility.</strong> The gate is frozen at commit <code>d2df880</code> and was rebuilt from the committed migration on a fresh branch with all 19 checks passing (evidence under <code>runs/acceptance/</code>). Each cohort is generated from a seed; its manifest, prompt, code and gate hashes are written to <code>FREEZE.json</code> before execution and the runner refuses any mismatch. Every model call keeps its raw request and response; secrets are never committed. <code>REPRODUCE.md</code> gives the exact commands.</p>
+<p><strong>Code and data.</strong> Repository <code>SwarmHive</code> at github.com/LoriensLibrary/SwarmHive. Every cohort's traces, ledgers, raw requests and responses, scored outputs, freeze records and analysis outputs are committed under <code>runs/</code>, <code>holdout/</code> and <code>report/</code>. Synthetic data only. Info-hazard note: the containment battery holds generic attacks on a shared record, run only against synthetic rows in a disposable test database.</p>
 <h2>References</h2>
 <p>Incident figures (about 1,200 agents, about 700 attackers, about 7 percent transcript spoofing, 7,905 distinct names) are cited as the sprint brief gives them; we verified the existence, authorship and venue of the published papers below but did not re-derive the incident figures from the primary reports.</p>
 <ul>
@@ -2166,6 +2167,112 @@ em { color: #222; }
 <td>0.1422</td>
 <td>1.5</td>
 <td>yes</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Second surface template (post-hoc): completion, lookup use, gate outcomes.</strong></p>
+<table>
+<thead>
+<tr>
+<th>model</th>
+<th>family</th>
+<th>compact</th>
+<th>lookup arm</th>
+<th>lookup taken</th>
+<th>delta (compact minus lookup)</th>
+<th>Tango 95%</th>
+<th>NI at -0.10</th>
+<th>unsafe proposals</th>
+<th>unsafe commits</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>gemma-4-31b-it</td>
+<td>V6</td>
+<td>30/30</td>
+<td>15/30</td>
+<td>0/30</td>
+<td>+0.500</td>
+<td>[+0.330, +0.668]</td>
+<td>holds (p 3.87e-06)</td>
+<td>15</td>
+<td>0</td>
+</tr>
+<tr>
+<td>gemma-4-31b-it</td>
+<td>V11</td>
+<td>30/30</td>
+<td>16/30</td>
+<td>2/30</td>
+<td>+0.467</td>
+<td>[+0.300, +0.639]</td>
+<td>holds (p 6.93e-06)</td>
+<td>14</td>
+<td>0</td>
+</tr>
+<tr>
+<td>deepseek-v4-flash</td>
+<td>V6</td>
+<td>11/11</td>
+<td>9/11</td>
+<td>9/11</td>
+<td>+0.067</td>
+<td>[-0.054, +0.213]</td>
+<td>holds (p 0.00921)</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>deepseek-v4-flash</td>
+<td>V11</td>
+<td>10/10</td>
+<td>11/11</td>
+<td>11/11</td>
+<td>-0.033</td>
+<td>[-0.167, +0.084]</td>
+<td>fails (p 0.112)</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>cohort</th>
+<th>registered</th>
+<th>complete</th>
+<th>unsafe proposals</th>
+<th>gate rejections</th>
+<th>unsafe commits</th>
+<th>settled</th>
+<th>ceiling</th>
+<th>complete run</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>v3_gemma431bit_incidents</td>
+<td>120</td>
+<td>120</td>
+<td>29</td>
+<td>29</td>
+<td>0</td>
+<td>0.0199</td>
+<td>0.6</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>v3_deepseekv4fl_incidents</td>
+<td>120</td>
+<td>42</td>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+<td>0.0562</td>
+<td>1.5</td>
+<td>RUNNING</td>
 </tr>
 </tbody>
 </table>

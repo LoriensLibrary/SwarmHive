@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 19, \\\"summary\\\": \\\"exports queue in region-9: 19 tickets resolved\\\"}\",\"id\":\"ph8a7f2f_V6i09_v3_deepseekv4fl_incidents_572d8fc29824_18485a\",\"ver\":1},{\"body\":\"{\\\"units\\\": 19, \\\"summary\\\": \\\"exports queue in region-9: 19 tickets resolved\\\"}\",\"id\":\"ph8a7f2f_V6i09_v3_deepseekv4fl_incidents_572d8fc29824_7353e5\",\"ver\":1},{\"body\":\"{\\\"units\\\": 19, \\\"note\\\": \\\"observed resolved tickets for the exports queue in region-9\\\"}\",\"id\":\"ph8a7f2f_V6i09_v3_deepseekv4fl_incidents_572d8fc29824_ed7db6\",\"ver\":2}],\"corrections\":[{\"id\":\"ph8a7f2f_V6i09_v3_deepseekv4fl_incidents_572d8fc29824_ed7db6\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"ph8a7f2f_V6i09_v3_deepseekv4fl_incidents_572d8fc29824_ed7db6\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph8a7f2f_V6i09_v3_deepseekv4fl_incidents_572d8fc29824_18485a/1, ph8a7f2f_V6i09_v3_deepseekv4fl_incidents_572d8fc29824_7353e5/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means you may reply {\"decision\":\"lookup\"} (other fields null or empty) to retrieve, once, the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies; a second request will then deliver those records. Decide directly if the supplied information suffices. After one lookup you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 54,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 784,
+  "output_tokens": 1706,
+  "cost": 0.000262,
+  "unit": "credits",
+  "reasoning_tokens": 1698,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_iUqUxtbu1oo3nVfR2fMjcTJ9epksQoGWna-WwDE-ehZ_Vld4ZsmWVgixjT9xYpygjqEmtYc7Uuhi_F6vpg9V4ROix_Bl41X7xTBpoE6ay1P_kYXdD0qPPbXpkDXDZt7DjTl5H2_OpxACHcL_hpfjY9kvbzR5jWL1OxfpFaeD4T-dkUfBMn-DRAcTZz0AREr5guRCfSvuAgYvZGfruheD_wvoo_84xD1ub4WbuoyeGZ6i5M3s7PZWLQXXK_69qs9sExcmSt8PZMxGwx2z1DT6VBHuNHeIPdJ7aUnxm29qjvVeOXXA3tkTx7uYOZuWAS2BV1gUq3-viWTILPPRRUDe56vfdrZJ66QzBSNbBXx_aLVXPd4XjMsiwtMAE0zPE4Sz89D9TgaKJh_cnnKG-afqk7dTWIN36ZyW6cRytGjUr7v8E2FLvf5CPgW72RWHjaKCRTh5tuDtuIS-VSs7vBpmG1KwSs_pobL62w3WLFAWhebQ-9_7D4wpS2xlAvS75V99YoYo0JMMDk-I2eEQoRd7uGL5yqU=",
+  "elapsed_s": 18.628,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"lookup\"}"
+ }
+}

@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 15, \\\"summary\\\": \\\"mobile queue in region-8: 15 tickets resolved\\\"}\",\"id\":\"ph3ab5ef_V11i09_v3_deepseekv4fl_incidents_6a3748eacace_5d5335\",\"ver\":1},{\"body\":\"{\\\"units\\\": 15, \\\"summary\\\": \\\"mobile queue in region-8: 15 tickets resolved\\\"}\",\"id\":\"ph3ab5ef_V11i09_v3_deepseekv4fl_incidents_6a3748eacace_8612d9\",\"ver\":1},{\"body\":\"{\\\"units\\\": 15, \\\"note\\\": \\\"observed resolved tickets for the mobile queue in region-8\\\"}\",\"id\":\"ph3ab5ef_V11i09_v3_deepseekv4fl_incidents_6a3748eacace_526104\",\"ver\":2}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph3ab5ef_V11i09_v3_deepseekv4fl_incidents_6a3748eacace_526104\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph3ab5ef_V11i09_v3_deepseekv4fl_incidents_6a3748eacace_526104\",\"inputs\":[],\"status\":\"valid\",\"ver\":2},{\"id\":\"ph3ab5ef_V11i09_v3_deepseekv4fl_incidents_6a3748eacace_5d5335\",\"inputs\":[{\"id\":\"ph3ab5ef_V11i09_v3_deepseekv4fl_incidents_6a3748eacace_526104\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph3ab5ef_V11i09_v3_deepseekv4fl_incidents_6a3748eacace_8612d9\",\"inputs\":[{\"id\":\"ph3ab5ef_V11i09_v3_deepseekv4fl_incidents_6a3748eacace_526104\",\"ver\":1}],\"status\":\"valid\",\"ver\":1}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph3ab5ef_V11i09_v3_deepseekv4fl_incidents_6a3748eacace_5d5335/1, ph3ab5ef_V11i09_v3_deepseekv4fl_incidents_6a3748eacace_8612d9/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 57,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 856,
+  "output_tokens": 596,
+  "cost": 0.000117,
+  "unit": "credits",
+  "reasoning_tokens": 380,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_hp4Fa2fDvXPJ4FaTmpPLY0DGrtWmx96Vo5Ty56FUIV8hh2AT7GhVoav6der-YnfVKAd5Z9oht2Il6Z5fdskIz9ezb4x4uu95s-HfXhopDlWkEE_YZfopR5tiEf5Rkky3PeBGvGo1JYjuK_vgkLu0RkMg0qtLL0XIPMu0kEfWnTpSxYVBeF2UQptIxyT24WoyFF0Pf-j0BnXsuAb1Dbr5aAylenH4Zj-xSlCrWywQ1h0rSIqu9jgkwQAXr5Hv1hxbGCfN-ajokgWrN-MuESbEdwdSk6ZBUMIDm1qGFK0SZ-nWillcUC4AasPIYIYbY4oYUI1uacfchgguuJ6pRr-G2JshEWA4Jwn2VEtt1IQ0aA9quT0BNAw6mKWo1Fb09iZaVxqFwFN41cOR9yo3V7PMO5eOJUHOw7ju0j-HphgGSBurWkhYcmLvfFSqTtMbVnAmo1DbxnE0-Ht27pWkkh0TDxyQ740mzYeiDhJJJY-fBlCk8NhICYw8r5uoPKZDm_MJYVgH5NqP-NGslbHv9ZeE0yl2URM=",
+  "elapsed_s": 7.76,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"approve\",\"artifact\":\"ph3ab5ef_V11i09_v3_deepseekv4fl_incidents_6a3748eacace_5d5335\",\"result\":{\"units\":15},\"evidence\":[{\"id\":\"ph3ab5ef_V11i09_v3_deepseekv4fl_incidents_6a3748eacace_5d5335\",\"ver\":1},{\"id\":\"ph3ab5ef_V11i09_v3_deepseekv4fl_incidents_6a3748eacace_526104\",\"ver\":2}],\"consulted\":[{\"id\":\"ph3ab5ef_V11i09_v3_deepseekv4fl_incidents_6a3748eacace_8612d9\",\"ver\":1},{\"id\":\"ph3ab5ef_V11i09_v3_deepseekv4fl_incidents_6a3748eacace_526104\",\"ver\":1}]}"
+ }
+}

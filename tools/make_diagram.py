@@ -27,7 +27,7 @@ for name, y in (("bot_researcher", 47), ("bot_writer", 39), ("bot_reviewer", 31)
     box(1, y, 16, 5, name, "#eef3f8", fs=6.2)
 
 box(22, 37, 19, 10, "exp.proposals\n\ntrigger binds proposer\nto session_user", "#fff4e0", fs=5.6)
-ax.text(31.5, 48.6, "INSERT payload: the agents' one direct write", ha="center", fontsize=5.3, color=NAVY)
+ax.text(31.5, 49.4, "INSERT payload: the agents' one direct write", ha="center", fontsize=5.3, color=NAVY)
 for y in (49.5, 41.5, 33.5, 25.5):
     arrow((17, y), (22, 42))
 
@@ -42,7 +42,7 @@ box(74, 37, 24, 5, "exp.invalidations: epochs", "#f3f3f3", fs=5.8)
 box(74, 30.5, 24, 5, "exp.approvals: committed decisions", "#f3f3f3", fs=5.8)
 box(74, 12.5, 24, 7, "hive_audit: operator-only\npost-evaluation extension:\ndenied attempts are recorded here", "#fafafa", fs=5.2, ec="#999", ls="--")
 
-arrow((41, 42), (45, 51)); ax.text(43.2, 36.2, "seals from\nthe receipt", ha="center", fontsize=5.1, color=NAVY, linespacing=1.1)
+arrow((41, 42), (45, 51)); ax.text(43.0, 34.6, "seals from\nthe receipt", ha="center", fontsize=5.1, color=NAVY, linespacing=1.1)
 arrow((69, 52.5), (74, 52.5)); arrow((69, 50), (74, 46))
 arrow((69, 41), (74, 39.5))
 arrow((69, 30.5), (74, 33))

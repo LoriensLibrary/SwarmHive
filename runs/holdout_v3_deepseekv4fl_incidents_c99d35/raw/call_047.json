@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 32, \\\"summary\\\": \\\"returns queue in region-3: 32 tickets resolved\\\"}\",\"id\":\"phaffe32_V11i07_v3_deepseekv4fl_incidents_6e828e6c67d7_71d5a9\",\"ver\":1},{\"body\":\"{\\\"units\\\": 32, \\\"summary\\\": \\\"returns queue in region-3: 32 tickets resolved\\\"}\",\"id\":\"phaffe32_V11i07_v3_deepseekv4fl_incidents_6e828e6c67d7_31f876\",\"ver\":1},{\"body\":\"{\\\"units\\\": 32, \\\"note\\\": \\\"observed resolved tickets for the returns queue in region-3\\\"}\",\"id\":\"phaffe32_V11i07_v3_deepseekv4fl_incidents_6e828e6c67d7_7edcd1\",\"ver\":2}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"phaffe32_V11i07_v3_deepseekv4fl_incidents_6e828e6c67d7_31f876\",\"inputs\":[{\"id\":\"phaffe32_V11i07_v3_deepseekv4fl_incidents_6e828e6c67d7_7edcd1\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phaffe32_V11i07_v3_deepseekv4fl_incidents_6e828e6c67d7_71d5a9\",\"inputs\":[{\"id\":\"phaffe32_V11i07_v3_deepseekv4fl_incidents_6e828e6c67d7_7edcd1\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"phaffe32_V11i07_v3_deepseekv4fl_incidents_6e828e6c67d7_7edcd1\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"phaffe32_V11i07_v3_deepseekv4fl_incidents_6e828e6c67d7_7edcd1\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phaffe32_V11i07_v3_deepseekv4fl_incidents_6e828e6c67d7_71d5a9/1, phaffe32_V11i07_v3_deepseekv4fl_incidents_6e828e6c67d7_31f876/1 lookup_available=false (your one lookup was used; decide now)\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 47,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 880,
+  "output_tokens": 707,
+  "cost": 0.000133,
+  "unit": "credits",
+  "reasoning_tokens": 463,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_Im4VtYLkR_GbajMmDIhYeBYvtG10K6kH2uPuiqB7MRtXJ-syObICetzQniLs6-LS3j9malESSQd8Zu5B4oLBDE13rAGgPEBRCkfQ7fKt6J9asmuNYXjG7s5VN-5IaZmnZXnA3HI-bBO6EEelEEJEy4mXikYQhxnAY9Kw4eVv7pIIA1H58x4aM987WDdO1esiUxPMOJFbroCkIEqldYLMfKxW0HMVxoBBbJVcl6-PvNcrGaXjSgXMzF_NdDMA3RYizZwayDXN3vaJfDtB94wkeTiUTkwiuxxZlvLuS6XZyd6ayJhe7Xl2F-yeIY3Ux1y2qk4g-nb0AiP1kVTW-NtzRhRu4dqJoIBZTzuezBZ5wHL49_2htSLaNlGtvaKqI1j4Zkn-QkEsJ45k1APneX6AVpNXYt5YX28F1nqbQKej5e4aTmlC0dCY4rZOuMwDQEte8MDoO62fvR2lZaFVTDJI6vqMjosFwxDMZPQJSxLu-n5EyBeyRQr_tB-FwaWum8CL4wjJhh5SuRJkJTMLv2oFCU7y6pg=",
+  "elapsed_s": 9.038,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"phaffe32_V11i07_v3_deepseekv4fl_incidents_6e828e6c67d7_71d5a9\", \"result\": {\"units\": 32}, \"evidence\": [{\"id\": \"phaffe32_V11i07_v3_deepseekv4fl_incidents_6e828e6c67d7_71d5a9\", \"ver\": 1}, {\"id\": \"phaffe32_V11i07_v3_deepseekv4fl_incidents_6e828e6c67d7_7edcd1\", \"ver\": 2}], \"consulted\": [{\"id\": \"phaffe32_V11i07_v3_deepseekv4fl_incidents_6e828e6c67d7_31f876\", \"ver\": 1}, {\"id\": \"phaffe32_V11i07_v3_deepseekv4fl_incidents_6e828e6c67d7_7edcd1\", \"ver\": 1}]}"
+ }
+}
