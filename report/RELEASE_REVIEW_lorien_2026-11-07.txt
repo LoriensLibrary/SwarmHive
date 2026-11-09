@@ -1,0 +1,122 @@
+SWARMHIVE RELEASE REVIEW
+Lorien | a97f2f9, 7 November 2026 ET
+
+Decision
+
+Hold the paid canary. The 19 existing PostgreSQL checks passed on scratch.
+A new schedule still blocked unrelated publication, and the intake can
+select the wrong proposal under the same role. The study has a viable
+submission independent of the eventual compact-versus-lookup result.
+
+1. Publication and authorship boundaries
+
+   LIVE, scratch. An uncommitted advisory contradiction claims the next
+   (artifact, version, epoch). Withdrawal of that version acquires the
+   singleton fence and waits on the advisory row's unique key. Publication
+   of an unrelated artifact then times out with SQLSTATE 55P03. Observed
+   via pg_blocking_pids, fixture lorien_advisory_f3b92a3c30ea4d70. Both
+   invalidation transactions rolled back. Put advisory rows in a separate
+   table or keyspace. Repeat this exact three-session schedule.
+   sql/gate_hardening.sql 19–27, sql/experiment_schema.sql 59–66.
+
+   LIVE, scratch. Using two sessions authenticated as bot_writer, I
+   submitted the expected body (12), then a competing body (99) for the
+   same artifact/version. The runner's latest-row selection sealed 99
+   under bot_writer, fixture lorien_proposal_race_656b74ccd53a. A matching
+   malformed version can also fail the integer cast. A privileged seal
+   should consume the exact ID returned by authenticated submission and
+   verify the body and artifact/version against the dispatch receipt.
+   Test a same-role competing row and a malformed proposal. This is
+   role-level attribution through a trusted dispatcher.
+   tools/pilot_runner.py 121–139, sql/seal_from_proposal.sql 18–40.
+
+2. Paid-run controls and evidence retention
+
+   REPRODUCED OFFLINE. The guard keeps its reserve when usage exceeds the
+   bound, then permits the next request. At that point its assumed upper
+   bound is suspect. Stop the whole cohort on bound violations or an
+   unrecognized billing model. Preserve the unresolved debit and reconcile
+   with the provider before another run. Bind the paid endpoint and
+   expected model identifiers at preflight. SDK retries are disabled.
+   tools/pilot_runner.py 248, 261–307, tools/adaption_send.py 25 and 74–78.
+
+   REPRODUCED OFFLINE, reference scorer fixed. A partial run's manifest
+   names future tasks whose keys have not been written. This previously
+   caused the evaluator to throw away the entire scoring pass. Missing
+   rows now stay in the denominator and finished rows remain scoreable.
+   The runner still writes traces after an entire task and rewrites the
+   task keys in place. Initialize the key file, persist each task key
+   atomically before reviewer dispatch, and flush each reviewer trace
+   and commit receipt as it completes. Include expected disposition in
+   the manifest and kill the runner after the first arm in an offline
+   failure test. A trace without a task key is an explicitly invalid
+   slot. A call with an unconfirmed commit remains unknown.
+   tools/pilot_runner.py 821–828, score_runs.py 198–230.
+
+   INSPECTION. The hash binds checked-out SQL files. The runner can still
+   use the default shared operator DSN and has no live schema/ACL check.
+   Require an explicit fresh evaluation endpoint and an expected live
+   fingerprint. The destructive tests use a hostname denylist. Use
+   prefixed fixtures or require a disposable database marker plus a
+   narrow test credential before any TRUNCATE. The main-branch incident
+   is evidence for making this a structural control.
+   tools/pilot_runner.py 414–423, 765–803, tools/det_tests.py 14–25.
+
+3. Review output and deterministic comparison
+
+   REPRODUCED OFFLINE. Approval with units:NaN or with no result passes
+   the strict output validator. Reject nonstandard JSON constants and
+   require the declared integer result, exact version and consistent
+   disposition before invoking the privileged gate.
+   tools/pilot_runner.py 372–403.
+
+   REPRODUCED OFFLINE. The content rule accepts either a sum or any
+   constituent. It approves 4 as the total for active inputs 4 and 6.
+   Give the rule the same explicit operation the reviewer receives
+   and require that operation's result. Add a clean-lineage, incomplete
+   aggregate case. A claim that reviewers add semantic judgment needs
+   a decision the structured comparator cannot already make.
+   tools/pilot_runner.py 654–659.
+
+   ANALYSIS. V11 makes the two draft bodies identical and removes the
+   correction notice. A reviewer with only that view must guess the
+   authorization or defer. Treat it as a control for access to the
+   necessary information. On the primary comparison, hold visible
+   evidence and queue order fixed, count lookup offered as the treatment,
+   and report lookup uptake. Put compact alongside model-mediated
+   lookup, eager deterministic retrieval and rule-based eligibility.
+   Report paired discordances, unknown outcomes and provider costs by
+   task family. More repeats tighten estimates within the same template.
+   Add a distinct realistic failure family to test transfer.
+
+4. Submission
+
+   LIVE, scratch. I verified the full timeline in one sequence. The
+   original draft was current. Its source author withdrew the source
+   two hops upstream. The old approval remained in history, vanished
+   from the current view, and could not be republished. The replacement
+   and an unrelated artifact both became current. Original and replacement
+   bodies were byte-identical at 12 units. See revocation_lifecycle_scratch.json.
+   This makes CAMA's value concrete: a correction reaches downstream
+   knowledge while preserving its history. Use the held-out comparison to measure
+   operator-facing cost and the effect of context, with the gate enforcing
+   the same safety policy in every arm.
+
+   Align the title and abstract with the measured governance evaluation.
+   Remove the placeholder held-out result and unverified general claims.
+   In the clean-room setup, apply every migration, separate role-admin
+   configuration from the limited operator, and ship the independent
+   driver. The current reproduction instructions omit gate_hardening.sql.
+   PostgreSQL 17 role defaults apply at login and the documented operator
+   privileges do not authorize changing other roles' defaults.
+   REPRODUCE.md 9–40. PostgreSQL 17 ALTER ROLE:
+   https://www.postgresql.org/docs/17/sql-alterrole.html
+
+Evidence boundary
+
+The live lock race and 19 existing checks were run on scratch in the
+preceding turn. This review added live scratch probes for proposal
+binding and same-value revocation, offline runner probes and a local
+evaluator fix. All 37 local tests passed. No paid calls, shared-repository
+edits, or main database writes in this review. The clean-room setup
+finding is based on inspection.

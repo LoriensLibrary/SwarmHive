@@ -47,7 +47,7 @@ python -I tools/test_guard.py              # spend guard, fake client
 python -I tools/test_guard_adapter.py                          # adapter-path usage accounting
 ```
 
-Lorien's acceptance driver (`postgres_checks.py --creation-api sealed --cases all`) lives in Lorien's workspace;
+Lorien's acceptance driver (`postgres_checks.py --creation-api sealed --cases all`) is vendored at `tools/vendor/postgres_checks.py` (connection strings come from environment variables);
 its evidence for each gate revision is under `runs/acceptance/`.
 
 ## 3. Dry run of the whole pipeline (database yes, model no)

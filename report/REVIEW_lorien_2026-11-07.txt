@@ -1,0 +1,186 @@
+SWARMHIVE INDEPENDENT ADVERSARIAL REVIEW
+Lorien | 7 November 2026 ET | SwarmHive edc2794 and the local reference
+
+Decision
+
+Hold the evaluation freeze. The per-attempt guard is materially stronger.
+The live evidence supports a publication-integrity claim under a trusted
+runtime and a narrowly measured inference-cost observation. The next run
+would spend money before settling what it counts as success. Fix the
+execution identity, decision contract and primary fixture first.
+
+Blockers before a paid holdout
+
+1. The score conflates approval, correctness and observability.
+   score_runs.py lines 54–76 and 80–112 score the proposal using the
+   model's stated result, then score the actual publication using the
+   sealed body. I reproduced a wrong-body approval marked as a correct
+   proposal because the reviewer stated the right number. Resolve the
+   selected version against evaluator-owned body, lineage and eligibility.
+   Report stated-answer accuracy separately. Track citation validity
+   separately too. An empty evidence array or an invented nonblocked
+   reference can pass this scorer despite the reviewer's citation contract.
+   Validate citations against the exact final dispatch and mark missing
+   support separately from whether the queued artifact was safe to publish.
+
+2. A correct refusal can fail the task and malformed output can erase the
+   known safety outcome. V10 has zero correct queued drafts by design
+   (pilot_runner.py 454–460). I reproduced a valid refusal scored as failed
+   completion (score_runs.py 111). Pre-register expected disposition and
+   separate V10 from approval-required completion. Score safe withholding
+   and wrong publication on V10. I also reproduced an invalid approval
+   stopped before dispatch becoming invalid_trace with unknown committed
+   outcome (pilot_runner.py 584–614, score_runs.py 63 and 142). Record an
+   explicit pre-gate stop, preserve the raw invalid selection, and report
+   zero committed actions when the gate was never invoked. Retain unknown
+   when a gate call may have committed and its receipt is missing. Add one
+   regression for each case, with V10's wrong-body proposal as a third.
+
+3. The primary same-number fixture exposes authorization in prose.
+   V6 leaves prose_names at its default true (pilot_runner.py 68–71,
+   354–356 and 363–371). In fixture mode the stale and fresh summaries
+   explicitly name their source versions. The correction names v1 and v2
+   (436). Thus a text-only reviewer can match drafts to the notice without
+   graph metadata. This is a deterministic inspection finding. For the
+   primary isolate, make both queued draft bodies byte-identical, using
+   distinct neutral artifact IDs. Assert the body hashes and confirm the
+   serialized visible inputs contain no independent source or recency cue.
+   Preserve the source-naming version as a realistic redundancy diagnostic.
+   V8's same-number unrelated artifact body is outside the reviewer's inputs
+   (466–475 and 526). Either deliver the decoy in every arm or describe the
+   tested cue as an unrelated correction notice.
+
+4. The freeze's one-execution rule and cap are local conventions.
+   pilot_runner.py 684–700 reads the registry then appends. A legal offline
+   interleaving admits two executions of the same freeze and cohort, each
+   with its own budget. The caller can also change the free-form cohort
+   without changing the freeze (638, 646, 671–695). Claim an immutable
+   authorized cohort atomically before paid dispatch. If multiple hosts can
+   launch, put the unique claim and aggregate cap in shared durable state.
+   Bind the authorization to a canonical freeze digest, model, cohort,
+   caps and target schema fingerprint. The current freeze_id is randomized
+   at creation and its contents are not authenticated by the runner.
+   Keep execution namespaces separate from frozen instance identities.
+   Escape or remove prefix LIKE matching (172), which treats '_' as a
+   wildcard. Use a single launch owner and keep retries disabled for canaries.
+
+5. Tighten reviewer output at the side-effect boundary.
+   pilot_runner.py 311–315 extracts JSON from a substring and accepts
+   duplicate keys. I reproduced an ambiguous reject/approve object parsing
+   as approve. Lines 589–594 coerce version numbers or accept bare IDs.
+   Validate one complete, unambiguous object with an allowed decision,
+   exact id/version and typed result/evidence. Reject duplicate keys,
+   malformed nested fields and incomplete responses before invoking the
+   operator. Score each invalid response in its registered slot. The same
+   rule should govern both providers and both lookup turns.
+
+High-priority threat-model and experiment corrections
+
+6. An advisory contradiction can hold the entire publication fence.
+   experiment_schema.sql 113–145 and 311 let a bot call invalidate with
+   'contradicted', acquire the same singleton lock as publication, and
+   leave its transaction open. This is a code-path finding, without a new
+   live denial-of-service exercise. Use a separate bounded advisory intake
+   path or a trusted transaction broker. Add a bounded contention check in
+   an isolated database. Make the fence fail closed if its row is absent.
+   Restrict untrusted INSERT to the payload column or assign intake IDs
+   server-side. Table-level grants currently allow choosing the primary key
+   (29–45, 301). State availability and resource limits explicitly.
+
+7. The gate controls new publications at commit time. A later correction
+   leaves previous approval rows in the ledger. A consumer that treats a
+   historical approval as current can still read stale output. A current
+   read path needs to resolve blocking closure against today's state or
+   return a tombstone/supersession. Show approve, revoke, then current read
+   as a separate acceptance case if claiming end-to-end recovery. The
+   current reviewer has no repair loop after a rejection/revalidate outcome.
+   Also give each gate attempt a durable decision ID. Counting approval
+   rows before and after in separate transactions (597–605) cannot prove
+   which attempt produced a row under concurrent execution or lost replies.
+
+8. Identity and audit claims need boundaries. SQL authenticates the
+   database login for invalidation and proposal intake. The pilot uses the
+   operator connection to seal outputs and attaches stage-role strings
+   (pilot_runner.py 104–113, 373–400). That tests trusted attribution by a
+   dispatcher, with no independent per-instance credential. The broad bot
+   SELECT grant (SQL 300) also permits reading shared historical bodies.
+   If a bot holds those credentials in a deployment, the current arm's
+   no-lookup exposure is experimental, not a capability isolation guarantee.
+   Keep denied attempts in a separate test/audit receipt. Dispatch SHA binds
+   a logical payload under operator trust (delivery_recorder.py 33–54,
+   57–101); it cannot establish what the model used or the exact provider
+   request after adapter transformation. Record the returned model and
+   provider request identity if available. Account for provider-side usage
+   and SDK retries when describing a hard spend bound.
+
+9. Resolve baseline and prompt alignment. The held-out direct lookup
+   actually returns the same reachable metadata as compact (runner
+   512–515, 563–578), but its instruction promises source bodies (52–55).
+   Freeze the normalized instructions and check metadata equivalence for
+   every task before reviewer dispatch, including those that skip lookup.
+   Give all arms the same authorization and abstention policy. Benchmark
+   eager deterministic fetch as an equivalent input path and the rule arm
+   as the eligibility floor. The current rule uses a direct-source
+   tie-breaker (543–546) and will approve the eligible but wrong V10 draft.
+   A cheap structured-number check would catch V10, whose active source
+   already carries the answer. To test model judgment beyond this fixture,
+   add a content-dependent case requiring interpretation of valid evidence.
+
+10. Broaden the design before broadening repetition. V1 and V6 vary
+    numerals, names and order inside two task families (holdout_freeze.py
+    32–55). More samples there improve precision for those generators.
+    Freeze varied graph topology, task wording and independent attack
+    families for any broader claim. V7–V10 are useful diagnostics. Keep
+    V5 scoped to a replay whose actual old source the runtime records.
+    An agent can copy stale text while dispatched only fresh inputs, a
+    different threat that recorded lineage cannot discover. A prospective
+    attack battery should distinguish those cases.
+
+11. Pre-register the paired analysis. Compare compact against current
+    plus lookup on V6 and inspect V1 false quarantines. Publish per-variant
+    paired discordances, uncertainty on paired effects, outcomes by
+    provider, and missing/invalid/unknown counts against all registered
+    slots. Pair resampling by task, including across models on shared
+    fixtures. Set an explicit margin before any noninferiority claim.
+    Include adverse upstream failures in the pipeline denominator, with
+    the sealed-fixture cohort answering the distinct reviewer-only
+    question. Record one-time upstream, reviewer calls, lookup, gate and
+    end-to-end latency separately. Report provider timing as provider
+    timing. Rerun a full dry freeze after the evaluator changes.
+
+Submission and reproducibility
+
+12. The pinned import and hash code use machine-local reference paths
+    (pilot_runner.py 22, 318–324). Package the exact recorder/scorer,
+    immutable fixture, schema and role bootstrap, and one offline scoring
+    command. Pin the SQL/grant fingerprint actually deployed. Save task
+    keys and manifest before review dispatch so interruption leaves the
+    denominator scoreable (699–715). Label canned traces as harness tests.
+    Correct report/DRAFT.md to distinguish 8 failed checks from unique
+    defects, tested race schedules from throughput, historical lookup
+    bodies from held-out metadata, and actual Sonnet and Gemma pilot
+    variants. Keep the original Gemma score alongside its correction.
+
+What survives the teardown
+
+Under a trusted operator with controlled dispatch and immutable recorded
+lineage, the tested PostgreSQL gate prevents new approvals whose recorded
+closure includes a revoked artifact version, including when the figure
+stays unchanged. In a small live Sonnet lookup control, both reviewer
+paths handled both cases correctly. Preloaded metadata took two calls
+instead of four for those two cases. Eager deterministic retrieval can
+remove the extra inference turn. The submission can show the approved
+number staying fixed while authorization changes, the gate refusing stale
+evidence, and a clean unrelated branch continuing. The next question is
+how often compact metadata improves the reviewer decision or its cost
+under diverse tasks and credible retrieval baselines.
+
+Verification and scope
+
+Reviewed edc2794 without reading Aelen's independent teardown. Re-ran
+the pinned offline spend and adapter checks and all 30 local reference
+unit tests. Reproduced three scorer defects, the duplicate-key parser
+behavior and the registry schedule offline. Gate liveness, preflight,
+current reads and experiment-design items are code inspection findings.
+The review launched zero provider calls and made no shared repository
+or database changes.
