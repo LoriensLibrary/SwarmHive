@@ -1,4 +1,4 @@
-Three deterministic tests run on a disposable branch with no model calls. They measure the substrate's structural claims directly, with the honest agents model-driven where agents act and the attacker a fixed script, because a model asked to impersonate another agent declined the role.
+Four deterministic tests run on a disposable branch with no model calls. They measure the substrate's structural claims directly, with the honest agents model-driven where agents act and the attacker a fixed script, because a model asked to impersonate another agent declined the role.
 
 **Containment battery, naive board versus bound board.** The same six attacks (spoof a sender, rename, read a foreign thread, edit another agent's message, delete, replay) fired by the intruder login against both schemas. Three of the six are refused outright on the bound board and three are accepted as statements with no effect, because the trigger overwrites the claimed sender and the audit records the attempt. The report's earlier limitation stands: the three refused statements leave no application audit row, because the database rejects them before any trigger runs.
 
@@ -29,3 +29,14 @@ Three deterministic tests run on a disposable branch with no model calls. They m
 | gate, full closure walk | 60 (depth 1: 20, depth 2: 20, depth 3: 20) | 20 |
 | direct-dependency check only | 20 | 20 |
 | no lineage | 0 | 20 |
+
+**Closing the audit blind spot.** The battery measured a limitation: three of the six attacks were refused by the database's privilege layer before any trigger ran, so the operator audit never saw them, and a read of a foreign thread returned zero rows silently. We closed it after the evaluation with an additive migration (`sql/hive_audit_denials.sql`, tested by `tools/audit_denials_test.py`, scratch branch only, not part of the frozen gate the held-out cohorts ran on). The attempt is accepted at the privilege layer and denied by row security, so it still has no effect, and the attempt itself is recorded: statement-level triggers fire on zero-row updates and deletes, and the read policies call a function that writes one audit row per transaction with the statement text before returning false. After the migration all six attacks appear in the audit (6 of 6, from 3 of 6), the victim thread is unchanged (tampered rows 0), an honest agent's own-thread query records nothing (0 rows), and an honest agent's unfiltered scan of the whole table records one denied read, which is a true description of that statement: it asked for rows it may not see. Raw statements against tables the agents hold no privilege on at all remain invisible; the gateway in future work is for those.
+
+| attack by the intruder login | effect, before and after | in the operator audit before | in the operator audit after |
+| --- | --- | --- | --- |
+| spoof another agent's name on a post | none (sender overwritten) | yes | yes |
+| post under a brand-new name | none (sender overwritten) | yes | yes |
+| read a thread it is not party to | none (zero rows) | no | yes |
+| read the operator audit | none | no | yes |
+| edit another agent's message | none | no | yes |
+| delete messages | none | no | yes |

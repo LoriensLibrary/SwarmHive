@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 17, \\\"summary\\\": \\\"spools at site-5: 17 units\\\"}\",\"id\":\"phfa117e_V11i57_v2_gemma431bit_mandlookup_6ddaf8f4b510_f97698\",\"ver\":1},{\"body\":\"{\\\"units\\\": 17, \\\"summary\\\": \\\"spools at site-5: 17 units\\\"}\",\"id\":\"phfa117e_V11i57_v2_gemma431bit_mandlookup_6ddaf8f4b510_1a7673\",\"ver\":1},{\"body\":\"{\\\"units\\\": 17, \\\"note\\\": \\\"observed count of spools at site-5\\\"}\",\"id\":\"phfa117e_V11i57_v2_gemma431bit_mandlookup_6ddaf8f4b510_875529\",\"ver\":2}],\"corrections\":[],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phfa117e_V11i57_v2_gemma431bit_mandlookup_6ddaf8f4b510_f97698/1, phfa117e_V11i57_v2_gemma431bit_mandlookup_6ddaf8f4b510_1a7673/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means your FIRST reply must be {\"decision\":\"lookup\"} (other fields null or empty); a second request will then deliver the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies. Do not approve, reject or revalidate before that lookup. After it you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 347,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 639,
+  "output_tokens": 6,
+  "cost": 6e-05,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-31b-it",
+  "provider_response_id": "resp__WqhOJSCyg4C7fRIgANhGU5fe0EaYdpdUiKIhdTE7ftMcDQk6widNMEG_GphZo0KJXKSb77alYzc9uH1Apmesg_4F1cp5i-xhUnjuMtPnK7WjqZ_akDYfTKRtRHnzNytjxXc-BaWKDzAeN-89xai4jnPE5tRSGhogAgUIs1eVcY53rNjLa3i30eVXuZY9QFDi74xnpp2pO4FshYsWOzTPraOZ1j19hyd5Frdt1a52nV6rjadjGobs1DZJoLIQI3ntv53D4p-OWF5Ana9hLOpCNfTl82bsAXaJXBHiQtZd0-VkTcXwmgKf2qzOvcnHno5PZmAriRghJMeztABs_JWwKPmxbSv2ZWdkcE836ZqCkgjLQLUtfXTDyDVuXIlsvjAewwmhgFbJQi6wb_p9daWk9UOoiri0DumnfzzDGOLvh1gkKSrPIJMPO5Cl0tjmRI58pon7Y3Vb9qAaKr8ccKX8_d271mEy6HDeMEWMAgPtLpb5LdOrvGKu0OC6iUHQl_3JeB1CLTwSxvmNSGUKy2iFnqmtBw=",
+  "elapsed_s": 0.399,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"lookup\"}"
+ }
+}

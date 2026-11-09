@@ -46,6 +46,7 @@ python -I tools/race_test.py                                   # concurrent publ
 python -I tools/revocation_test.py                             # Track 3 revocation: grant revoke/restore, NOLOGIN (scratch endpoint)
 python -I tools/identity_copies_test.py                         # ten copies, one login: bound vs naive identity count, one revocation
 python -I tools/blast_radius_test.py                            # compromised root, 60 descendants three deep: gate vs direct check vs no lineage
+python -I tools/audit_denials_test.py --apply                   # applies sql/hive_audit_denials.sql on the scratch endpoint, reruns the six-attack battery, counts audit rows
 python -I tools/structural_results.py                           # tables for the report's structural subsection
 python -I tools/test_guard.py              # spend guard, fake client
 python -I tools/test_guard_adapter.py                          # adapter-path usage accounting

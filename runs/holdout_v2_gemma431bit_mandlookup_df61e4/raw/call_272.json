@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 37, \\\"summary\\\": \\\"clamps at site-9: 37 units\\\"}\",\"id\":\"phb0ed39_V6i45_v2_gemma431bit_mandlookup_dfe63b930a87_83feac\",\"ver\":1},{\"body\":\"{\\\"units\\\": 37, \\\"summary\\\": \\\"clamps at site-9: 37 units\\\"}\",\"id\":\"phb0ed39_V6i45_v2_gemma431bit_mandlookup_dfe63b930a87_bfb817\",\"ver\":1},{\"body\":\"{\\\"units\\\": 37, \\\"note\\\": \\\"observed count of clamps at site-9\\\"}\",\"id\":\"phb0ed39_V6i45_v2_gemma431bit_mandlookup_dfe63b930a87_6b77c9\",\"ver\":2}],\"corrections\":[{\"id\":\"phb0ed39_V6i45_v2_gemma431bit_mandlookup_dfe63b930a87_6b77c9\",\"reason\":\"superseded by a re-authorized recount\",\"step\":3,\"superseded_by\":{\"id\":\"phb0ed39_V6i45_v2_gemma431bit_mandlookup_dfe63b930a87_6b77c9\",\"ver\":2},\"type\":\"withdrawal\",\"ver\":1}],\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: phb0ed39_V6i45_v2_gemma431bit_mandlookup_dfe63b930a87_83feac/1, phb0ed39_V6i45_v2_gemma431bit_mandlookup_dfe63b930a87_bfb817/1 lookup_available=true\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct. lookup_available=true means your FIRST reply must be {\"decision\":\"lookup\"} (other fields null or empty); a second request will then deliver the recorded lineage behind each queued draft: artifact versions, delivered-input dependency links and invalidation status, with no additional bodies. Do not approve, reject or revalidate before that lookup. After it you must return a final approve, reject or revalidate."
+ },
+ "response": {
+  "call": 272,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 749,
+  "output_tokens": 6,
+  "cost": 6.9e-05,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-31b-it",
+  "provider_response_id": "resp_aH51bLbJf8rOhTSY55pcpA7JtEIT6iksQp_BiyQ1hejTA7zJNWWOGavDCpD3ZsP7ZOlwjpnZk8QzBXZ5NXUkWiyjKAEGMXZZnVJeNbGNmu3LKiowUfNV2Aw5EiQ-rNf7QBAG-EoLGpQ-z1MUjb1xdsASyMW7GHfu4eve0yQ078uALlShNnrq0F1lMVPovzZPGnp0Pccn0foyet-LqcQCHJaFnurXS8NMtWGm_s1VxISM6OzFgH8U13K22gZBXkcDEmpCFGi9wlOPLKKhtD8kHLJnWHEvJtBOhneJAyya3scTc023l0aEwtz7X-vU11PoKml53AOm3RBm3luHuzcviJYIawvKEs2CouO8KmRV6lR_I499jXW_I8fYBAsWfjnyUp4x4lyOql129UJcyUIQ13e5uWszaBWS6Ps-bVC2QjK2ilrefLfrgQY_39gSBW4NTVfz2U2h5KwwqyXlUPyoOfbKf2wXFDU-Oeh2opTL9LvNQIpt7LkEUvpLGt5Y7r9TUPQECTZfFCPkhLrD2VxaAQKPFhQ=",
+  "elapsed_s": 0.711,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\":\"lookup\"}"
+ }
+}

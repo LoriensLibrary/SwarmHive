@@ -13,7 +13,7 @@ Start here: `report/REPORT.pdf` (the submitted report; `report/REPORT.md` is its
 frozen at d2df880) and `tools/pilot_runner.py` (matched arms, frozen held-out runner, spend guard).
 Every number in the report regenerates from the committed traces: `tools/analysis.py`, `tools/results_tables.py`,
 `tools/write_section5.py`. Held-out cohorts live under `runs/holdout_heldout_*` and `runs/holdout_diag_*`;
-freeze records under `holdout/heldout_v1/`. Post-hoc follow-up cohorts (mandatory lookup; independent DeepSeek V6 replication) are under `holdout/heldout_v2/` and `runs/holdout_v2_*`, labeled post-hoc in the report. Deterministic structural tests, no model calls: `tools/revocation_test.py`, `tools/identity_copies_test.py`, `tools/blast_radius_test.py`.
+freeze records under `holdout/heldout_v1/`. Post-hoc follow-up cohorts (mandatory lookup; independent DeepSeek V6 replication) are under `holdout/heldout_v2/` and `runs/holdout_v2_*`, labeled post-hoc in the report. Deterministic structural tests, no model calls: `tools/revocation_test.py`, `tools/identity_copies_test.py`, `tools/blast_radius_test.py`, and `tools/audit_denials_test.py` with `sql/hive_audit_denials.sql` (post-evaluation migration that makes denied attempts visible in the audit).
 The section below describes the pre-sprint containment battery that this work builds on.
 
 ---

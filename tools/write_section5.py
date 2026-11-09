@@ -149,6 +149,7 @@ Separate freeze (seed 2026110803), eight families at ten instances, same six arm
 4. Not a deviation, recorded for completeness: the direction of the token claim was fixed in the preregistration. The gemma-31 result is reported as not supported rather than reinterpreted.
 5. Post-hoc follow-up cohorts. Two cohorts were frozen and run after the preregistered set had been analyzed and this report drafted (section 5, follow-up subsection): a gemma-4-31b-it cohort with the lookup made mandatory and an independent deepseek-v4-flash V6 replication. New seeds, new freezes, separate ledgers, never pooled with the held-out set; their results are labeled post-hoc wherever they appear.
 6. Structural tests added after the report draft. The containment battery was run before the sprint's held-out evaluation; the identity-under-copying and blast-radius tests (section 5, structural subsection) were written and run on the scratch branch after the held-out analysis, with no model calls, and do not change any held-out number.
+7. Audit migration after the evaluation. `sql/hive_audit_denials.sql` (statement-level denial triggers and logging read policies on the bound board) was written and tested on the scratch branch after the held-out analysis. It is not applied to the evaluation branch and changes no held-out number; its before/after is in the structural subsection.
 
 """
     d = open(a.draft, encoding="utf-8").read()
