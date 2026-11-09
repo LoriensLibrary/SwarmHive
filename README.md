@@ -1,13 +1,19 @@
 # SwarmHive: a lineage-gated publication boundary for agent swarms
 
 Entry for the Swarm Alignment Hackathon (Apart Research x AI Alignment Foundation, Nov 6-8, 2026).
-Measured contribution: Track 4 evaluation of a publication gate that re-reads authenticated lineage, with a
-matched reviewer comparison across seven open models and Claude. Substrate: Track 3 identity bound to the
-database login below the agent, exercised in every run through the intake (`sql/seal_from_proposal.sql`).
+Measured contribution: Track 4 evaluation of a publication gate that re-reads authenticated lineage inside one
+fenced transaction, with a preregistered matched reviewer comparison (six arms, three families, n = 60 each) across
+five open models: 5,400 registered slots, 428 unsafe proposals, 0 unsafe commits, every approval row on the
+evaluation branch accounted for. Substrate: Track 3 identity bound to the database login below the agent,
+exercised in every run through the intake (`sql/seal_from_proposal.sql`).
 
-Start here: `REPRODUCE.md` (run everything from this repo), `report/DRAFT.md` (the write-up),
+Start here: `report/REPORT.pdf` (the submitted report; `report/REPORT.md` is its source, assembled by
+`tools/assemble_report.py` from `report/DRAFT.md`), `REPRODUCE.md` (run everything from this repo),
 `report/REVIEW_aelen_2026-11-07.md` (adversarial review with receipts), `sql/experiment_schema.sql` (the gate,
 frozen at d2df880) and `tools/pilot_runner.py` (matched arms, frozen held-out runner, spend guard).
+Every number in the report regenerates from the committed traces: `tools/analysis.py`, `tools/results_tables.py`,
+`tools/write_section5.py`. Held-out cohorts live under `runs/holdout_heldout_*` and `runs/holdout_diag_*`;
+freeze records under `holdout/heldout_v1/`.
 The section below describes the pre-sprint containment battery that this work builds on.
 
 ---
