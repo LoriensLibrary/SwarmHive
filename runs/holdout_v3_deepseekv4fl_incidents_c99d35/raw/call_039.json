@@ -1,0 +1,36 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 30, \\\"summary\\\": \\\"search queue in region-6: 30 tickets resolved\\\"}\",\"id\":\"ph2deb98_V11i06_v3_deepseekv4fl_incidents_ee8c547c09e3_fdd163\",\"ver\":1},{\"body\":\"{\\\"units\\\": 30, \\\"summary\\\": \\\"search queue in region-6: 30 tickets resolved\\\"}\",\"id\":\"ph2deb98_V11i06_v3_deepseekv4fl_incidents_ee8c547c09e3_b89e3d\",\"ver\":1},{\"body\":\"{\\\"units\\\": 30, \\\"note\\\": \\\"observed resolved tickets for the search queue in region-6\\\"}\",\"id\":\"ph2deb98_V11i06_v3_deepseekv4fl_incidents_ee8c547c09e3_ff2271\",\"ver\":2}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph2deb98_V11i06_v3_deepseekv4fl_incidents_ee8c547c09e3_b89e3d\",\"inputs\":[{\"id\":\"ph2deb98_V11i06_v3_deepseekv4fl_incidents_ee8c547c09e3_ff2271\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph2deb98_V11i06_v3_deepseekv4fl_incidents_ee8c547c09e3_fdd163\",\"inputs\":[{\"id\":\"ph2deb98_V11i06_v3_deepseekv4fl_incidents_ee8c547c09e3_ff2271\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph2deb98_V11i06_v3_deepseekv4fl_incidents_ee8c547c09e3_ff2271\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph2deb98_V11i06_v3_deepseekv4fl_incidents_ee8c547c09e3_ff2271\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph2deb98_V11i06_v3_deepseekv4fl_incidents_ee8c547c09e3_fdd163/1, ph2deb98_V11i06_v3_deepseekv4fl_incidents_ee8c547c09e3_b89e3d/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "deepseek-v4-flash",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 39,
+  "model": "deepseek-v4-flash",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 855,
+  "output_tokens": 546,
+  "cost": 0.000111,
+  "unit": "credits",
+  "reasoning_tokens": 307,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "reasoning",
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "deepseek-v4-flash",
+  "provider_response_id": "resp_Lq_Ab4ddZjA4gxD_Zedjigl8_M9E24y0_XAqUxEHoufBcYcaNwNpm6UdzpJ37gwyTUHgWLkbPQ-XrBgNH4cU0U0aDah0PSy7-g0F14u9YCVn-DBsE4CAwuWYL2I9ZBXWsnWnaxdWMJojt2_W0iy5VB9yDK9t9UHcxjfIuMNydwVul2ExUe9BTI7u79hgWVtQv8wq8RrdAHz2Y4u_lIWpQC9UyMlxdXSwT33sTmRQIWzfwLDh-91hSXTxLUDN4IJjw9q58Xg3PgSnJUmiZ7Y5H_cVIjfi0hZIvBNu9sHAMZzbqmfPDUNjYEoEP4PAOn1j2syJWYyJN6Yn7f0xvEBRUZV7yhJhj9gr8YLkaVLQvFDmPFBhGiakk_uD-JAiJ7WuxXmIJ-gTRV42MzmyBFaAoHI3S8FR_VNx0K5x7rAUPTGcK2JWcSd1x8uqlJ84Ux-3v6UCScaaygNM9DPrC_VKuaoI4Pcj_LNyLABe6-fvQDuC_BKBa-EfTSU8NP_ly8niZBd2YfY2pWacAGUMKF-xlmvqsuI=",
+  "elapsed_s": 6.585,
+  "stop_reason": "end_turn",
+  "raw_text": "{\"decision\": \"approve\", \"artifact\": \"ph2deb98_V11i06_v3_deepseekv4fl_incidents_ee8c547c09e3_b89e3d\", \"result\": {\"units\": 30}, \"evidence\": [{\"id\": \"ph2deb98_V11i06_v3_deepseekv4fl_incidents_ee8c547c09e3_b89e3d\", \"ver\": 1}, {\"id\": \"ph2deb98_V11i06_v3_deepseekv4fl_incidents_ee8c547c09e3_ff2271\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph2deb98_V11i06_v3_deepseekv4fl_incidents_ee8c547c09e3_fdd163\", \"ver\": 1}, {\"id\": \"ph2deb98_V11i06_v3_deepseekv4fl_incidents_ee8c547c09e3_ff2271\", \"ver\": 1}]}"
+ }
+}

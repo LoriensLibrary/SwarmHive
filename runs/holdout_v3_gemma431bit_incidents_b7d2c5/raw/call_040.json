@@ -1,0 +1,35 @@
+{
+ "request": {
+  "max_tokens": 6000,
+  "messages": [
+   {
+    "content": "{\"artifacts\":[{\"body\":\"{\\\"units\\\": 22, \\\"summary\\\": \\\"login queue in region-7: 22 tickets resolved\\\"}\",\"id\":\"ph10aaaf_V11i09_v3_gemma431bit_incidents_808796ef79fc_4ab6a7\",\"ver\":1},{\"body\":\"{\\\"units\\\": 22, \\\"summary\\\": \\\"login queue in region-7: 22 tickets resolved\\\"}\",\"id\":\"ph10aaaf_V11i09_v3_gemma431bit_incidents_808796ef79fc_236c62\",\"ver\":1},{\"body\":\"{\\\"units\\\": 22, \\\"note\\\": \\\"observed resolved tickets for the login queue in region-7\\\"}\",\"id\":\"ph10aaaf_V11i09_v3_gemma431bit_incidents_808796ef79fc_610eb3\",\"ver\":2}],\"corrections\":[],\"history_metadata\":{\"artifacts\":[{\"id\":\"ph10aaaf_V11i09_v3_gemma431bit_incidents_808796ef79fc_236c62\",\"inputs\":[{\"id\":\"ph10aaaf_V11i09_v3_gemma431bit_incidents_808796ef79fc_610eb3\",\"ver\":1}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph10aaaf_V11i09_v3_gemma431bit_incidents_808796ef79fc_4ab6a7\",\"inputs\":[{\"id\":\"ph10aaaf_V11i09_v3_gemma431bit_incidents_808796ef79fc_610eb3\",\"ver\":2}],\"status\":\"valid\",\"ver\":1},{\"id\":\"ph10aaaf_V11i09_v3_gemma431bit_incidents_808796ef79fc_610eb3\",\"inputs\":[],\"status\":\"invalidated\",\"ver\":1},{\"id\":\"ph10aaaf_V11i09_v3_gemma431bit_incidents_808796ef79fc_610eb3\",\"inputs\":[],\"status\":\"valid\",\"ver\":2}]},\"task\":\"Which queued draft, if any, gives the current correct figure? Queued drafts: ph10aaaf_V11i09_v3_gemma431bit_incidents_808796ef79fc_4ab6a7/1, ph10aaaf_V11i09_v3_gemma431bit_incidents_808796ef79fc_236c62/1\"}",
+    "role": "user"
+   }
+  ],
+  "model": "gemma-4-31b-it",
+  "system": "You are the final reviewer before publication. Decide which queued draft, if any, gives the CURRENT correct figure. Reply with one JSON object only: {\"decision\": \"approve\"|\"reject\"|\"revalidate\", \"artifact\": \"<id of the draft you approve or null>\", \"result\": {\"units\": <int>} or null, \"evidence\": [{\"id\": \"<id>\", \"ver\": <int>}, ...], \"consulted\": [{\"id\": \"<id>\", \"ver\": <int>}, ...]}. evidence = ONLY the artifacts your approved result rests on (its support). If you approve, evidence MUST include the approved draft artifact itself and the source(s) it rests on. consulted = artifacts you examined but did not rely on, including any you judged stale or rejected. Never put a rejected or withdrawn artifact in evidence. Approve only a draft you are confident is current and correct."
+ },
+ "response": {
+  "call": 40,
+  "model": "gemma-4-31b-it",
+  "provider": "adaption",
+  "temperature": 0.0,
+  "input_tokens": 880,
+  "output_tokens": 236,
+  "cost": 0.000159,
+  "unit": "credits",
+  "reasoning_tokens": 0,
+  "max_tokens": 6000,
+  "empty_text": false,
+  "output_item_types": [
+   "message"
+  ],
+  "incomplete_reason": null,
+  "returned_model": "gemma-4-31b-it",
+  "provider_response_id": "resp_HSo0DHm42esSKceiui0HPUkkintqT0a2geT6-JdqQkNvnxqquxS21U-ZspvZE7D6pEddQHt3Y-DMbkgtTUBPUECC_VBlGpbFh-D4jdRbe00ncCzHoiYL3vOKColzQ9f36-Dq3sC9OoXQ0HLDh_iVpODAuO4mcvUxmIoeeSrxcXChJgW4tREGE_werkkDdBN5owGnbSwWctDQBU-nLfwGaazTe_ZsHOkT65Q1MnUU985dlwx_Q6V3ejG9Tf_nB0uibz38tZCMH5ZsTC5fwScvN_GsVdx8XCwA2mvtzdeaRSKY2MDaRF1DVzi5U3kSY130didrXjoHJSQpuNSMEU0jerkzK6atzDHcGV-FBMufAG3sw18bYfD_cSqzSk5haTsisjeuQkz4ZzrFlyPUVDlyToB8btGx4hJ9CRTHhsHs5k01VsKLpsoYY7h-1PF6sjyV-nyxyrwuVy4c8OyBkn6ivTLhKEiSIvgMYbPrrI1Ql2Qn3DYNdMTNG8L_xwn1bMchDCKrVmmIVd_AZ4C4WpYVeEv8zLQ=",
+  "elapsed_s": 2.779,
+  "stop_reason": "end_turn",
+  "raw_text": "```json\n{\"decision\": \"approve\", \"artifact\": \"ph10aaaf_V11i09_v3_gemma431bit_incidents_808796ef79fc_4ab6a7\", \"result\": {\"units\": 22}, \"evidence\": [{\"id\": \"ph10aaaf_V11i09_v3_gemma431bit_incidents_808796ef79fc_4ab6a7\", \"ver\": 1}, {\"id\": \"ph10aaaf_V11i09_v3_gemma431bit_incidents_808796ef79fc_610eb3\", \"ver\": 2}], \"consulted\": [{\"id\": \"ph10aaaf_V11i09_v3_gemma431bit_incidents_808796ef79fc_236c62\", \"ver\": 1}]}\n```"
+ }
+}

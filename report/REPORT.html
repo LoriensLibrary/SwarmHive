@@ -37,10 +37,12 @@ em { color: #222; }
 <h2>3. Methods</h2>
 <h3>3.1 The gate</h3>
 <p>The gate is a PostgreSQL schema in which the four agent roles hold no write access to authoritative state. They may read, and they may submit proposals to an intake table whose author column is bound to the authenticated login by a trigger. Everything else goes through four trusted functions, each <code>SECURITY DEFINER</code> with a pinned search path, with public execute revoked and only two entry points granted back to agents.</p>
+<p><img alt="Figure 0" src="figures/fig0_gate.png" /></p>
+<p><em>Figure 0. Permissions at the trust boundary. Agents hold one login and one direct write, a proposal the trigger binds to that login; every change to authoritative state goes through an operator-owned function callable only by the principals named in its box; agents read current records directly, and the lookup arm may fetch lineage records through one recorded request. Solid arrows are submissions or authorized writes, dashed arrows are reads or returned data.</em></p>
 <p>Agents reach the authoritative tables only through the operator's functions; their one direct write is a proposal, and everything else they can do is read.</p>
-<p><strong>Sealed creation.</strong> <code>seal_artifact</code> is the only creator. The runtime calls it with the author taken from the authenticated dispatch context, the body, and the list of inputs it actually delivered to the model. In one transaction it writes the immutable artifact and its provenance edges, marks it a root (no inputs) or a derivative, and rejects any input that does not already exist as a sealed artifact. Late edges and cycles are impossible by construction. A correction is a new version, never an overwrite.</p>
-<p><strong>Authority-checked invalidation.</strong> <code>invalidate</code> is the only write path. An author may withdraw its own artifact. Only an adjudicator may issue an adjudicated invalidation. Anyone may propose a contradiction, which is advisory and never blocks. A compromised agent cannot invalidate another agent's work by assertion.</p>
-<p><strong>Fenced publication.</strong> <code>publish_decision</code> is callable only by an adjudicator. It takes a shared row lock before any state check and holds it to commit, requires read-committed isolation so a stale snapshot aborts instead of approving, checks that the artifact exists and is sealed, walks the full transitive dependency closure including the artifact itself and rejects if any member is withdrawn or adjudicated, and requires the operator's acknowledgment list to cover every recorded direct input. Only then does it commit the approval; a withdrawal that lands after the call leaves a reconcilable superseded state.</p>
+<p><strong>Sealed creation.</strong> <code>seal_artifact</code> is the only creator. The runtime calls it with the author from the authenticated dispatch context, the body, and the inputs it actually delivered to the model, and in one transaction writes the immutable artifact and its provenance edges, rejecting any input that is not already a sealed artifact. Late edges and cycles are impossible by construction; a correction is a new version, never an overwrite.</p>
+<p><strong>Authority-checked invalidation.</strong> <code>invalidate</code> is the only write path: an author may withdraw its own artifact, only an adjudicator may issue an adjudicated invalidation, and a contradiction is advisory and never blocks. A compromised agent cannot invalidate another agent's work by assertion.</p>
+<p><strong>Fenced publication.</strong> <code>publish_decision</code> is callable only by an adjudicator. It takes a shared row lock before any state check and holds it to commit, requires read-committed isolation so a stale snapshot aborts instead of approving, checks that the artifact exists and is sealed, walks the full transitive dependency closure including the artifact itself and rejects if any member is withdrawn or adjudicated, and requires the operator's acknowledgment list to cover every recorded direct input. Only then does it commit the approval; a withdrawal that lands after the call leaves a reconcilable superseded state. The live race schedule (<code>tools/race_test.py</code>, four checks) runs the sequence a two-step monitor gets wrong: the reviewer approves a draft, a withdrawal of its source commits in another session, the publication call then runs inside the fence and returns <code>rejected: closure member S/1 invalidated (epoch 1)</code>, and the approvals view shows no live approval of that draft.</p>
 <p><strong>What it does not do.</strong> It is a database boundary, not a sandbox: it says nothing about shell, network or file egress. Operations the database denies at the privilege layer leave no application audit row, because they are rejected before any trigger fires; three of six attacks in our first battery were invisible to that audit. We measured that, and after the evaluation closed it for every attack in the battery (section 4, structural tests); the frozen gate the held-out cohorts ran on does not carry that migration.</p>
 <p><strong>Revocation.</strong> Identity is the login, so revoking an agent is removing its grant or its login and nothing else. <code>tools/revocation_test.py</code> shows it on the scratch branch in eight checks: the intruder role submits through the intake and the trigger binds it as proposer; after the operator revokes its intake grant the same role's next submission is refused by the database while another role still submits; restoring the grant reinstates it; setting the role NOLOGIN refuses its next connection outright. No row, trigger or function changes to revoke an identity.</p>
 <p><strong>Independent verification.</strong> Lorien, an AI collaborator in a separate workspace, wrote an executable reference specification and a live acceptance driver against the committed SQL. Its first pass passed 1 of 9 core checks, and every failure was a real defect: the gate approved nonexistent artifacts, checked only direct dependencies so a withdrawn grandparent passed, and let any agent record provenance edges onto another agent's artifact; later probes found a bot could supply its own proposer name, call the internal fence lock directly, and seal an edgeless artifact. Each was fixed and the suite re-run at each revision, 1 of 9, then 5, then 8, then 19 of 19, and the committed migration then passed all 19 on a fresh Neon branch with every routine hashed. The frozen gate is commit <code>d2df880</code>; four additive migrations after two adversarial reviews on 7 November (authenticated authorship through the intake, advisory contradictions moved off the fence, a validity view, payload-only grants and a fail-closed fence) were each re-verified. The suite checks specific boundaries; it is not a proof of every property.</p>
@@ -49,33 +51,106 @@ em { color: #222; }
 <table>
 <thead>
 <tr>
-<th>Arm</th>
-<th>What the reviewer sees</th>
+<th>arm</th>
+<th>what the reviewer sees</th>
+<th>enforcement</th>
+<th>registered</th>
+<th>complete</th>
+<th>unsafe proposals</th>
+<th>rejected at the gate</th>
+<th>stopped before the gate</th>
+<th>unsafe commits</th>
+<th>correct publications</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>current</td>
-<td>queued draft bodies, the current source, the correction notice</td>
+<td>queued drafts, current source, correction notice; no lineage</td>
+<td>model proposes; gate decides</td>
+<td>900</td>
+<td>784</td>
+<td>264</td>
+<td>258</td>
+<td>6</td>
+<td>0</td>
+<td>372</td>
 </tr>
 <tr>
 <td>current + lookup</td>
-<td>the same, plus one authenticated lookup, answered from the trusted store in a second fully recorded request, returning exactly the lineage records the compact arm preloads and no bodies; the runtime checks per task that the two are identical</td>
+<td>current, plus one optional authenticated lookup of the lineage records</td>
+<td>model proposes; gate decides</td>
+<td>900</td>
+<td>784</td>
+<td>151</td>
+<td>82</td>
+<td>69</td>
+<td>0</td>
+<td>532</td>
 </tr>
 <tr>
 <td>compact</td>
-<td>current, plus authenticated artifact versions, delivered-input links and invalidation status, no historical bodies</td>
+<td>current, plus lineage records preloaded (versions, delivered inputs, invalidation status)</td>
+<td>model proposes; gate decides</td>
+<td>900</td>
+<td>884</td>
+<td>7</td>
+<td>5</td>
+<td>2</td>
+<td>0</td>
+<td>686</td>
 </tr>
 <tr>
 <td>full</td>
-<td>compact, plus the protected historical bodies, delivered as recorded inputs</td>
+<td>compact, plus the historical bodies as recorded inputs</td>
+<td>model proposes; gate decides</td>
+<td>900</td>
+<td>874</td>
+<td>6</td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+<td>687</td>
 </tr>
 <tr>
-<td>rule, rule + content</td>
-<td>deterministic references: approve the queued draft whose lineage is valid; the second also checks the figure</td>
+<td>rule</td>
+<td>lineage records only; approves the queued draft whose closure is valid</td>
+<td>deterministic; gate decides</td>
+<td>900</td>
+<td>900</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>900</td>
+</tr>
+<tr>
+<td>rule + content</td>
+<td>rule, plus a check of the figure against the current source</td>
+<td>deterministic; gate decides</td>
+<td>900</td>
+<td>900</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>900</td>
+</tr>
+<tr>
+<td>all</td>
+<td></td>
+<td></td>
+<td>5400</td>
+<td>5126</td>
+<td>428</td>
+<td>348</td>
+<td>80</td>
+<td>0</td>
+<td>4077</td>
 </tr>
 </tbody>
 </table>
+<p><em>Table 1. The six arms, pooled over the five held-out cohorts and three families (registered denominator 900 per arm). A model proposes; the gate decides. Unsafe proposals are approvals of a draft with invalid lineage or selections of a non-queued artifact; those that reached the gate were rejected on lineage, the rest were stopped before it.</em></p>
 <p><strong>Fixed-input dispatch.</strong> Every model call goes through a delivery recorder written by Lorien. The harness resolves artifact bodies from the authoritative store, constructs the exact request, hashes it and each delivered body, and transmits it without appending anything. When an agent's output is sealed, its dependencies come from that receipt, never from citations in the model's text. The recorder establishes what the harness supplied and sealed; it cannot establish what the model relied on.</p>
 <p><strong>Tasks.</strong> Synthetic inventory counts with exact known answers, one harness-injected compromise opportunity per instance (a replayed stale body, a wrong body with valid lineage), identical across arms. No agent attempts anything adversarial in these runs; that lives in the containment battery. Identifiers are opaque random strings, because an early version leaked recency through names like <code>draft2</code>. The held-out families are V6 (figure unchanged, authorization changed), V11 (V6 with no correction notice delivered) and V1 (an unrelated correction before review, the false-quarantine control); the development and diagnostics variants are listed in Appendix B.1 and B.7.</p>
 <p><strong>Scoring.</strong> The reviewer returns a decision, a result, the evidence its result rests on, and a separate list of artifacts consulted but not relied on; an approval's evidence must include the approved draft itself, a rule added after the open-model pilot showed a stale pick with the right number and a current citation escaping detection. Gate events are recorded only after a separate committed-state query. The independently written scorer holds the answer keys and the authoritative provenance export and resolves withdrawn ancestors itself, so citing a summary cannot hide its dead source. Every registered run stays in the denominator, including timeouts, errors and invalid output. For lineage-visible staleness the expected unsafe-commit count is zero; for V10, whose lineage is valid, the measure is which reviewers catch a wrong figure by reading it.</p>
@@ -85,9 +160,9 @@ em { color: #222; }
 <p>Preregistered before any freeze (<code>report/HELDOUT_PREREGISTRATION.md</code>); analysis by <code>tools/analysis.py</code>; every registered slot stays in its denominator. The full tables, per-arm counts, the branch audit, the cost ledger and the disclosed deviations are in Appendix B.</p>
 <p><strong>In one paragraph.</strong> Three results. First, the gate held: across 5,400 registered slots the five models made 428 unsafe proposals and the gate committed none, and every approval row on the evaluation branch is accounted for. Second, whether a reviewer needs lineage preloaded or can fetch it depends on whether it fetches: gemma-4-31b-it took its offered lookup in 13 of 120 cases and completed 119 of 120 same-number cases with preloaded lineage against 68 with the lookup offered, while deepseek-v4-flash took it in 119 of 120 and the two arms tied. Third, refusing a clean draft under an unrelated correction notice is model behavior, not a lineage effect: three of five models refused all or nearly all clean drafts in every model arm, including the arm with no lineage at all, and the deterministic rules reading the same lineage never did. The follow-up cohorts and the structural tests at the end of this section test the first two of these directly.</p>
 <p><strong>What ran.</strong> Five reviewer cohorts of 1,080 registered slots: three families at 60 instances (V6, the same-number authority change; V11, the same with no correction notice, so lineage is the only signal; V1, the clean-draft control), six arms per instance, presealed byte-identical upstream bodies, authenticated authorship, temperature 0, a uniform 6,000-token budget, no retries, opaque identifiers, randomized arm and counterbalanced queue order (Appendix B.1). Each cohort was frozen with manifest, prompt, code and gate hashes, a request cap and a credit ceiling. The preregistered reliability rule (33 of 36 valid canary replies) admitted gemma-4-31b-it and deepseek-v4-flash to the inferential tier; qwen3.5-397b, qwen3.8-27b and gemma-4-26b-a4b-it are a labeled exploratory tier; two GLM models were excluded.</p>
-<p><strong>What the gate did.</strong> Across 5,400 registered slots the models made 428 unsafe proposals, an approval of a draft with invalid lineage or a selection of an artifact that was not a queued candidate. 348 were rejected by the fenced gate on lineage and 80 were stopped before the gate; 4,077 correct publications committed; unsafe commits: 0. One slot has an unknown commit outcome, the request in flight when the host slept and the database socket died; the branch holds its approval row and the scorer counts it as an error, not a publication. A read-only count of approvals on the evaluation branch matches the traces, with 4 extra rows from instances re-run whole after the resume and 1 from the unknown-outcome slot, every one accounted for (Appendix B).</p>
+<p><strong>What the gate did.</strong> Across 5,400 registered slots the models made 428 unsafe proposals (an approval of a draft with invalid lineage, or a selection of a non-queued artifact): 348 were rejected by the fenced gate on lineage and 80 stopped before it; 4,077 correct publications committed; unsafe commits 0. One slot has an unknown commit outcome (the request in flight when the host slept; the branch holds its approval row, the scorer counts an error). A read-only count of approvals on the evaluation branch matches the traces, with 4 extra rows from instances re-run whole after the resume and 1 from that slot, every one accounted for (Appendix B).</p>
 <p><img alt="Figure 1" src="figures/fig1_completion.png" /></p>
-<p><em>Figure 1. Completed correctly per arm on the same-number families (V6, V11) and clean-draft approval on the control (V1), five models, registered denominators. Lineage preloaded (dark) and the deterministic rule (green) complete nearly every same-number case; the lookup arm (light blue) tracks how often the model took its lookup. On V1 three models refuse the clean draft in every model arm.</em></p>
+<p><em>Figure 1. Completed correctly per arm on the same-number families (V6, V11) and clean-draft approval on the control (V1), five models, registered denominators. The lookup arm tracks how often the model took its lookup; on V1 three models refuse the clean draft in every model arm.</em></p>
 <p><strong>Primary: completion, compact vs lookup-offered.</strong> The two inferential models answer the question differently.</p>
 <table>
 <thead>
@@ -253,12 +328,10 @@ em { color: #222; }
 <p><strong>Identity under copying.</strong> Ten copies of one agent with ten claimed names through one login: ten identities on the naive board, one on the bound intake with the ten names kept as evidence, and one grant revocation silenced all ten (<code>tools/identity_copies_test.py</code>).</p>
 <p><strong>Blast radius.</strong> One adjudicated root, sixty descendants three deep, twenty unrelated: the closure walk blocked 60 of 60 at every depth and approved 20 of 20 unrelated at a median 0.448 s; a direct-dependency check catches 20 of 60; no lineage catches none (<code>tools/blast_radius_test.py</code>).</p>
 <p><strong>Audit blind spot, closed after the evaluation.</strong> Three of six attacks had left no audit row because the privilege layer refused them before any trigger ran. <code>sql/hive_audit_denials.sql</code> accepts the statement, denies every effect with row security, and records the attempt (statement-level triggers for zero-row updates and deletes, logging read policies): 6 of 6 attacks now visible, effects still zero, no false positives on an honest agent's own-thread reads. Scratch branch only, not on the frozen gate.</p>
-<p><img alt="Figure 2" src="figures/fig2_structural.png" /></p>
-<p><em>Figure 2. Structural tests on the scratch branch, no model calls. Left: stale descendants blocked after one source is adjudicated, sixty descendants three deep. Middle: identities recorded for ten copies of one agent on one login. Right: attacks visible in the operator audit before and after the denial-logging migration.</em></p>
 <h2>5. Discussion and Limitations</h2>
-<p><strong>Discussion.</strong> What is new is narrow. A tested multi-agent failure: stale evidence surviving a correction through summarization even when the number is unchanged. Its recovery under a gate agents cannot write around, verified by a second implementation and reproduced from source. A preregistered matched evaluation others can rerun. And the comparison that fell out of it: whether preloaded authenticated lineage beats on-demand retrieval turns on whether the model takes the retrieval. When it does, the two reach the same decisions and preloading saves the second call and its tokens; when it does not, preloading is the only thing that saves the same-number case. The lookup control corrected our starting hypothesis twice, in development and in the held-out set, where one model's lookup arm took its lookup in 13 of 120 offers and another's in 119. The post-hoc follow-up then closed the loop: requiring the lookup took gemma-4-31b-it from 68 to 120 of 120 at a median cost of 724 more tokens per case than preloading, and an independent DeepSeek cohort saw the same model take its optional lookup in 47 of 60 offers and fall to 51 of 60 where preloading stayed at 60.</p>
+<p><strong>Discussion.</strong> What is new is narrow. A tested multi-agent failure: stale evidence surviving a correction through summarization even when the number is unchanged. Its recovery under a gate agents cannot write around, verified by a second implementation and reproduced from source. A preregistered matched evaluation others can rerun. And the comparison that fell out of it: whether preloaded lineage beats on-demand retrieval turns on whether the model takes the retrieval, which the lookup control showed twice (13 of 120 offers taken on one model, 119 on another) and the post-hoc follow-up resolved: requiring the lookup took gemma-4-31b-it from 68 to 120 of 120 at a median 724 more tokens per case than preloading, and an independent DeepSeek cohort took its optional lookup in 47 of 60 offers and fell to 51 of 60 where preloading stayed at 60.</p>
 <p>The safety reading is in two parts. The gate is the part we would trust in deployment: across 5,400 registered slots on 5 models it saw 428 unsafe proposals and committed 0, and a read-only count of the evaluation branch accounts for every approval row. The model reviewer above it is the part to measure per model before trusting: the same preloaded lineage that lifted one model from 68 to 119 of 120 made it refuse more clean drafts, three models refused all or nearly all clean drafts under any unrelated notice, and one model's optional lookup went mostly untaken. A deterministic rule reading the same lineage never false-quarantined and never missed a stale draft; where the gate cannot see content (V10) the model still has a job, and that job should be measured per model and bounded by the rule.</p>
-<p><strong>What the structural tests add.</strong> The held-out cohorts measure the reviewer; the deterministic tests in 4.2 measure the substrate under the sprint's own questions. Under the naive board the intruder landed two spoofed identities, read a foreign thread, tampered and deleted; under the bound board every count is zero and the attempts are in the audit. Ten copies of one agent are ten identities on the naive board and one on the bound intake, silenced by one revocation, which is the motivating incident's 7,905 names reduced to the number of logins. And when one source is adjudicated, the closure walk blocks all sixty descendants three levels deep while a direct-dependency monitor passes forty of them. Those are not model results and need no per-model measurement; they hold by construction and were checked by execution.</p>
+<p><strong>What the structural tests add.</strong> The held-out cohorts measure the reviewer; the deterministic tests in 4.2 measure the substrate under the sprint's own questions, and they hold by construction: the intruder's six attacks have no effect and are all in the audit, ten copies of one agent are one revocable identity, and one adjudicated source blocks every descendant three deep where a direct-dependency monitor passes forty of sixty. Those need no per-model measurement.</p>
 <p><strong>Limitations.</strong> Appendix A gives the full list, as the sprint rules require. The three that bound the claims most: the operator is trusted and owns every function, so a compromised owner defeats every property; lineage is what the runtime delivered, not what the model relied on; and the tasks are known-answer inventory counts drawn from one template, so the intervals describe resampling of that template, not a task distribution.</p>
 <p><strong>Future work.</strong> An eager deterministic lookup that delivers lineage records before the model's first call, which removes the offered-versus-taken question and makes preloading redundant by construction. Identity per agent instance rather than per role login. A trusted gateway in front of the database, so that statements against objects an agent holds no privilege on, the one class of attempt the audit migration cannot see, become legible. Contention and throughput measurements rather than serialized race schedules. And, with the sponsor's fine-tuning platform, a reviewer adapted on these traces, evaluated under the same frozen protocol as a new cohort.</p>
 <h2>6. Conclusion</h2>

@@ -53,26 +53,31 @@ def main():
     related = pick(S, "7. Prior work").split("\n\nWhat is new is narrow.")[0]
     discussion_new = "What is new is narrow." + pick(S, "7. Prior work").split("\n\nWhat is new is narrow.")[1]
 
-    methods = ("### 3.1 The gate\n\n" + pick(S, "2. The gate") + "\n\n### 3.2 Experiment design\n\n" + pick(S, "3. Experiment design") +
+    gate_txt = pick(S, "2. The gate")
+    gate_txt = re.sub(r"\n&#91;embedded content:[^\n]*\n", "\n\n![Figure 0](figures/fig0_gate.png)\n\n*Figure 0. Permissions at the trust boundary. Agents hold one login and one direct write, a proposal the trigger binds to that login; every change to authoritative state goes through an operator-owned function callable only by the principals named in its box; agents read current records directly, and the lookup arm may fetch lineage records through one recorded request. Solid arrows are submissions or authorized writes, dashed arrows are reads or returned data.*\n", gate_txt)
+    design = pick(S, "3. Experiment design")
+    if os.path.exists("report/heldout_results/ARM_TABLE.md"):
+        i0 = design.index("| Arm | What the reviewer sees |"); i1 = design.index("\n\n", i0)
+        design = design[:i0] + open("report/heldout_results/ARM_TABLE.md", encoding="utf-8").read().strip() + "\n\n*Table 1. The six arms, pooled over the five held-out cohorts and three families (registered denominator 900 per arm). A model proposes; the gate decides. Unsafe proposals are approvals of a draft with invalid lineage or selections of a non-queued artifact; those that reached the gate were rejected on lineage, the rest were stopped before it.*" + design[i1:]
+    methods = ("### 3.1 The gate\n\n" + gate_txt + "\n\n### 3.2 Experiment design\n\n" + design +
                "\n\n### 3.3 Development findings that shaped the freeze\n\n" + pick(S, "4. Development findings"))
     results = pick(S, "5. Held-out results")
     fig1 = ("\n\n![Figure 1](figures/fig1_completion.png)\n\n*Figure 1. Completed correctly per arm on the same-number families (V6, V11) and clean-draft approval on the control (V1), five models, registered denominators. "
-            "Lineage preloaded (dark) and the deterministic rule (green) complete nearly every same-number case; the lookup arm (light blue) tracks how often the model took its lookup. On V1 three models refuse the clean draft in every model arm.*\n\n")
+            "The lookup arm tracks how often the model took its lookup; on V1 three models refuse the clean draft in every model arm.*\n\n")
     anchor = "**Primary: completion, compact vs lookup-offered.**"
     assert results.count(anchor) == 1
     results = results.replace(anchor, fig1.strip("\n") + "\n\n" + anchor)
     trace = pick(S, "6. One inspectable trace")
-    import os
     if os.path.exists("report/heldout_v2_results/SECTION.md"):
         results += "\n\n### 4.1 Follow-up cohorts run after the preregistered set (post-hoc, labeled)\n\n" + open("report/heldout_v2_results/SECTION.md", encoding="utf-8").read().strip()
     if os.path.exists("report/structural/SECTION.md"):
-        results += "\n\n### 4.2 Structural tests: containment, identity under copying, blast radius\n\n" + open("report/structural/SECTION.md", encoding="utf-8").read().strip() + ("\n\n![Figure 2](figures/fig2_structural.png)\n\n*Figure 2. Structural tests on the scratch branch, no model calls. Left: stale descendants blocked after one source is adjudicated, sixty descendants three deep. Middle: identities recorded for ten copies of one agent on one login. Right: attacks visible in the operator audit before and after the denial-logging migration.*")
+        results += "\n\n### 4.2 Structural tests: containment, identity under copying, blast radius\n\n" + open("report/structural/SECTION.md", encoding="utf-8").read().strip()
 
     discussion = f"""**Discussion.** {discussion_new}
 
 The safety reading is in two parts. The gate is the part we would trust in deployment: across {gate['slots']:,} registered slots on {n_models} models it saw {gate['unsafe_proposals']} unsafe proposals and committed {gate['unsafe_commits']}, and a read-only count of the evaluation branch accounts for every approval row. The model reviewer above it is the part to measure per model before trusting: the same preloaded lineage that lifted one model from 68 to 119 of 120 made it refuse more clean drafts, three models refused all or nearly all clean drafts under any unrelated notice, and one model's optional lookup went mostly untaken. A deterministic rule reading the same lineage never false-quarantined and never missed a stale draft; where the gate cannot see content (V10) the model still has a job, and that job should be measured per model and bounded by the rule.
 
-**What the structural tests add.** The held-out cohorts measure the reviewer; the deterministic tests in 4.2 measure the substrate under the sprint's own questions. Under the naive board the intruder landed two spoofed identities, read a foreign thread, tampered and deleted; under the bound board every count is zero and the attempts are in the audit. Ten copies of one agent are ten identities on the naive board and one on the bound intake, silenced by one revocation, which is the motivating incident's 7,905 names reduced to the number of logins. And when one source is adjudicated, the closure walk blocks all sixty descendants three levels deep while a direct-dependency monitor passes forty of them. Those are not model results and need no per-model measurement; they hold by construction and were checked by execution.
+**What the structural tests add.** The held-out cohorts measure the reviewer; the deterministic tests in 4.2 measure the substrate under the sprint's own questions, and they hold by construction: the intruder's six attacks have no effect and are all in the audit, ten copies of one agent are one revocable identity, and one adjudicated source blocks every descendant three deep where a direct-dependency monitor passes forty of sixty. Those need no per-model measurement.
 
 **Limitations.** Appendix A gives the full list, as the sprint rules require. The three that bound the claims most: the operator is trusted and owns every function, so a compromised owner defeats every property; lineage is what the runtime delivered, not what the model relied on; and the tasks are known-answer inventory counts drawn from one template, so the intervals describe resampling of that template, not a task distribution.
 

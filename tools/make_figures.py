@@ -17,7 +17,7 @@ arms = [("current", "no lineage"), ("current_lookup", "lookup offered"), ("compa
 colors = ["#b3b3b3", "#8fb8de", "#1f4e79", "#5aa9a3", "#2e7d32"]
 
 plt.rcParams.update({"font.family": "serif", "font.size": 8, "axes.spines.top": False, "axes.spines.right": False})
-fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.7), sharey=True)
+fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.25), sharey=True)
 for ax, fam, title in zip(axes, ["V6", "V11", "V1"], ["V6: same number, authority changed", "V11: same, no correction notice", "V1: clean draft, unrelated correction"]):
     x = range(len(order)); w = 0.16
     for j, (arm, lab) in enumerate(arms):
@@ -29,7 +29,7 @@ for ax, fam, title in zip(axes, ["V6", "V11", "V1"], ["V6: same number, authorit
     if fam != "V1":
         for i, k in enumerate(order):
             ar = C[k]["arm_rates"].get(f"{fam}/current_lookup")
-            if ar: ax.text(i, 1.045, f"lookup taken {ar['lookup_used']}/{ar['lookup_offered']}", ha="center", va="bottom", fontsize=5.2, color="#333")
+            if ar: ax.text(i, 1.045, f"{ar['lookup_used']}/{ar['lookup_offered']}", ha="center", va="bottom", fontsize=5.6, color="#333")
     ax.set_xticks(list(x)); ax.set_xticklabels([labels[k] for k in order], rotation=28, ha="right", fontsize=6.5)
     ax.set_ylim(0, 1.18); ax.set_title(title, fontsize=7.5, pad=10)
     ax.axhline(1.0, color="#999", linewidth=0.4, linestyle=":")

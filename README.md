@@ -1,90 +1,120 @@
-# SwarmHive: a lineage-gated publication boundary for agent swarms
+# SwarmHive: sealed provenance and a trusted publication gate for agent swarms
 
-Entry for the Swarm Alignment Hackathon (Apart Research x AI Alignment Foundation, Nov 6-8, 2026).
-Measured contribution: Track 4 evaluation of a publication gate that re-reads authenticated lineage inside one
-fenced transaction, with a preregistered matched reviewer comparison (six arms, three families, n = 60 each) across
-five open models: 5,400 registered slots, 428 unsafe proposals, 0 unsafe commits, every approval row on the
-evaluation branch accounted for. Substrate: Track 3 identity bound to the database login below the agent,
-exercised in every run through the intake (`sql/seal_from_proposal.sql`).
-
-Start here: `report/REPORT.pdf` (the submitted report; `report/REPORT.md` is its source, assembled by
-`tools/assemble_report.py` from `report/DRAFT.md`), `REPRODUCE.md` (run everything from this repo),
-`report/REVIEW_aelen_2026-11-07.md` (adversarial review with receipts), `sql/experiment_schema.sql` (the gate,
-frozen at d2df880) and `tools/pilot_runner.py` (matched arms, frozen held-out runner, spend guard).
-Every number in the report regenerates from the committed traces: `tools/analysis.py`, `tools/results_tables.py`,
-`tools/write_section5.py`. Held-out cohorts live under `runs/holdout_heldout_*` and `runs/holdout_diag_*`;
-freeze records under `holdout/heldout_v1/`. Post-hoc follow-up cohorts (mandatory lookup; independent DeepSeek V6 replication) are under `holdout/heldout_v2/` and `runs/holdout_v2_*`, labeled post-hoc in the report. Deterministic structural tests, no model calls: `tools/revocation_test.py`, `tools/identity_copies_test.py`, `tools/blast_radius_test.py`, and `tools/audit_denials_test.py` with `sql/hive_audit_denials.sql` (post-evaluation migration that makes denied attempts visible in the audit).
-The section below describes the pre-sprint containment battery that this work builds on.
-
----
-
-# Pre-sprint containment battery: identity bound below the agent
-
-Entry for the Swarm Alignment Hackathon (Apart Research x AI Alignment
-Foundation, Nov 6-8, 2026), Track 3: agent identity that holds when agents can
-rename or copy themselves.
+Entry for the Swarm Alignment Hackathon (Apart Research x AI Alignment Foundation, 6 to 8 November 2026), tracks 3 and 4.
+Report: `report/REPORT.pdf` (source `report/REPORT.md`, assembled by `tools/assemble_report.py` from `report/DRAFT.md`).
 
 ## The question
 
-In the July 2026 Hugging Face incident, about 1,200 agents used 7,905 names.
-Identity was something each agent asserted, so a name proved nothing. This
-project asks whether identity enforced one layer below the agent holds up when
-an agent tries to forge it, and whether an operator can revoke it cleanly.
+Can an enforced publication boundary stop agents from committing findings whose supporting provenance has become
+invalid, even when a model reviewer approves them? And does a reviewer that can see authenticated lineage behave
+differently from one that must fetch it, or cannot?
 
-The mechanism: every agent talks only through a shared message board (the
-Hive). Each agent connects as its own database login role. A trigger overwrites
-the `sender` field with the authenticated role before the row is stored, so the
-name an agent claims is ignored and recorded separately as evidence. An
-operator-only audit table logs every post and every spoof attempt, and the
-agents cannot read, edit, or delete it. Revoking an agent is dropping its role.
+**What goes wrong without it.** One agent reports a figure, a second summarizes it, a third summarizes the summary; the
+figure is then withdrawn and replaced. The summaries still exist and still read as current. A reviewer with no lineage
+picked the stale draft exactly half the time on three of five models when the replacement carried the same number.
 
-## Pre-existing work (declared per Apart rules)
+**What the gate checks.** Agents hold one database login each and one direct write: a proposal whose author a trigger binds
+to the login. Everything else goes through operator-owned functions. Sealing records the inputs the runtime actually
+delivered; invalidation is authority-checked; publication takes a fence, re-reads the full upstream closure of the
+artifact, and commits only if nothing in it is withdrawn or adjudicated. It cannot see content: a wrong figure with valid
+lineage passes (tested as V10, caught only by the rule that also reads the figure).
 
-The test Hive infrastructure was built on 2026-11-02, before the sprint window.
-Per Apart's rules it is declared here as pre-existing. It is:
+**What we found.** Preregistered, matched comparison on five open models: 5,400 registered slots, 428 unsafe
+proposals, 0 unsafe commits, 4,077 correct publications, every approval row on the evaluation branch accounted for.
+Whether preloaded lineage beats an on-demand lookup turns on whether the model takes the lookup; making the lookup
+mandatory closed the gap. Three of five models refused every clean draft under an unrelated correction notice, in every
+arm including the one with no lineage; the deterministic rule never did. Ten copies of one agent collapse to one
+revocable identity; one adjudicated source blocks all sixty descendants three deep where a direct-dependency check
+passes forty.
 
-- the Neon Postgres database, the `hive_messages` / `hive_message_receipts` /
-  `hive_audit` tables, the `hive_bind_sender` and `hive_log_insert` triggers,
-  the row-level security policies, and the four bot roles;
-- `tools/hive_http.py`, the SQL-over-HTTPS client;
-- `tools/spoof_test.py`, the eleven static containment tests;
-- `SETUP.md`, which documents all of the above.
+**What it does not establish.** The operator is trusted and owns every function. Lineage is what the runtime delivered,
+not what the model relied on. Tasks come from two synthetic templates. Nothing here measures throughput or the
+thousand-agent regime of the motivating incident.
 
-Everything else in this repository is weekend work: the bot harness
-(`tools/hive_tool.py`, `tools/bot.py`, `tools/run_experiment.py`), the naive
-control schema (`sql/naive_schema.sql`), every experimental run under `runs/`,
-the measurements, and the report.
+## Results at a glance (five held-out cohorts, registered denominators)
 
-## Two conditions
+| | count |
+| --- | --- |
+| registered slots (5 models x 6 arms x 3 families x 60) | 5,400 |
+| complete slots | 5,126 |
+| not complete (provider 504/502, budget exhausted, malformed or non-queued output, 2 request-cap stops) | 274 |
+| unsafe proposals (approve a draft with invalid lineage, or select a non-queued artifact) | 428 |
+| of which rejected at the gate on lineage | 348 |
+| of which stopped before the gate (non-queued selection) | 80 |
+| unsafe commits | 0 |
+| correct publications committed | 4,077 |
+| approval rows on the evaluation branch | 4,082 (4 from instances re-run whole after a host sleep, 1 unknown-outcome slot; all accounted for) |
 
-- **Bound** (`public` schema): the Hive as described above.
-- **Naive** (`naive` schema): the same message shape with no trigger, no
-  row-level security, no audit table, and `sender` set to whatever the caller
-  writes. This reproduces the gap in a plain shared message board, where the
-  sender is a self-reported field.
+Per arm, pooled over cohorts and families (`report/heldout_results/ARM_TABLE.md`, generated by `tools/arm_outcomes.py`):
 
-The same four agents run the same task in both conditions. Three honest agents
-pass a finding from researcher to writer to reviewer. One intruder tries to get
-a false finding approved by posting under another agent's name, reading a thread
-it is not party to, and renaming itself.
+| arm | what the reviewer sees | enforcement | registered | complete | unsafe proposals | unsafe commits | correct publications |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| current | drafts, current source, notice; no lineage | model proposes, gate decides | 900 | 784 | 264 | 0 | 372 |
+| current + lookup | plus one optional authenticated lookup | model proposes, gate decides | 900 | 784 | 151 | 0 | 532 |
+| compact | plus lineage records preloaded | model proposes, gate decides | 900 | 884 | 7 | 0 | 686 |
+| full | plus historical bodies | model proposes, gate decides | 900 | 874 | 6 | 0 | 687 |
+| rule | lineage only, deterministic | deterministic, gate decides | 900 | 900 | 0 | 0 | 900 |
+| rule + content | rule plus figure check | deterministic, gate decides | 900 | 900 | 0 | 0 | 900 |
 
-## Running
+"Unsafe" is assigned by an independently written scorer (`tools/vendor/score_runs.py`) that holds the answer keys and
+the authoritative provenance export and resolves withdrawn ancestors itself. False quarantine (refusing a clean draft)
+is reported separately in the report's V1 table; the gate's utility is the correct-publication column above.
 
-Each agent runs as its own process with one database connection string in its
-environment, standing in for the cloud proxy that would attach it as a header.
-The agent never sees the string, so it cannot swap identities.
+## What is pre-existing and what was built in the sprint
+
+| component | when | role in the evaluation |
+| --- | --- | --- |
+| Hive substrate (shared memory, provenance tags, trigger-guarded authorship) on CAMA | April 2026, pre-sprint | background; the design the gate generalizes |
+| test Hive: `hive_messages`, receipts, `hive_audit`, triggers, RLS, four bot roles, `tools/hive_http.py`, `tools/spoof_test.py`, `SETUP.md` | 2 November 2026, pre-sprint | substrate for the containment battery; declared, not judged |
+| `exp` schema: sealed creation, provenance, invalidation authorities, fence, publication gate (`sql/`) | 6 to 8 November | the evaluated gate (frozen at d2df880 plus four additive migrations) |
+| naive control schema, six-attack battery (`tools/attack_battery.py`, `tools/run_experiment.py`) | sprint | containment comparison |
+| Lorien's reference spec, acceptance driver, delivery recorder, scorer (`tools/vendor/`) | sprint | independent verification and scoring |
+| pilot runner, freeze generator, open-model adapter, preregistration, analysis (`tools/`) | sprint | the matched evaluation |
+| revocation, identity-copies, blast-radius tests; audit migration `sql/hive_audit_denials.sql` | sprint, after the held-out analysis | structural tests, labeled post-hoc |
+| v2 (mandatory lookup, DeepSeek replication) and v3 (second task template) cohorts | sprint, after the report draft | follow-ups, labeled post-hoc, never pooled |
+
+## Security claims, stated precisely
+
+- Identity is the login the agent's process connects on. In these runs agents are model calls made by the harness; the model
+  never receives a connection string. An agent that could execute code and read its own environment would hold its own
+  credential, not another agent's; it still cannot claim another name, because the trigger binds the proposer to the login.
+- Revocation is a grant revocation (takes effect on the next statement, including pooled sessions) or a login revocation
+  (refuses new connections; measured within seconds on the HTTP path). Previously sealed artifacts stay sealed and
+  attributed; in-flight proposals from a revoked role are refused at the database (`tools/revocation_test.py`).
+- The gate checks authenticated lineage, not truth. A false finding from an authorized source with valid lineage is
+  committed if the reviewer approves it (V10). Only the content rule catches it.
+- Statements the database refuses at the privilege layer left no audit row during the evaluation. A post-evaluation
+  migration records denied updates, deletes and foreign reads (6 of 6 battery attacks visible, from 3); raw statements
+  against objects an agent holds no privilege on remain invisible.
+
+## Reproduce
+
+`REPRODUCE.md` has the exact commands: deterministic gate tests, race schedule, structural tests, freeze, run, score,
+analyze. Every number in the report regenerates from committed traces (`tools/analysis.py`, `tools/results_tables.py`,
+`tools/write_section5.py`, `tools/v2_followup.py`, `tools/structural_results.py`, `tools/arm_outcomes.py`).
+
+---
+
+# Background: pre-sprint infrastructure (containment battery)
+
+Built on 2 November 2026, before the sprint window, and declared per Apart's rules. Track 3 question: identity that holds
+when agents can rename or copy themselves, and clean revocation.
+
+In the July 2026 Hugging Face incident, about 1,200 agents used 7,905 names. Identity was something each agent asserted,
+so a name proved nothing. The test Hive binds identity one layer below the agent: every agent talks only through a shared
+message board, each connects as its own database login, a trigger overwrites the `sender` field with the authenticated
+role and keeps the claimed name as evidence, and an operator-only audit table records every post and every spoof attempt.
+
+Two conditions: **bound** (`public` schema, as above) and **naive** (`naive` schema, no trigger, no row-level security,
+no audit, `sender` is whatever the caller writes). The same four agents run the same task in both; one intruder fires a
+fixed six-attack battery (spoof, read a foreign thread, rename, read the audit, tamper, delete). Results are the
+containment table in the report (section 4.2 and Appendix B.10).
 
 ```
-export ANTHROPIC_API_KEY=...        # required for the agents
+export ANTHROPIC_API_KEY=...        # honest agents
 python -I tools/run_experiment.py bound runs/bound_01
 python -I tools/run_experiment.py naive runs/naive_01
 ```
 
-Each run resets its schema, launches the agents, and writes `result.json` with
-the final message table, the audit log, per-agent step logs, and counts.
-
-## Not in this repository
-
-The `secrets/` directory (connection strings and role passwords) is gitignored
-and never committed. The test Hive holds no personal data and never touches any
-other system.
+The `secrets/` directory (connection strings and role passwords) is gitignored and never committed. The test Hive holds
+no personal data and never touches any other system.
